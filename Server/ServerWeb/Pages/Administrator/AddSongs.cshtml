@@ -1,0 +1,47 @@
+﻿@page
+@model ServerWeb.Pages.Administrator.AddSongsModel
+@{
+    ViewData["Title"] = "Add Songs";
+}
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-musical-note" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Add Song</h4>
+    <div class="text-center">
+    </div>
+</div>
+
+<div class="container" style="width:50%">
+    <form method="post" enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label asp-for="SongInput.SongName" class="form-label"></label>
+            <input type="text" class="form-control" asp-for="SongInput.SongName">
+            <span asp-validation-for="SongInput.SongName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SongInput.ArtistName" class="form-label"></label>
+            <input type="text" class="form-control" asp-for="SongInput.ArtistName">
+            <span asp-validation-for="SongInput.ArtistName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="SongInput.ImageFile" class="form-label"></label>
+            <input class="form-control" asp-for="SongInput.ImageFile" >
+            <span asp-validation-for="SongInput.ImageFile" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="SongInput.SongFile" class="form-label"></label>
+            <input class="form-control" asp-for="SongInput.SongFile" >
+            <span asp-validation-for="SongInput.SongFile" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Song</button>
+    </form>
+</div>
+
+
+
+
+

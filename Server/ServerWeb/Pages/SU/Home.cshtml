@@ -1,0 +1,53 @@
+﻿@page
+@using Components
+@model ServerWeb.Pages.SU.HomeModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+
+
+<div class="container" style="position:absolute; top:15%;">
+    <div class="row align-items-center h-100">
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-shield" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Super Users</h3>
+            <div class="text-center">
+                <h1>@Model.NumberOfSuperUsers</h1>
+                <a asp-page="/SU/SuperUserRole" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-person" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Administrators</h3>
+            <div class="text-center">
+                <h1>@Model.NumberOfAdministrators</h1>
+                <a asp-page="/SU/AdministratorRole" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-cog" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Engine Administrators</h3>
+            <div class="text-center">
+                <h1>@Model.NumberOfEngineAdministrators</h1>
+                <a asp-page="/SU/EngineAdministratorRole" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-people" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Users</h3>
+            <div class="text-center">
+                <h1>@Model.NumberOfUsers</h1>
+                <a asp-page="/SU/UserRole" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+    </div>
+</div>

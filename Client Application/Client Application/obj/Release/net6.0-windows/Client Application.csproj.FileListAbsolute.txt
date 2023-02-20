@@ -1,0 +1,135 @@
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.exe
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.deps.json
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.runtimeconfig.json
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.AssemblyReference.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\App.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.lref
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.g.resources
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfoInputs.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfo.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.CoreCompileInputs.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\refint\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.genruntimeconfig.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\ref\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll.config
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\App.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.exe
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll.config
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.deps.json
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.runtimeconfig.json
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.AssemblyReference.cache
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.g.cs
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\App.g.cs
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.cache
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.lref
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\App.baml
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.baml
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.g.resources
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfoInputs.cache
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfo.cs
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.CoreCompileInputs.cache
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\refint\Client Application.dll
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.genruntimeconfig.cache
+C:\Users\Emiliano\Desktop\Diploma Thesis - Emiliano Xhukellari\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\ref\Client Application.dll
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.exe
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll.config
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.deps.json
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.runtimeconfig.json
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.AssemblyReference.cache
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.g.cs
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\App.g.cs
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.cache
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.lref
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\App.baml
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.baml
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.g.resources
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfoInputs.cache
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfo.cs
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.CoreCompileInputs.cache
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\refint\Client Application.dll
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.genruntimeconfig.cache
+C:\Users\Emiliano\Desktop\Xhukellari-DT\Audio Streaming Service\Client Application\Client Application\obj\Release\net6.0-windows\ref\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.exe
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll.config
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.deps.json
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.runtimeconfig.json
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.AssemblyReference.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\App.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.lref
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\App.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.g.resources
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfoInputs.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfo.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.CoreCompileInputs.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\refint\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.genruntimeconfig.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0\Client Application\Client Application\obj\Release\net6.0-windows\ref\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.exe
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll.config
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.deps.json
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.runtimeconfig.json
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\bin\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.AssemblyReference.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\App.g.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application_MarkupCompile.lref
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\App.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\MainWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\AddPlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\UserWindows\RenamePlaylistWindow.baml
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.g.resources
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfoInputs.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.AssemblyInfo.cs
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.csproj.CoreCompileInputs.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\refint\Client Application.dll
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.pdb
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\Client Application.genruntimeconfig.cache
+C:\Users\Emiliano\Desktop\Audio Streaming Service 2.0 - Copy\Client Application\Client Application\obj\Release\net6.0-windows\ref\Client Application.dll

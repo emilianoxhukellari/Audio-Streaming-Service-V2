@@ -1,0 +1,18 @@
+﻿@page
+@model ServerWeb.Pages.SU.AdministratorRoleModel
+@{
+    ViewData["Title"] = "Administrators";
+}
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-person" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Administrators</h4>
+    <div class="text-center">
+    </div>
+</div>
+
+<div class="mt-4">
+    <component type="typeof(Components.UserSearch)" render-mode="ServerPrerendered" param-CurrentUserSearch='"Administrator"' />
+</div>

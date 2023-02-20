@@ -1,0 +1,33 @@
+﻿@page
+@model ServerWeb.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-sm-12 col-md-12 col-lg-4">
+            <h1 class="mb-3">Login</h1>
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Login.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <label asp-for="Login.Email" class="form-label"></label>
+                    <span asp-validation-for="Login.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Login.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <label asp-for="Login.Password" class="form-label"></label>
+                    <span asp-validation-for="Login.Password" class="text-danger"></span>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" asp-for="Login.RememberMe" class="form-check-input"/>
+                    <label class="form-check-label" asp-for="Login.RememberMe"></label>
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

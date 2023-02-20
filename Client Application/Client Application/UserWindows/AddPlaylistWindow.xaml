@@ -1,0 +1,15 @@
+﻿<Window x:Class="Client_Application.AddPlaylistWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client_Application"
+        mc:Ignorable="d"
+        Name ="addNewPlaylist" Title="Create New Playlist" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid>
+        <TextBox x:Name="newPlaylistTextbox" HorizontalAlignment="Left" Margin="78,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="148"/>
+        <Button x:Name="createNewPlaylistButton" Content="Create" HorizontalAlignment="Left" Margin="94,83,0,0" VerticalAlignment="Top" Width="40" Height="20" Click="createNewPlaylistButton_Click"/>
+        <Button x:Name="cancelCreateNewPlaylistButton" Content="Cancel" HorizontalAlignment="Left" Margin="166,83,0,0" VerticalAlignment="Top" Width="40" Height="20" Click="cancelCreateNewPlaylistButton_Click"/>
+
+    </Grid>
+</Window>

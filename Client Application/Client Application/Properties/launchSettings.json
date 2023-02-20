@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Client Application": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

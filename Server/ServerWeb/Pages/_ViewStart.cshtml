@@ -1,0 +1,22 @@
+﻿@{
+    if(User.IsInRole("SU"))
+    {
+        Layout = "SU/_LayoutSU";
+    }
+    else if (User.IsInRole("Administrator"))
+    {
+        Layout = "Administrator/_LayoutAdministrator";
+    }
+    else if(User.IsInRole("EngineAdministrator"))
+    {
+        Layout = "EngineAdministrator/_LayoutEngineAdministrator";
+    }
+    else if(User.IsInRole("User"))
+    {
+        Layout = "User/_LayoutUser";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+}

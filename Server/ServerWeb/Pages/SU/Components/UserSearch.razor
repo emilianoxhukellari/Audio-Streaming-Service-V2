@@ -1,0 +1,133 @@
+﻿@inject UserControlService UserControlService
+
+<div class="d-flex justify-content-center">
+    <div style="width: 40%; margin-right: 50px">
+        <div class="d-flex justify-content-between my-3">
+            <h3>Current Users</h3>
+            <div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" @bind="SearchTermCurrent" placeholder="Search users by email">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" style="margin-left: 8px;" onclick="@SearchCurrentUsers">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Controls</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in CurrentUsers)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>
+                            <div class="d-flex">
+                                <button class="btn btn-danger" onclick="@(() => RemoveFromRole(user.Email))">Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div style="width: 40%">
+        <div class="d-flex justify-content-between my-3">
+            <h3>Add User To Role</h3>
+            <div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" @bind="SearchTermOther" placeholder="Search users by email">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" style="margin-left: 8px;" onclick="@SearchOtherUsers">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Controls</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in OtherUsers)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>
+                            <div class="d-flex">
+                                <button class="btn btn-secondary mr-2" onclick="@(() => AddToRole(user.Email))">Add</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+
+    private string SearchTermCurrent { get; set; }
+    private string SearchTermOther { get; set; }
+    private List<IdentityUser> CurrentUsers { get; set; } = new List<IdentityUser>();
+    private List<IdentityUser> OtherUsers { get; set; } = new List<IdentityUser>();
+
+    [Parameter]
+    public string CurrentUserSearch { get; set; }
+
+    private async Task SearchCurrentUsers()
+    {
+        if (SearchTermCurrent != null && SearchTermCurrent != String.Empty)
+        {
+            CurrentUsers = await UserControlService.GetUsersInRoleMatch(CurrentUserSearch, SearchTermCurrent);
+        }
+        else
+        {
+            CurrentUsers = await UserControlService.GetAllUsersInRole(CurrentUserSearch);
+        }
+    }
+
+    private async Task SearchOtherUsers()
+    {
+        if (SearchTermOther != null && SearchTermOther != String.Empty)
+        {
+            OtherUsers = await UserControlService.GetUsersNotInRoleMatch(CurrentUserSearch, SearchTermOther);
+        }
+        else
+        {
+            OtherUsers = await UserControlService.GetAllUsersNotInRole(CurrentUserSearch);
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
+        await SearchOtherUsers();
+        await SearchCurrentUsers();
+        StateHasChanged();
+    }
+
+    private async Task RemoveFromRole(string email)
+    {
+        var result = await UserControlService.RemoveUserFromRoleAsync(email);
+        Console.WriteLine(result);
+        await RefreshAsync();
+    }
+
+    private async Task AddToRole(string email)
+    {
+        var result = await UserControlService.ChangeUserRoleToAsync(email, CurrentUserSearch);
+        Console.WriteLine(result);
+        await RefreshAsync();
+    }
+}
+
+
+

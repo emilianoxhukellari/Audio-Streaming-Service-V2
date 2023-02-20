@@ -273,7 +273,7 @@ namespace Client_Application.WaveOut
             while (true)
             {
                 _buffersQueuedFlag.WaitOne();
-                Thread.Sleep(200);
+                Thread.Sleep(200); // Give time to properly open the waveform-audio output device for playback before sending buffers
 
                 while (true)
                 {

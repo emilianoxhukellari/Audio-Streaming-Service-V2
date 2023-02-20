@@ -3435,11 +3435,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service 2.0\\Server\\DataAccess\\DataAccess.csproj",
+      "projectUniqueName": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service V2\\Server\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
-      "projectPath": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service 2.0\\Server\\DataAccess\\DataAccess.csproj",
+      "projectPath": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service V2\\Server\\DataAccess\\DataAccess.csproj",
       "packagesPath": "C:\\Users\\Emiliano\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service 2.0\\Server\\DataAccess\\obj\\",
+      "outputPath": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service V2\\Server\\DataAccess\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

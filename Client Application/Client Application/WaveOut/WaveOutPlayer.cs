@@ -213,6 +213,9 @@ namespace Client_Application.WaveOut
             }
         }
 
+        /// <summary>
+        /// Waits for active buffers to finish. Must not call waveOutClose before all the buffers have been returned.
+        /// </summary>
         private void WaitForBuffersToFinish()
         {
             while (_activeBuffers > 0)

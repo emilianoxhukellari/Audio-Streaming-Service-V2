@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iqj+ZL7BJV6fK9PYybdJLbpNmPOpc3MJdM+sw80wNj5r1If8Roa+bwodWmbWFDGixIn/vPNwsCc/MpR37HvnKw==",
+  "dgSpecHash": "5doLD0WcS/EyBtLc217YT913VneYz2Kzu/TjKB9itJjGD5mS2OCGsw3VXVHKp0PdaBKhfEAtGMJva6v8xvwg9Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service 2.0\\Server\\AudioEngine\\AudioEngine.csproj",
+  "projectFilePath": "C:\\Users\\Emiliano\\Desktop\\Audio Streaming Service V2\\Server\\AudioEngine\\AudioEngine.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Emiliano\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\Emiliano\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

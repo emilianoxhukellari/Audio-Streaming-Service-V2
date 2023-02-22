@@ -256,8 +256,8 @@ namespace Client_Application.Client
                     byte[] requestSongIdBytes = BitConverter.GetBytes(requestSongId);
                     lock (_lock)
                     {
-                        _dualSocket.MediaPlayerStreamSSL.SendSSL(MOD1, 4);
-                        _dualSocket.MediaPlayerStreamSSL.SendSSL(requestSongIdBytes, 4);
+                        _dualSocket.StreamingSSL.SendSSL(MOD1, 4);
+                        _dualSocket.StreamingSSL.SendSSL(requestSongIdBytes, 4);
                     }
                     StartReceiveData();
                     _preparedFlag.WaitOne();
@@ -462,9 +462,9 @@ namespace Client_Application.Client
                 int toPacket = end;
                 byte[] toPacketBytes = BitConverter.GetBytes(toPacket);
                 TerminateReceive();
-                _dualSocket.MediaPlayerStreamSSL.SendSSL(MOD2, 4);
-                _dualSocket.MediaPlayerStreamSSL.SendSSL(fromPacketBytes, 4);
-                _dualSocket.MediaPlayerStreamSSL.SendSSL(toPacketBytes, 4);
+                _dualSocket.StreamingSSL.SendSSL(MOD2, 4);
+                _dualSocket.StreamingSSL.SendSSL(fromPacketBytes, 4);
+                _dualSocket.StreamingSSL.SendSSL(toPacketBytes, 4);
                 StartReceiveData();
             }
         }
@@ -484,24 +484,24 @@ namespace Client_Application.Client
                 bool receivedAll = true;
                 try
                 {
-                    mode = _dualSocket.MediaPlayerStreamSSL.ReceiveSSL(4);
+                    mode = _dualSocket.StreamingSSL.ReceiveSSL(4);
 
                     if (Enumerable.SequenceEqual(mode, MOD1))
                     {
-                        byte[] waveHeader = _dualSocket.MediaPlayerStreamSSL.ReceiveSSL(44);
+                        byte[] waveHeader = _dualSocket.StreamingSSL.ReceiveSSL(44);
                         _audioStream.Prepare(waveHeader);
                         _waveOutPlayer.Prepare(_audioStream.Format);
                         _preparedFlag.Set();
                     }
 
-                    byte[] packetCountBytes = _dualSocket.MediaPlayerStreamSSL.ReceiveSSL(4);
+                    byte[] packetCountBytes = _dualSocket.StreamingSSL.ReceiveSSL(4);
                     int packetCount = BitConverter.ToInt32(packetCountBytes);
                     for (int i = 0; i < packetCount; i++) // Receive all packets unless terminated. Termination comes as command from server
                     {
-                        currentType = _dualSocket.MediaPlayerStreamSSL.ReceiveSSL(4);
+                        currentType = _dualSocket.StreamingSSL.ReceiveSSL(4);
                         if (Enumerable.SequenceEqual(currentType, DATA))
                         {
-                            packet = _dualSocket.MediaPlayerStreamSSL.ReceiveSSL(4096);
+                            packet = _dualSocket.StreamingSSL.ReceiveSSL(4096);
                             Buffer.BlockCopy(packet, 0, indexBytes, 0, 4);
                             Buffer.BlockCopy(packet, 4, data, 0, 4092);
                             _audioStream.ReceivePacket(data, BitConverter.ToInt32(indexBytes));

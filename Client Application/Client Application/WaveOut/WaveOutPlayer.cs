@@ -333,15 +333,15 @@ namespace Client_Application.WaveOut
 
         private void Recover()
         {
-            new Task(() =>
+            Task.Run(() =>
             {
                 _bufferDoneFlag.Set();
-            }).Start();
-            new Task(() =>
+            });
+            Task.Run(() =>
             {
                 Prepare(_lastWaveFormat);
                 Play();
-            }).Start();
+            });
         }
 
         private void DisposeBuffers()

@@ -23,8 +23,8 @@ namespace Client_Application.Client
     /// 
     public sealed class DualSocket
     {
-        public SslClient MediaPlayerStreamSSL { get; private set; }
-        public SslClient ControllerStreamSSL { get; private set; }
+        public SslClient StreamingSSL { get; private set; }
+        public SslClient CommunicationSSL { get; private set; }
         public bool Connected
         {
             get { return _connected; }
@@ -32,113 +32,109 @@ namespace Client_Application.Client
         }
 
         private volatile bool _connected;
-        private volatile bool _controllerConnected;
-        private volatile bool _mediaPlayerConnected;
+        private volatile bool _communicationConnected;
+        private volatile bool _streamingConnected;
         private readonly ManualResetEvent _reconnectFlag;
-        private readonly ManualResetEvent _controllerConnectedFlag;
-        private readonly ManualResetEvent _mediaPlayerConnectedFlag;
+        private readonly ManualResetEvent _communicationConnectedFlag;
+        private readonly ManualResetEvent _streamingConnectedFlag;
         private readonly string _clientId;
-        private readonly IPEndPoint _controllerIPE;
-        private readonly IPEndPoint _mediaPlayerIPE;
-        private readonly Task _connectionTaskController;
-        private readonly Task _connectionTaskMediaPlayer;
+        private readonly IPEndPoint _communicationIPE;
+        private readonly IPEndPoint _streamingIPE;
+        private readonly Task _connectionTaskCommunication;
+        private readonly Task _connectionTaskStreaming;
         private readonly CallbackRecoverSession RecoverSession;
         private readonly CallbackConnectionStateUpdate ConnectionStateUpdate;
         private readonly object _lockDisconnected = new object();
         private readonly object _lockConnected = new object();
 
-        public DualSocket(IPEndPoint controllerIPE, 
-            IPEndPoint mediaPlayerIPE, 
-            string clientId, 
+        public DualSocket(IPEndPoint communicaitonIPE,
+            IPEndPoint streamingIPE,
+            string clientId,
             CallbackRecoverSession callbackSessionRecover,
             CallbackConnectionStateUpdate callbackConnectionStateUpdate)
         {
-            _mediaPlayerIPE = mediaPlayerIPE;
-            _controllerIPE = controllerIPE;
+            _streamingIPE = streamingIPE;
+            _communicationIPE = communicaitonIPE;
 
-            _controllerIPE = controllerIPE;
-            _mediaPlayerIPE = mediaPlayerIPE;
+            _communicationIPE = communicaitonIPE;
+            _streamingIPE = streamingIPE;
             _reconnectFlag = new ManualResetEvent(false);
-            _controllerConnectedFlag = new ManualResetEvent(false);
-            _mediaPlayerConnectedFlag = new ManualResetEvent(false);
+            _communicationConnectedFlag = new ManualResetEvent(false);
+            _streamingConnectedFlag = new ManualResetEvent(false);
             _clientId = clientId;
 
-            MediaPlayerStreamSSL = new SslClient(_mediaPlayerIPE);
-            ControllerStreamSSL = new SslClient(_controllerIPE);
+            StreamingSSL = new SslClient(_streamingIPE);
+            CommunicationSSL = new SslClient(_communicationIPE);
 
-            _connectionTaskMediaPlayer = new Task(ConnectToServerMediaPlayer);
-            _connectionTaskController = new Task(ConnectToServerController);
-            _connectionTaskMediaPlayer.Start();
-            _connectionTaskController.Start();
+            _connectionTaskStreaming= new Task(ConnectToServerStreaming);
+            _connectionTaskCommunication = new Task(ConnectToServerCommunication);
+            _connectionTaskStreaming.Start();
+            _connectionTaskCommunication.Start();
             RecoverSession = callbackSessionRecover;
             ConnectionStateUpdate = callbackConnectionStateUpdate;
-            _reconnectFlag.Set();
         }
 
         ~DualSocket()
         {
-            MediaPlayerStreamSSL?.Dispose();
-            ControllerStreamSSL?.Dispose();    
+            StreamingSSL?.Dispose();
+            CommunicationSSL?.Dispose();
         }
 
         public void ForceDisconnect()
         {
-            MediaPlayerStreamSSL.ForceDisconnect();
-            ControllerStreamSSL.ForceDisconnect();
+            StreamingSSL.ForceDisconnect();
+            CommunicationSSL.ForceDisconnect();
         }
 
         public void Reconnect()
         {
-            _controllerConnectedFlag.Reset();
-            _mediaPlayerConnectedFlag.Reset();
+            _communicationConnectedFlag.Reset();
+            _streamingConnectedFlag.Reset();
             _reconnectFlag.Set();
-            new Task(() =>
+            Task.Run(() =>
             {
-                _controllerConnectedFlag.WaitOne();
-                _mediaPlayerConnectedFlag.WaitOne();
+                _communicationConnectedFlag.WaitOne();
+                _streamingConnectedFlag.WaitOne();
                 RecoverSession();
-            }).Start();
+            });
         }
 
         public void Connect()
         {
-            _controllerConnectedFlag.Reset();
-            _mediaPlayerConnectedFlag.Reset();
+            _communicationConnectedFlag.Reset();
+            _streamingConnectedFlag.Reset();
             _reconnectFlag.Set();
-            _controllerConnectedFlag.WaitOne();
-            _mediaPlayerConnectedFlag.WaitOne();
+            _communicationConnectedFlag.WaitOne();
+            _streamingConnectedFlag.WaitOne();
         }
 
-        private void ConnectToServerController()
+        private void ConnectToServerCommunication()
         {
             while (true)
             {
                 _reconnectFlag.WaitOne();
-                ControllerStreamSSL?.Dispose();
-                ControllerStreamSSL = new SslClient(_controllerIPE);
-
+                CommunicationSSL?.Dispose();
+                CommunicationSSL = new SslClient(_communicationIPE);
                 lock (_lockDisconnected)
                 {
-                    _controllerConnected = false;
-                    if(!_controllerConnected && !_mediaPlayerConnected)
+                    _communicationConnected = false;
+                    if (!_communicationConnected && !_streamingConnected)
                     {
-                        Trace.WriteLine("DISCONNECTED");
                         Connected = false;
                     }
                 }
-
                 while (true)
                 {
                     try
                     {
-                        ControllerStreamSSL.Connect(_controllerIPE);
-                        ControllerStreamSSL.InitializeSSL();
-                        ControllerStreamSSL.SendSSL(Encoding.UTF8.GetBytes(_clientId), 6);
-                        _controllerConnectedFlag.Set();
-                        lock(_lockConnected)
+                        CommunicationSSL.Connect(_communicationIPE);
+                        CommunicationSSL.InitializeSSL();
+                        CommunicationSSL.SendSSL(Encoding.UTF8.GetBytes(_clientId), 6);
+                        _communicationConnectedFlag.Set();
+                        lock (_lockConnected)
                         {
-                            _controllerConnected = true;
-                            if(_controllerConnected && _mediaPlayerConnected)
+                            _communicationConnected = true;
+                            if (_communicationConnected && _streamingConnected)
                             {
                                 Connected = true;
                             }
@@ -151,35 +147,34 @@ namespace Client_Application.Client
             }
         }
 
-        private void ConnectToServerMediaPlayer()
+        private void ConnectToServerStreaming()
         {
             while (true)
             {
                 _reconnectFlag.WaitOne();
-                MediaPlayerStreamSSL?.Dispose();
-                MediaPlayerStreamSSL = new SslClient(_mediaPlayerIPE);
+                StreamingSSL?.Dispose();
+                StreamingSSL = new SslClient(_streamingIPE);
                 lock (_lockDisconnected)
                 {
-                    _mediaPlayerConnected = false;
-                    if (!_controllerConnected && !_mediaPlayerConnected)
+                    _streamingConnected = false;
+                    if (!_communicationConnected && !_streamingConnected)
                     {
-                        Trace.WriteLine("DISCONNECTED");
                         Connected = false;
                     }
                 }
-
                 while (true)
                 {
                     try
                     {
-                        MediaPlayerStreamSSL.Connect(_mediaPlayerIPE);
-                        MediaPlayerStreamSSL.InitializeSSL();
-                        MediaPlayerStreamSSL.SendSSL(Encoding.UTF8.GetBytes(_clientId), 6);
-                        _mediaPlayerConnectedFlag.Set();
+                        StreamingSSL.Connect(_streamingIPE);
+                        StreamingSSL.InitializeSSL();
+                        StreamingSSL.SendSSL(Encoding.UTF8.GetBytes(_clientId), 6);
+                        _streamingConnectedFlag.Set();
+                                Trace.WriteLine("STREAMING CONNECTED");
                         lock (_lockConnected)
                         {
-                            _mediaPlayerConnected = true;
-                            if (_controllerConnected && _mediaPlayerConnected)
+                            _streamingConnected = true;
+                            if (_communicationConnected && _streamingConnected)
                             {
                                 Connected = true;
                             }

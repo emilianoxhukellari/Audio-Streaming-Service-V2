@@ -37,8 +37,10 @@ namespace Client_Application
         WindowReady,
         UpdateRememberMe,
         LogOut,
+        LogIn,
         ResetWindow,
-        UpdateConnectionState
+        UpdateConnectionState,
+        SearchSongOrArtist
     }
 
     public enum LogInState

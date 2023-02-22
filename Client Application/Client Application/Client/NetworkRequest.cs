@@ -6,8 +6,8 @@ namespace Client_Application.Client
     {
         SearchSongOrArtist,
         TerminateSongDataReceive,
-        LogIn,
-        Disconnect
+        Disconnect,
+        AuthenticateToServer
     }
 
     /// <summary>

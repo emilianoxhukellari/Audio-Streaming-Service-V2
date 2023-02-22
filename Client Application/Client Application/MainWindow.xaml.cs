@@ -680,7 +680,7 @@ namespace Client_Application
                     rememberMe = false;
                 }
 
-                new ClientEvent(EventType.NetworkRequest, true, NetworkRequestType.LogIn, email, password, rememberMe);
+                new ClientEvent(EventType.LogIn, true, email, password, rememberMe);
             }
         }
 

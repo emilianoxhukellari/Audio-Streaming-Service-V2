@@ -20,6 +20,9 @@ namespace Client_Application.Client
     {
         // ATTRIBUTES
         private MediaPlayer _mediaPlayer;
+        private CommunicationManager _communicationManager;
+        private AuthenticationManager _authenticationManager;
+
         private readonly ClientListener _clientListener;
         private ProgressBarState _progressBarState;
         private readonly string _playlistsRelateivePath;
@@ -42,7 +45,6 @@ namespace Client_Application.Client
 
         // THREADS AND TASKS
         private readonly Thread _internalRequestThread;
-        private readonly Thread _communicationThread;
         private readonly Task _progressTask;
         // THREADS AND TASKS
 
@@ -60,18 +62,18 @@ namespace Client_Application.Client
             _IP = IPAddress.Parse(_host);
             _controllerIPE = new IPEndPoint(_IP, _portCommunication);
             _mediaPlayerIPE = new IPEndPoint(_IP, _portStreaming);
-            _dualSocket = new DualSocket(_controllerIPE, 
-                _mediaPlayerIPE, 
-                _clientId, 
+            _dualSocket = new DualSocket(_controllerIPE,
+                _mediaPlayerIPE,
+                _clientId,
                 new CallbackRecoverSession(RecoverSession),
                 new CallbackConnectionStateUpdate(ConnectionStateUpdate));
+            _communicationManager = CommunicationManager.InitializeSingleton(_dualSocket);
+            _authenticationManager = AuthenticationManager.InitializeSingleton();
 
             _playlistsRelateivePath = Config.Config.GetPlaylistsRelativePath();
             _currentPlaylist = "";
             _internalRequestThread = new Thread(InternalRequestLoop);
             _internalRequestThread.IsBackground = true;
-            _communicationThread = new Thread(CommunicationLoop);
-            _communicationThread.IsBackground = true;
             _progressTask = new Task(ProgressLoop);
             _newNetworkRequestFlag = new AutoResetEvent(false);
             _newInternalRequestFlag = new AutoResetEvent(false);
@@ -86,7 +88,6 @@ namespace Client_Application.Client
                 new CallbackUpdateRepeatState(UpdateRepeatState));
 
             // Listen for events from Windows
-            Listen(EventType.NetworkRequest, new ClientEventCallback(AddNetworkRequest));
             Listen(EventType.InternalRequest, new ClientEventCallback(AddInternalRequest));
             Listen(EventType.UpdateProgressBarState, new ClientEventCallback(SetProgressBarState));
             Listen(EventType.MoveSongUpQueue, new ClientEventCallback(ExecuteMoveSongUpQueue));
@@ -104,9 +105,20 @@ namespace Client_Application.Client
             Listen(EventType.AddPlaylistToQueue, new ClientEventCallback(ExecuteAddPlaylistToQueue));
             Listen(EventType.DeletePlaylist, new ClientEventCallback(ExecuteDeletePlaylist));
             Listen(EventType.SearchPlaylist, new ClientEventCallback(ExecuteSearchPlaylist));
-            Listen(EventType.LogOut, new ClientEventCallback(ExecuteLogOut));
+            Listen(EventType.LogOut, new ClientEventCallback(OnLogOut));
+            Listen(EventType.SearchSongOrArtist, new ClientEventCallback(OnSearchSongOrArtist));
+            Listen(EventType.LogIn, new ClientEventCallback(OnLogIn));
         }
 
+        private void OnSearchSongOrArtist(params object[] parameters)
+        {
+            Task.Run(() =>
+            {
+                string search = (string)parameters[0];
+                List<Song> foundSongs = _communicationManager.SearchSongOrArtist(search);
+                new ClientEvent(EventType.DisplaySongs, true, foundSongs);
+            });
+        }
 
         private void ConnectionStateUpdate(bool connected)
         {
@@ -115,80 +127,36 @@ namespace Client_Application.Client
 
         private void RecoverSession()
         {
-            if(_session != null)
-            {
-                if(_session.IsLoggedIn)
-                {
-                    AuthenticateToServer(_session.Email, _session.Password);
-                }
-            }
+            AuthenticationManager.WaitForInstance();
+            _authenticationManager.RecoverSession();
         }
 
-        private void Disconnect(ManualResetEvent disconnectComplete)
+        private void OnLogIn(params object[] parameters)
         {
-            AddNetworkRequest(NetworkRequestType.Disconnect, disconnectComplete);
+            Task.Run(() =>
+            {
+                string email = (string)parameters[0];
+                string password = (string)parameters[1];
+                bool rememberMe = (bool)parameters[2];
+                _dualSocket.Connect();
+                bool success = _authenticationManager.LogIn(email, password, rememberMe);
+                if (success)
+                {
+                    DisplayPlaylistLinks(DisplayPlaylistLinksMode.None);
+                }
+            });
         }
 
-        private void ExecuteDisconnect(params object[] parameters)
+        private void OnLogOut(params object[] parameters)
         {
-
-            ManualResetEvent manualResetEvent = (ManualResetEvent)parameters[0];
-            string reply = "";
-
-            try
+            Task.Run(() =>
             {
-                string request = "DISCONNECT@";
-                byte[] requestBytes = Encoding.UTF8.GetBytes(request);
-
-                int length = requestBytes.Length;
-                byte[] lengthBytes = BitConverter.GetBytes(length);
-
-                _dualSocket.ControllerStreamSSL.SetWriteTimeout(1000);
-                _dualSocket.ControllerStreamSSL.SendSSL(lengthBytes, 4);
-                _dualSocket.ControllerStreamSSL.SendSSL(requestBytes, length);
-
-                _dualSocket.ControllerStreamSSL.SetReadTimeout(1000);
-                byte[] replyLengthBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(4);
-                int replyLength = BitConverter.ToInt32(replyLengthBytes);
-                byte[] replyBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(replyLength);
-                reply = Encoding.UTF8.GetString(replyBytes);
-
-                byte[] ackBytes = Encoding.UTF8.GetBytes("ACK");
-                int ackLength = ackBytes.Length;
-                byte[] ackLengthBytes = BitConverter.GetBytes(ackLength);
-                _dualSocket.ControllerStreamSSL.SendSSL(ackLengthBytes, 4);
-                _dualSocket.ControllerStreamSSL.SendSSL(ackBytes, ackLength);
-            }
-            catch { }
-
-            finally
-            {
-                _dualSocket.ControllerStreamSSL.ResetWriteTimeout();
-                _dualSocket.ControllerStreamSSL.ResetReadTimeout();
-                if (reply == "OK")
-                {
-                    manualResetEvent.Set();
-                }
-                else
-                {
-                    _dualSocket.ForceDisconnect();
-                    manualResetEvent.Set();
-                }
-            }
-        }
-
-        private void ExecuteLogOut(params object[] parameters)
-        {
-            new Task(() =>
-            {
-                ManualResetEvent manualResetEvent = new ManualResetEvent(false);
-                Disconnect(manualResetEvent);
-                manualResetEvent.WaitOne();
-                _session = new Session();
+                _communicationManager.DisconnectFromServer();
+                _authenticationManager.NewSession();
                 new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogOut, "");
                 FillRememberMe();
                 ResetApp();
-            }).Start();
+            });
         }
 
         private void ResetApp()
@@ -197,158 +165,6 @@ namespace Client_Application.Client
             new ClientEvent(EventType.ResetWindow, true);
         }
 
-        private bool IsRememeberMe(out string? email, out string? password)
-        {
-            IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
-
-            if(isoStore.FileExists("login.dat"))
-            {
-                using (IsolatedStorageFileStream isoStream = new IsolatedStorageFileStream("login.dat", FileMode.Open, isoStore))
-                {
-                    using (StreamReader reader = new StreamReader(isoStream))
-                    {
-                        string? encryptedEmail = reader.ReadLine();
-                        string? encryptedPassword = reader.ReadLine();
-
-                        if(encryptedEmail != null && encryptedPassword != null)
-                        {
-                            email = AES.Decrypt(encryptedEmail);
-                            password = AES.Decrypt(encryptedPassword);
-                        }
-                        else
-                        {
-                            email = null;
-                            password = null;
-                        }
-                    }
-                }
-                return true;
-            }
-            email = null;
-            password = null;
-            return false;
-        }
-
-        private void RememberMeUpdate(string email, string password)
-        {
-            IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
-
-            using (IsolatedStorageFileStream isoStream = new IsolatedStorageFileStream("login.dat", FileMode.Create, isoStore))
-            {
-                using (StreamWriter writer = new StreamWriter(isoStream))
-                {
-                    writer.WriteLine(AES.Encrypt(email));
-                    writer.WriteLine(AES.Encrypt(password));
-                }
-            }
-        }
-
-        private void RemoveRememberMe()
-        {
-            IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
-            if(isoStore.FileExists("login.dat"))
-            {
-                isoStore.DeleteFile("login.dat");
-            }
-        }
-
-        private bool AuthenticateToServer(string email, string password)
-        {
-            try
-            {
-                string request = "LOGIN@";
-                byte[] requestBytes = Encoding.UTF8.GetBytes(request);
-
-                int requestLength = requestBytes.Length;
-                byte[] requestLengthBytes = BitConverter.GetBytes(requestLength);
-
-                _dualSocket.ControllerStreamSSL.SendSSL(requestLengthBytes, 4);
-                _dualSocket.ControllerStreamSSL.SendSSL(requestBytes, requestLength);
-
-                byte[] emailBytes = Encoding.UTF8.GetBytes(email);
-                int emailLength = emailBytes.Length;
-                byte[] emailLengthBytes = BitConverter.GetBytes(emailLength);
-                _dualSocket.ControllerStreamSSL.SendSSL(emailLengthBytes, 4);
-                _dualSocket.ControllerStreamSSL.SendSSL(emailBytes, emailLength);
-
-                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-                int passwordLength = passwordBytes.Length;
-                byte[] passwordLengthBytes = BitConverter.GetBytes(passwordLength);
-                _dualSocket.ControllerStreamSSL.SendSSL(passwordLengthBytes, 4);
-                _dualSocket.ControllerStreamSSL.SendSSL(passwordBytes, passwordLength);
-
-                byte[] replyLengthBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(4);
-                int replyLength = BitConverter.ToInt32(replyLengthBytes);
-                byte[] replyBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(replyLength);
-                string reply = Encoding.UTF8.GetString(replyBytes);
-
-                if (reply == "VALID")
-                {
-                    return true;
-                }
-                else if (reply == "INVALID")
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
-            {
-                _dualSocket.Reconnect();
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Network request for log in.
-        /// </summary>
-        /// <param name="parameters"></param>
-        private void ExecuteLogIn(params object[] parameters)
-        {
-            string email = (string)parameters[0];
-            string password = (string)parameters[1];
-            bool rememeberMe = (bool)parameters[2];
-
-            _dualSocket.Connect();
-
-            bool result = AuthenticateToServer(email, password);
-
-            if (result)
-            {
-                _session = new Session(email, password);
-                ExecuteValidLogIn(email, password, rememeberMe);
-            }
-            else
-            {
-                _session = new Session();
-                ExecuteInvalidLogIn(email, password, rememeberMe);
-            }
-        }
-
-        private void ExecuteValidLogIn(string email, string password, bool rememberMe)
-        {
-            new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogInValid, email);
-
-            DisplayPlaylistLinks(DisplayPlaylistLinksMode.None);
-
-            if(rememberMe)
-            {
-                RememberMeUpdate(email, password);
-            }    
-            else
-            {
-                RemoveRememberMe();
-            }
-        }
-
-        private void ExecuteInvalidLogIn(string email, string password, bool rememberMe)
-        {
-            new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogInInvalid);
-
-            if(!rememberMe)
-            {
-                RemoveRememberMe();
-            }
-        }
 
         /// <summary>
         /// Expects (int)index. It will ask the media player to move the song at index up the queue.
@@ -521,18 +337,15 @@ namespace Client_Application.Client
         /// <param name="parameters"></param>
         private void ExecuteWindowReady(params object[] parameters)
         {
-            new Task(() =>
-            {
-                FillRememberMe();
-                
-            }).Start();
+            AuthenticationManager.WaitForInstance();
+            FillRememberMe();
         }
 
         private void FillRememberMe()
         {
             string? email;
             string? password;
-            bool rememberMe = IsRememeberMe(out email, out password);
+            bool rememberMe = _authenticationManager.IsRememeberMe(out email, out password);
 
             if (rememberMe && email != null && password != null)
             {
@@ -577,6 +390,10 @@ namespace Client_Application.Client
             {
                 ShuffleState shuffleState = (ShuffleState)internalRequest.Parameters[0];
                 ExecuteShuffleStateChange(shuffleState);
+            }
+            else if (internalRequest.Type == InternalRequestType.LogIn)
+            {
+
             }
         }
 
@@ -711,9 +528,9 @@ namespace Client_Application.Client
 
             if (File.Exists(fullSongPath))
             {
-                MessageBox.Show($"{song.SongName} by {song.ArtistName} is already in {playlistLink}.", 
-                    "Cannot add song to playlist", 
-                    MessageBoxButton.OK, 
+                MessageBox.Show($"{song.SongName} by {song.ArtistName} is already in {playlistLink}.",
+                    "Cannot add song to playlist",
+                    MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
             else
@@ -764,7 +581,7 @@ namespace Client_Application.Client
         private void PlayCurrentPlaylist()
         {
             List<Song> playlistSongs = GetPlaylistSongs(_currentPlaylist);
-            if(playlistSongs.Any())
+            if (playlistSongs.Any())
             {
                 _mediaPlayer.PlayPlaylistSongs(playlistSongs);
                 SendPlayState(PlayButtonState.Play);
@@ -823,13 +640,7 @@ namespace Client_Application.Client
 
         private void TerminateSongDataReceiveRequest()
         {
-            AddNetworkRequest(NetworkRequestType.TerminateSongDataReceive);
-        }
-
-        private void AddNetworkRequest(params object[] parameters)
-        {
-            _networkRequestQueue.Enqueue(new NetworkRequest(parameters));
-            _newNetworkRequestFlag.Set();
+            _communicationManager.TerminateSongDataReceive();
         }
 
         /// <summary>
@@ -844,48 +655,6 @@ namespace Client_Application.Client
         private void SendPlayState(PlayButtonState playButtonState)
         {
             new ClientEvent(EventType.ChangePlayState, true, playButtonState);
-        }
-
-        private void ExecuteNetworkRequest(NetworkRequest networkRequest)
-        {
-            if (networkRequest.Type == NetworkRequestType.SearchSongOrArtist)
-            {
-                ExecuteSearchRequest(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.TerminateSongDataReceive)
-            {
-                ExecuteTerminateSongDataReceiveRequest();
-            }
-            else if (networkRequest.Type == NetworkRequestType.LogIn)
-            {
-                ExecuteLogIn(networkRequest.Parameters);
-            }
-            else if(networkRequest.Type == NetworkRequestType.Disconnect)
-            {
-                ExecuteDisconnect(networkRequest.Parameters);
-            }
-        }
-
-        /// <summary>
-        /// Ask the server to stop sound data.
-        /// </summary>
-        private void ExecuteTerminateSongDataReceiveRequest()
-        {
-            string request = "TERMINATE_SONG_DATA_RECEIVE@";
-            byte[] requestBytes = Encoding.UTF8.GetBytes(request);
-
-            int length = requestBytes.Length;
-            byte[] lengthBytes = BitConverter.GetBytes(length);
-
-            try
-            {
-                _dualSocket.ControllerStreamSSL.SendSSL(lengthBytes, 4);
-                _dualSocket.ControllerStreamSSL.SendSSL(requestBytes, length);
-            }
-            catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
-            {
-                _dualSocket.Reconnect();
-            }
         }
 
         private void AddInternalRequest(params object[] parameters)
@@ -912,99 +681,6 @@ namespace Client_Application.Client
                 if (_internalRequestQueue.TryDequeue(out internalRequest))
                 {
                     ExecuteInternalRequest(internalRequest);
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method should be run in a separate Thread/Task.
-        /// It will execute network requests. Searching for song or artist, and terminate sound data command are network requests.
-        /// </summary>
-        private void CommunicationLoop()
-        {
-            while (true)
-            {
-                if (_networkRequestQueue.Count == 0)
-                {
-                    _newNetworkRequestFlag.WaitOne();
-                }
-
-                NetworkRequest? networkRequest;
-
-                if (_networkRequestQueue.TryDequeue(out networkRequest))
-                {
-                    ExecuteNetworkRequest(networkRequest);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Expects (string)inpput. It will take this input and remove white spaces.
-        /// Thereafter, it will send this input to the server and it will wait for results.
-        /// All the results are saved and sent to the Search Window.
-        /// </summary>
-        /// <param name="parameters"></param>
-        private void ExecuteSearchRequest(object[] parameters)
-        {
-            string searchString = (string)parameters[0];
-            string searchSongSerialized = string.Concat(searchString.Where(c => !char.IsWhiteSpace(c)));
-            List<Song> foundSongs = new List<Song>(0);
-
-            if (searchSongSerialized == "")
-            {
-                new ClientEvent(EventType.DisplaySongs, true, foundSongs); // Display empty
-            }
-
-            else
-            {
-                try
-                {
-                    string request = $"SEARCH@{searchSongSerialized}";
-                    byte[] requestBytes = Encoding.UTF8.GetBytes(request);
-
-                    int length = requestBytes.Length;
-                    byte[] lengthBytes = BitConverter.GetBytes(length);
-
-                    _dualSocket.ControllerStreamSSL.SendSSL(lengthBytes, 4);
-                    _dualSocket.ControllerStreamSSL.SendSSL(requestBytes, length);
-
-                    byte[] numberOfSongsBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(4);
-
-                    int numberOfSongs = BitConverter.ToInt32(numberOfSongsBytes);
-
-                    for (int i = 0; i < numberOfSongs; i++)
-                    {
-
-                        byte[] packetsCountBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(4);
-
-                        int packetsCount = BitConverter.ToInt32(packetsCountBytes);
-
-
-                        byte[] lastPacketLengthBytes = _dualSocket.ControllerStreamSSL.ReceiveSSL(4); // This is the last packet which is likely to be less than 1024 bytes
-                        int lastPacketLength = BitConverter.ToInt32(lastPacketLengthBytes);
-
-                        byte[] songBytes = new byte[packetsCount * 1024 + lastPacketLength]; // Full packets + last packet
-                        byte[] lastPacket = _dualSocket.ControllerStreamSSL.ReceiveSSL(lastPacketLength);
-
-                        Buffer.BlockCopy(lastPacket, 0, songBytes, songBytes.Length - lastPacketLength, lastPacketLength); // Add last packet at the end 
-
-                        int index = 0;
-
-                        for (int j = 0; j < packetsCount - 1; j++)
-                        {
-                            Buffer.BlockCopy(_dualSocket.ControllerStreamSSL.ReceiveSSL(1024), 0, songBytes, index, 1024);
-                            index += 1024;
-                        }
-                        foundSongs.Add(new Song(songBytes));
-                    }
-                }
-                catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
-                {
-                    _dualSocket.Reconnect();
-                }
-                finally
-                {
-                    new ClientEvent(EventType.DisplaySongs, true, foundSongs);
                 }
             }
         }
@@ -1053,7 +729,6 @@ namespace Client_Application.Client
         public void Run()
         {
             _mediaPlayer.Run();
-            _communicationThread.Start();
             _internalRequestThread.Start();
             _progressTask.Start();
         }

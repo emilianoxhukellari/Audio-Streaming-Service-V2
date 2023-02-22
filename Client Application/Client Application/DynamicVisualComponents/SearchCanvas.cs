@@ -82,7 +82,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            new ClientEvent(EventType.NetworkRequest, true, NetworkRequestType.SearchSongOrArtist, Text);
+            new ClientEvent(EventType.SearchSongOrArtist, true, Text);
         }
     }
 

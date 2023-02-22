@@ -215,28 +215,19 @@ namespace Client_Application.Streaming
                         }
                         if (hasEndRange)
                         {
-                            new Task(() =>
-                            {
-                                OptimizeDynamicStreaming(endRangeIndex, result.RangeIndex); // Fill the space
-                            }).Start();
+                            Task.Run(() => { OptimizeDynamicStreaming(endRangeIndex, result.RangeIndex); });
                         }
                         else
                         {
                             // There is no packet that starts before ReadIndex and ends after ReadIndex
                             // Thus, we can start from ReadIndex
-                            new Task(() =>
-                            {
-                                OptimizeDynamicStreaming(GetValidIndexFloor(currentReadIndex), result.RangeIndex);
-                            }).Start();
+                            Task.Run(() => { OptimizeDynamicStreaming(GetValidIndexFloor(currentReadIndex), result.RangeIndex); });
                         }
                     }
 
                     else // Start filling from the beginning
                     {
-                        new Task(() =>
-                        {
-                            OptimizeDynamicStreaming(_ranges[0].EndIndex, _ranges[1].StartIndex - 4092);
-                        }).Start();
+                        Task.Run(() => { OptimizeDynamicStreaming(_ranges[0].EndIndex, _ranges[1].StartIndex - 4092); });
                     }
                 }
                 else if (_ranges.Count != 0) // There is only one range, it starts at 0 but does not end at _dataSize
@@ -414,18 +405,12 @@ namespace Client_Application.Streaming
 
             if (result.HasRange) // Fill data until the end of the empty space.
             {
-                new Task(() =>
-                {
-                    OptimizeDynamicStreaming(fromIndex, result.RangeIndex);
-                }).Start();
+                Task.Run(() => { OptimizeDynamicStreaming(fromIndex, result.RangeIndex); });
             }
 
             else // Fill until the end
             {
-                new Task(() =>
-                {
-                    OptimizeDynamicStreaming(fromIndex, GetValidIndexFloor(_dataSize - 1));
-                }).Start();
+                Task.Run(() => { OptimizeDynamicStreaming(fromIndex, GetValidIndexFloor(_dataSize - 1)); });
             }
         }
 

@@ -10,6 +10,14 @@
 
 [Ll]og/
 [Ll]ogs/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
 # Benchmark Results
 BenchmarkDotNet.Artifacts/

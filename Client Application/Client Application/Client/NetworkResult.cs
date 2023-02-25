@@ -12,13 +12,27 @@ namespace Client_Application.Client
     {
         Authentication,
         Disconnect,
-        FoundSongs
+        FoundSongs,
+        SynchronizationStart,
+        SynchronizationUpdate
     }
+    public sealed class SyncDiff
+    {
+        public List<int>? DeletePlaylists;
+        public List<(int playlistId, string playlistName)>? AddPlaylists;
+        public List<(int playlistId, string newName)>? RenamePlaylists;
+        public List<(int playlistId, int songId)>? DeleteSongs;
+        public List<(int playlistId, List<Song> songs)>? AddSongs;
+    }
+
     public class Result
     {
         public bool ValidAuthentication { get; set; }
         public bool Disconnected { get; set; }
+        public int PlaylistId { get; set; }
+        public SyncDiff? SyncDiff { get; set; }
         public  List<Song>? FoundSongs { get; set; }
+
     }
     public sealed class NetworkResult
     {
@@ -34,6 +48,29 @@ namespace Client_Application.Client
             _event.Reset();
         } 
         
+        public void UpdateSyncUpdate()
+        {
+            _event.Set();
+        }
+
+        public void UpdateSyncDiff(SyncDiff syncDiff)
+        {
+            lock(_lock)
+            {
+                _result.SyncDiff = syncDiff;
+                _event.Set();
+            }
+        }
+
+        public void UpdateNewPlaylistId(int playlistId)
+        {
+            lock(_lock)
+            {
+                _result.PlaylistId = playlistId;
+                _event.Set();
+            }
+        }
+
         public void UpdateAuthenticationResult(bool success)
         {
             lock(_lock)

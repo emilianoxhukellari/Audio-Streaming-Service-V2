@@ -1,4 +1,5 @@
-﻿using DataAccess.Contexts;
+﻿using AudioEngine.Services;
+using DataAccess.Contexts;
 using DataAccess.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,32 @@ using System.Threading;
 
 namespace Server_Application.Server
 {
+    public sealed class SyncDiff
+    {
+        public List<int>? DeletePlaylists;
+        public List<(int playlistId, string playlistName)>? AddPlaylists;
+        public List<(int playlistId, string newName)>? RenamePlaylists;
+        public List<(int playlistId, int songId)>? DeleteSongs;
+        public List<(int playlistId, List<Song> songs)>? AddSongs;
+    }
+    public sealed class PlaylistSyncData
+    {
+        public int PlaylistId { get; private set; }
+        public string PlaylistName { get; set; }
+        public List<int> SongIds { get; set; }
+
+        public int NumberOfSongs
+        {
+            get { return SongIds.Count; }
+        }
+        public PlaylistSyncData(int playlistId, string playlistName, List<int> songIds)
+        {
+            PlaylistId = playlistId;
+            PlaylistName = playlistName;
+            SongIds = songIds;
+        }
+    }
+
     /// <summary>
     /// This class represents a handler for a single client. It contains the necessary logic and 
     /// attributes to communicate with a client.
@@ -24,6 +51,7 @@ namespace Server_Application.Server
     public sealed class ClientHandler
     {
         private readonly AudioRetrievingInternalService _audioRetrievingInternalService;
+        private readonly PlaylistSynchronizerInternalService _playlistSynchronizerInternalService;
         private readonly IServiceProvider _serviceProvider;
         private SslStream? _streamingSSL;
         private SslStream? _communcationSSL;
@@ -48,6 +76,7 @@ namespace Server_Application.Server
         public ClientHandler(string clientId, SslStream streamingSSL, SslStream communicationSSL, StreamingDbContext  streamingDbContext, IServiceProvider serviceProvider)
         {
             _audioRetrievingInternalService = new AudioRetrievingInternalService(streamingDbContext);
+            _playlistSynchronizerInternalService = new PlaylistSynchronizerInternalService(_audioRetrievingInternalService);
             _serviceProvider = serviceProvider;
             ClientId = clientId;
             _lastSongData = new byte[0];
@@ -289,6 +318,36 @@ namespace Server_Application.Server
                 {
                     DisconnectClient();
                 }
+
+                else if (translate[0] == "SYNC_UP")
+                {
+                    SynchronizePlaylists();
+                }
+
+                else if (translate[0] == "SYNC_DELETE_PLAYLIST")
+                {
+                    SynchronizeDeletePlaylist();
+                }
+
+                else if (translate[0] == "SYNC_ADD_PLAYLIST")
+                {
+                    SynchronizeAddPlaylist();
+                }
+
+                else if (translate[0] == "SYNC_RENAME_PLAYLIST")
+                {
+                    SynchronizeRenamePlaylist();
+                }
+
+                else if (translate[0] == "SYNC_DELETE_SONG")
+                {
+                    SynchronizeDeleteSongFromPlaylist();
+                }
+
+                else if (translate[0] == "SYNC_ADD_SONG")
+                {
+                    SynchronizeAddSongToPlaylist();
+                }
             }
 
             else
@@ -298,6 +357,62 @@ namespace Server_Application.Server
                     LogIn().Wait();
                 }
             }
+        }
+
+        private void SynchronizeAddPlaylist()
+        {
+            byte[] playlistNameLength = ReceiveSSL(4, _communcationSSL);
+            int playlistLength = BitConverter.ToInt32(playlistNameLength);
+            byte[] playlistNameBytes = ReceiveSSL(playlistLength, _communcationSSL);
+            string playlistName = Encoding.UTF8.GetString(playlistNameBytes);
+
+            int playlistId = _playlistSynchronizerInternalService.SyncAddPlaylist(playlistName);
+            byte[] playlistIdBytes = BitConverter.GetBytes(playlistId);
+            SendSSL(playlistIdBytes, 4, _communcationSSL);
+        }
+
+        private void SynchronizeRenamePlaylist()
+        {
+            byte[] playlistIdBytes = ReceiveSSL(4, _communcationSSL);
+            int playlistId = BitConverter.ToInt32(playlistIdBytes);
+
+            byte[] newNameLengthBytes = ReceiveSSL(4, _communcationSSL);
+            int newNameLength = BitConverter.ToInt32(newNameLengthBytes);
+
+            byte[] newNameBytes = ReceiveSSL(newNameLength, _communcationSSL);
+            string newName = Encoding.UTF8.GetString(newNameBytes);
+
+            _playlistSynchronizerInternalService.SyncRenamePlaylist(playlistId, newName);
+        }
+
+        private void SynchronizeDeleteSongFromPlaylist()
+        {
+            byte[] playlistIdBytes = ReceiveSSL(4, _communcationSSL);
+            byte[] songIdBytes = ReceiveSSL(4, _communcationSSL);
+
+            int playlistId = BitConverter.ToInt32(playlistIdBytes);
+            int songId = BitConverter.ToInt32(songIdBytes);
+
+            _playlistSynchronizerInternalService.SyncDeleteSongFromPlaylist(playlistId, songId);
+        }
+
+        private void SynchronizeAddSongToPlaylist()
+        {
+            byte[] playlistIdBytes = ReceiveSSL(4, _communcationSSL);
+            byte[] songIdBytes = ReceiveSSL(4, _communcationSSL);
+
+            int playlistId = BitConverter.ToInt32(playlistIdBytes);
+            int songId = BitConverter.ToInt32(songIdBytes);
+
+            _playlistSynchronizerInternalService.SyncAddSongToPlaylist(playlistId, songId);
+        }
+
+        private void SynchronizeDeletePlaylist()
+        {
+            byte[] playlistIdBytes = ReceiveSSL(4, _communcationSSL);
+            int playlistId = BitConverter.ToInt32(playlistIdBytes);
+
+            _playlistSynchronizerInternalService.SyncDeletePlaylist(playlistId);
         }
 
         private void DisconnectClient()
@@ -344,6 +459,213 @@ namespace Server_Application.Server
             }
         }
 
+        private void SendDeletePlaylistsDiff(SyncDiff diff)
+        {
+            if (diff.DeletePlaylists == null)
+            {
+                SendNullReply();
+            }
+            else
+            {
+                SendDiffPropertyReply("DELETE_PLAYLISTS");
+
+                int playlistIdsCount = diff.DeletePlaylists.Count;
+                byte[] playlistIdsCountBytes = BitConverter.GetBytes(playlistIdsCount);
+                SendSSL(playlistIdsCountBytes, 4, _communcationSSL);
+
+                foreach (int playlistId in diff.DeletePlaylists)
+                {
+                    SendSSL(BitConverter.GetBytes(playlistId), 4, _communcationSSL);
+                }
+            }
+        }
+
+        private void SendAddPlaylistsDiff(SyncDiff diff)
+        {
+            if (diff.AddPlaylists == null)
+            {
+                SendNullReply();
+            }
+            else
+            {
+                SendDiffPropertyReply("ADD_PLAYLISTS");
+
+                int count = diff.AddPlaylists.Count;
+                byte[] countBytes = BitConverter.GetBytes(count);
+                SendSSL(countBytes, 4, _communcationSSL);
+
+                foreach ((int playlistId, string playlistName) playlist in diff.AddPlaylists)
+                {
+                    byte[] playlistIdBytes = BitConverter.GetBytes(playlist.playlistId);
+                    SendSSL(playlistIdBytes, 4, _communcationSSL);
+
+                    byte[] playlistNameBytes = Encoding.UTF8.GetBytes(playlist.playlistName);
+                    int playlistNameLength = playlistNameBytes.Length;
+                    byte[] playlistNameLengthBytes = BitConverter.GetBytes(playlistNameLength);
+                    SendSSL(playlistNameLengthBytes, 4, _communcationSSL);
+                    SendSSL(playlistNameBytes, playlistNameLength, _communcationSSL);
+                }
+            }
+        }
+
+        private void SendRenamePlaylistsDiff(SyncDiff diff)
+        {
+            if (diff.RenamePlaylists == null)
+            {
+                SendNullReply();
+            }
+            else
+            {
+                SendDiffPropertyReply("RENAME_PLAYLISTS");
+
+                int count = diff.RenamePlaylists.Count;
+                byte[] countBytes = BitConverter.GetBytes(count);
+                SendSSL(countBytes, 4, _communcationSSL);
+
+                foreach ((int playlistId, string newName) playlist in diff.RenamePlaylists)
+                {
+                    byte[] playlistIdBytes = BitConverter.GetBytes(playlist.playlistId);
+                    SendSSL(playlistIdBytes, 4, _communcationSSL);
+
+                    byte[] newNameBytes = Encoding.UTF8.GetBytes(playlist.newName);
+                    int newNameLength = newNameBytes.Length;
+                    byte[] newNameLengthBytes = BitConverter.GetBytes(newNameLength);
+                    SendSSL(newNameLengthBytes, 4, _communcationSSL);
+                    SendSSL(newNameBytes, newNameLength, _communcationSSL);
+                }
+            }
+        }
+
+        private void SendDeleteSongsDiff(SyncDiff diff)
+        {
+            if (diff.DeleteSongs == null)
+            {
+                SendNullReply();
+            }
+            else
+            {
+                SendDiffPropertyReply("DELETE_SONGS");
+
+                int count = diff.DeleteSongs.Count;
+                byte[] countBytes = BitConverter.GetBytes(count);
+                SendSSL(countBytes, 4, _communcationSSL);
+
+                foreach ((int playlistId, int songId) in diff.DeleteSongs)
+                {
+                    byte[] playlistIdBytes = BitConverter.GetBytes(playlistId);
+                    byte[] songIdBytes = BitConverter.GetBytes(songId);
+                    SendSSL(playlistIdBytes, 4, _communcationSSL);
+                    SendSSL(songIdBytes, 4, _communcationSSL);
+                }
+            }
+        }
+
+        private void SendAddSongsDiff(SyncDiff diff)
+        {
+            if (diff.AddSongs == null)
+            {
+                SendNullReply();
+            }
+            else
+            {
+                SendDiffPropertyReply("ADD_SONGS");
+                int count = diff.AddSongs.Count;
+                byte[] countBytes = BitConverter.GetBytes(count);
+                SendSSL(countBytes, 4, _communcationSSL);
+
+                foreach ((int playlistId, List<Song> songs) in diff.AddSongs)
+                {
+                    byte[] playlistIdBytes = BitConverter.GetBytes(playlistId);
+                    SendSSL(playlistIdBytes, 4, _communcationSSL);
+
+                    byte[] songsCountBytes = BitConverter.GetBytes(songs.Count);
+                    SendSSL(songsCountBytes, 4, _communcationSSL);
+
+                    foreach (Song song in songs)
+                    {
+                        byte[] serializedSong = song.GetSerialized();
+                        List<byte[]> packets = GetPackets(serializedSong, 1024);
+
+                        int packetCount = packets.Count;
+                        byte[] packetCountBytes = BitConverter.GetBytes(packetCount);
+                        SendSSL(packetCountBytes, 4, _communcationSSL);
+
+
+                        byte[] lastPacket = packets.Last();
+                        int lastPacketLength = lastPacket.Length;
+                        byte[] lastPacketLengthBytes = BitConverter.GetBytes(lastPacketLength);
+                        SendSSL(lastPacketLengthBytes, 4, _communcationSSL);
+                        SendSSL(lastPacket, lastPacketLength, _communcationSSL);
+
+                        for (int i = 0; i < packets.Count - 1; i++)
+                        {
+                            SendSSL(packets[i], 1024, _communcationSSL);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SynchronizePlaylists()
+        {
+            byte[] numberOfPlaylistsBytes = ReceiveSSL(4, _communcationSSL);
+            int numberOfPlaylists = BitConverter.ToInt32(numberOfPlaylistsBytes);
+            List<PlaylistSyncData> playlists = new List<PlaylistSyncData>();
+
+            for(int i = 0; i < numberOfPlaylists; i++)
+            {
+                byte[] playlistIdBytes = ReceiveSSL(4, _communcationSSL);
+                int playlistId = BitConverter.ToInt32(playlistIdBytes);
+
+                byte[] playlistNameLengthBytes = ReceiveSSL(4, _communcationSSL);
+                int playlistNameLength = BitConverter.ToInt32(playlistNameLengthBytes);
+
+                byte[] playlistNameBytes = ReceiveSSL(playlistNameLength, _communcationSSL);
+                string playlistName = Encoding.UTF8.GetString(playlistNameBytes);
+
+                byte[] numberOfSongsBytes = ReceiveSSL(4, _communcationSSL);
+                int numberOfSongs = BitConverter.ToInt32(numberOfSongsBytes);
+
+                List<int> songIds = new List<int>(numberOfSongs);
+
+                for(int j = 0; j < numberOfSongs; j++)
+                {
+                    byte[] songIdBytes = ReceiveSSL(4, _communcationSSL);
+                    int songId = BitConverter.ToInt32(songIdBytes);
+                    songIds.Add(songId);
+                }
+
+                playlists.Add(new PlaylistSyncData(playlistId, playlistName, songIds));
+            }
+
+            SyncDiff diff = _playlistSynchronizerInternalService.GetDiff(playlists);
+
+            SendDeletePlaylistsDiff(diff);
+            SendAddPlaylistsDiff(diff);
+            SendRenamePlaylistsDiff(diff);
+            SendDeleteSongsDiff(diff);
+            SendAddSongsDiff(diff);
+        }
+
+        private void SendDiffPropertyReply(string reply)
+        {
+            byte[] replyBytes = Encoding.UTF8.GetBytes(reply);
+            int replyLength = replyBytes.Length;
+            byte[] replyLengthBytes = BitConverter.GetBytes(replyLength);
+            SendSSL(replyLengthBytes, 4, _communcationSSL);
+            SendSSL(replyBytes, replyLength, _communcationSSL);
+        }
+
+        private void SendNullReply()
+        {
+            string reply = "NULL";
+            byte[] replyBytes = Encoding.UTF8.GetBytes(reply);
+            int replyLength = replyBytes.Length;
+            byte[] replyLengthBytes = BitConverter.GetBytes(replyLength);
+            SendSSL(replyLengthBytes, 4, _communcationSSL);
+            SendSSL(replyBytes, replyLength, _communcationSSL);
+        }
+
         private async Task LogIn()
         {
             IdentityUser? identityUser = null;
@@ -383,6 +705,7 @@ namespace Server_Application.Server
             if (validRequest)
             {
                 UserId = identityUser!.Id;
+                _playlistSynchronizerInternalService.SetUserId(UserId);
                 LoggedIn(true);
                 replyBytes = Encoding.UTF8.GetBytes("VALID");
             }

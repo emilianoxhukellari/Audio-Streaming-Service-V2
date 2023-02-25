@@ -29,12 +29,20 @@ namespace DataAccess.Contexts
             modelBuilder.Entity<PlaylistSong>()
                 .HasOne(ps => ps.Playlist)
                 .WithMany(p => p.PlaylistSongs)
-                .HasForeignKey(ps => ps.PlaylistId);
+                .HasForeignKey(ps => ps.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PlaylistSong>()
                 .HasOne(ps => ps.Song)
                 .WithMany(p => p.PlaylistSongs)
-                .HasForeignKey(ps => ps.SongId);
+                .HasForeignKey(ps => ps.SongId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Song>()
+                .HasMany(s => s.PlaylistSongs)
+                .WithOne(ps => ps.Song)
+                .HasForeignKey(ps => ps.SongId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -27,7 +27,6 @@ namespace Client_Application.Client
         private readonly ClientListener _clientListener;
         private ProgressBarState _progressBarState;
         private readonly Queue<InternalRequest> _internalRequestQueue;
-        private Session? _session;
         // ATTRIBUTES
 
         // NETWORKING
@@ -138,21 +137,33 @@ namespace Client_Application.Client
                 bool success = _authenticationManager.LogIn(email, password, rememberMe);
                 if (success)
                 {
-                    DisplayPlaylistLinks(DisplayPlaylistLinksMode.None, _playlistManager.GetPlaylistLinks());
+                    PlaylistResult result = _playlistManager.Sync();
+                    if (result == PlaylistResult.Success)
+                    {
+                        DisplayPlaylistLinks(DisplayPlaylistLinksMode.None, _playlistManager.GetPlaylistLinks());
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Could not sync playlists.", "Sync Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             });
         }
 
         private void OnLogOut(params object[] parameters)
         {
-            Task.Run(() =>
+            new Thread(() =>
             {
                 _communicationManager.DisconnectFromServer();
                 _authenticationManager.NewSession();
                 new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogOut, "");
                 FillRememberMe();
+                if (!_authenticationManager.IsRememberMe())
+                {
+                    PlaylistResult result = _playlistManager.DeleteAllPlaylistsLocal();
+                }
                 ResetApp();
-            });
+            }).Start();
         }
 
         private void ResetApp()
@@ -361,7 +372,7 @@ namespace Client_Application.Client
         {
             string? email;
             string? password;
-            bool rememberMe = _authenticationManager.IsRememeberMe(out email, out password);
+            bool rememberMe = _authenticationManager.IsRememberMe(out email, out password);
 
             if (rememberMe && email != null && password != null)
             {

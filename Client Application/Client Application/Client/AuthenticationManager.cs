@@ -13,7 +13,7 @@ namespace Client_Application.Client
     public sealed class AuthenticationManager
     {
         private static volatile AuthenticationManager? _instance;
-        private static readonly object syncLock = new object();
+        private static readonly object _syncLock = new object();
         private static readonly ManualResetEvent _isInitialized = new ManualResetEvent(false);
         private readonly CommunicationManager _communicationManager;
         private Session? _session;
@@ -32,7 +32,7 @@ namespace Client_Application.Client
         {
             if (_instance == null)
             {
-                lock (syncLock)
+                lock (_syncLock)
                 {
                     if (_instance == null)
                     {
@@ -74,11 +74,9 @@ namespace Client_Application.Client
 
         public bool LogIn(string email, string password, bool rememberMe)
         {
-            bool result = _communicationManager.AuthenticateToServer(email, password);
+            bool success = _communicationManager.AuthenticateToServer(email, password);
 
-            Trace.WriteLine(result);
-
-            if (result)
+            if (success)
             {
                 _session = new Session(email, password);
                 ExecuteValidLogIn(email, password, rememberMe);
@@ -109,7 +107,6 @@ namespace Client_Application.Client
         private void ExecuteInvalidLogIn(string email, string password, bool rememberMe)
         {
             new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogInInvalid);
-
             if (!rememberMe)
             {
                 RemoveRememberMe();
@@ -138,8 +135,17 @@ namespace Client_Application.Client
                 }
             }
         }
+        public bool IsRememberMe()
+        {
+            IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
+            if(isoStore.FileExists("login.dat"))
+            {
+                return true;
+            }
+            return false;
+        }
 
-        public bool IsRememeberMe(out string? email, out string? password)
+        public bool IsRememberMe(out string? email, out string? password)
         {
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
 

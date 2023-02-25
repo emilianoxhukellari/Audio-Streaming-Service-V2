@@ -7,7 +7,13 @@ namespace Client_Application.Client
         SearchSongOrArtist,
         TerminateSongDataReceive,
         Disconnect,
-        AuthenticateToServer
+        AuthenticateToServer,
+        SynchronizeStart,
+        SynchronizeAddPlaylist,
+        SynchronizeDeletePlaylist,
+        SynchronizeRenamePlaylist,
+        SynchronizeAddSong,
+        SynchronizeDeleteSong
     }
 
     /// <summary>

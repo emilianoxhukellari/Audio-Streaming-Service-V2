@@ -150,10 +150,10 @@ namespace Client_Application
         private void ExecuteLogInStateUpdate(params object[] parameters)
         {
             LogInState logInState = (LogInState)parameters[0];
-            string email = (string)parameters[1];
 
             if(logInState == LogInState.LogInValid)
             {
+                string email = (string)parameters[1];
                 Dispatcher.Invoke(() =>
                 {
                     currentUserLabel.Content = email;
@@ -306,7 +306,10 @@ namespace Client_Application
             else
             {
                 RemoveAllPlaylistLinks();
-                contentControl.Content = _searchCanvas;
+                Dispatcher.Invoke(() =>
+                {
+                    contentControl.Content = _searchCanvas;
+                });
             }
         }
 
@@ -324,7 +327,6 @@ namespace Client_Application
 
         private void RemoveAllPlaylistLinks()
         {
-
             Dispatcher.Invoke(() =>
             {
                 playlistStackPanel.Children.Clear();

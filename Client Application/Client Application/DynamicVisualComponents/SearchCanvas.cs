@@ -1,7 +1,12 @@
 ﻿using Client_Application.Client;
+using ModernWpf.Controls;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace Client_Application.DynamicVisualComponents
@@ -19,7 +24,6 @@ namespace Client_Application.DynamicVisualComponents
             _playButtonImageBrush = playButtonImageBrush;
             _moreButtonImageBrush = moreButtonImageBrush;
             Width = 440;
-            Height = 420;
             _searchBox = new SearchBox();
             _scrollableSearchStackPanel = new ScrollableSearchStackPanel();
             Children.Add(_searchBox);
@@ -46,18 +50,21 @@ namespace Client_Application.DynamicVisualComponents
             }
         }
 
-        public void DisplaySongs(List<Song> songs)
+        public void DisplaySongsByOne(List<Song> songs)
         {
-            foreach (Song song in songs)
+            foreach(Song song in songs)
             {
-
-                _scrollableSearchStackPanel.Children.Add(new SearchSongContainer(song, _playlistLinks.ToArray(), _playButtonImageBrush, _moreButtonImageBrush));
+                Dispatcher.Invoke(() =>
+                {
+                    _scrollableSearchStackPanel.Children.Add(new SearchSongContainer(song, _playlistLinks.ToArray(), _playButtonImageBrush, _moreButtonImageBrush));
+                });
             }
         }
 
         public void RemoveAllSongs()
         {
             _scrollableSearchStackPanel.Children.Clear();
+            GC.Collect();
         }
     }
 
@@ -65,10 +72,10 @@ namespace Client_Application.DynamicVisualComponents
     {
         public SearchBox() : base()
         {
-            Canvas.SetLeft(this, 10);
+            Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, 40);
             TextWrapping = TextWrapping.Wrap;
-            Width = 420;
+            Width = 440;
             Height = 30;
             FontSize = 18;
             TextChanged += SearchBox_TextChanged;
@@ -82,7 +89,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            new ClientEvent(EventType.SearchSongOrArtist, true, Text);
+            ClientEvent.Fire(EventType.SearchSongOrArtist, Text);
         }
     }
 
@@ -95,12 +102,14 @@ namespace Client_Application.DynamicVisualComponents
             _searchStackPanel = new StackPanel();
             Content = _searchStackPanel;
             Width = 440;
-            Height = 340;
+            Height = 420;
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            
             Canvas.SetTop(this, 80);
         }
     }
+
     public class SearchSongContainer : Canvas
     {
         public Song Song { get; set; }
@@ -117,9 +126,10 @@ namespace Client_Application.DynamicVisualComponents
         {
             Song = song;
             Height = 60;
-            Width = 420;
+            Width = 440;
             Background = new SolidColorBrush(Color.FromRgb(35, 35, 35));
             Margin = new Thickness(0, 6, 0, 0);
+            HorizontalAlignment = HorizontalAlignment.Left;
 
             Image = new Image();
             SongNameInner = new Label();
@@ -168,20 +178,22 @@ namespace Client_Application.DynamicVisualComponents
         private void InitializeSongNameInnerLabel(Label songNameInnerLabel)
         {
             songNameInnerLabel.Width = 180;
-            songNameInnerLabel.Height = 26;
-            Canvas.SetTop(songNameInnerLabel, 3);
-            Canvas.SetLeft(songNameInnerLabel, 62);
+            songNameInnerLabel.Height = 24;
+            Canvas.SetTop(songNameInnerLabel, 6);
+            Canvas.SetLeft(songNameInnerLabel, 66);
             songNameInnerLabel.Foreground = new SolidColorBrush(Colors.White);
+            songNameInnerLabel.FontSize = 15;
             songNameInnerLabel.Content = Song.SongName;
         }
 
         private void InitializeArtistNameInnerLabel(Label artistNameInnerLabel)
         {
             artistNameInnerLabel.Width = 180;
-            artistNameInnerLabel.Height = 26;
-            Canvas.SetBottom(artistNameInnerLabel, 3);
-            Canvas.SetLeft(artistNameInnerLabel, 62);
+            artistNameInnerLabel.Height = 20;
+            Canvas.SetBottom(artistNameInnerLabel, 5);
+            Canvas.SetLeft(artistNameInnerLabel, 66);
             artistNameInnerLabel.Foreground = new SolidColorBrush(Colors.White);
+            artistNameInnerLabel.FontSize = 14;
             artistNameInnerLabel.Content = Song.ArtistName;
         }
 
@@ -198,7 +210,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlayThisButton_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.InternalRequest, true, InternalRequestType.PlayThis, Song);
+            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
         }
 
         private void InitializeMoreButton(Button moreButton, string[] playlistLinks)
@@ -219,7 +231,7 @@ namespace Client_Application.DynamicVisualComponents
             foreach (string playlistLink in playlistLinks)
             {
                 CustomMenuItem item = new CustomMenuItem(Song, playlistLink);
-                moreButton.ContextMenu.Items.Add(item);
+                moreButton.ContextMenu.Items.Add(item.MenuItem);
             }
 
             moreButton.Click += ShowMoreButtonMenu;
@@ -237,7 +249,7 @@ namespace Client_Application.DynamicVisualComponents
             foreach (string playlistLink in playlistLinks)
             {
                 CustomMenuItem item = new CustomMenuItem(Song, playlistLink);
-                MoreButton.ContextMenu.Items.Add(item);
+                MoreButton.ContextMenu.Items.Add(item.MenuItem);
             }
         }
 
@@ -248,25 +260,27 @@ namespace Client_Application.DynamicVisualComponents
 
         private void AddToQueue_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.InternalRequest, true, InternalRequestType.AddSongToQueue, Song);
+            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.AddSongToQueue, Song);
         }
     }
 
-    public class CustomMenuItem : MenuItem
+    public class CustomMenuItem
     {
+        public MenuItem MenuItem { get; set; }
         private string _playlistLink;
         private Song _song;
         public CustomMenuItem(Song song, string playlistLink) : base()
         {
+            MenuItem = new MenuItem();
             _playlistLink = playlistLink;
             _song = song;
-            Header = $"Add to Playlist: {_playlistLink}";
-            Click += CustomMenuItem_Click;
+            MenuItem.Header = $"Add to Playlist: {_playlistLink}";
+            MenuItem.Click += CustomMenuItem_Click;
         }
 
         private void CustomMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.AddSongToPlaylist, true, _song, _playlistLink);
+            ClientEvent.Fire(EventType.AddSongToPlaylist, _song, _playlistLink);
         }
     }
 }

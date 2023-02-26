@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client_Application"
         mc:Ignorable="d"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
         Name ="addNewPlaylist" Title="Create New Playlist" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    <Grid>
-        <TextBox x:Name="newPlaylistTextbox" HorizontalAlignment="Left" Margin="78,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="148"/>
-        <Button x:Name="createNewPlaylistButton" Content="Create" HorizontalAlignment="Left" Margin="94,83,0,0" VerticalAlignment="Top" Width="40" Height="20" Click="createNewPlaylistButton_Click"/>
-        <Button x:Name="cancelCreateNewPlaylistButton" Content="Cancel" HorizontalAlignment="Left" Margin="166,83,0,0" VerticalAlignment="Top" Width="40" Height="20" Click="cancelCreateNewPlaylistButton_Click"/>
-
+    <Grid Background="#FF323232">
+        <TextBox x:Name="newPlaylistTextbox" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Width="220" Margin="0,20,0,0"/>
+        <Button x:Name="createNewPlaylistButton" Content="Create" VerticalAlignment="Bottom" Width="78" Height="32" Click="createNewPlaylistButton_Click" Background="#FF00AA7F" BorderBrush="{x:Null}" Margin="60,0,0,20"/>
+        <Button x:Name="cancelCreateNewPlaylistButton" Content="Cancel" VerticalAlignment="Bottom" Width="78" Height="32" Click="cancelCreateNewPlaylistButton_Click" Background="#FF00AA7F" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,60,20"/>
     </Grid>
 </Window>

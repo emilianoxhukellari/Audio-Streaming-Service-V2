@@ -6,51 +6,54 @@
         xmlns:local="clr-namespace:Client_Application"
         xmlns:DynamicVisualComponents="clr-namespace:Client_Application.DynamicVisualComponents" x:Class="Client_Application.MainWindow"
         mc:Ignorable="d"
-        Title="Client" Height="600" Width="1000" ResizeMode="CanMinimize"  WindowStartupLocation="CenterScreen" Background="#FD161616">
-    <Grid Background="#FD161616" Height ="600" Width="1000" Margin="3,-13,0,2" HorizontalAlignment="Left">
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="Client" Height="750" Width="1200" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="#FD161616">
+    <Grid Background="#FD161616" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid x:Name="grid" Visibility="Collapsed">
-
-            <Slider x:Name="progressBar" HorizontalAlignment="Center" VerticalAlignment="Top" Width="404" Maximum="100" Margin="0,552,0,0" Value="-1" PreviewMouseLeftButtonDown="progressBar_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="progressBar_PreviewMouseLeftButtonUp" Height="18"/>
-            <Button x:Name="playButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Center" Margin="0,510,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.025,0.503" Height="30" Width="30" Click="playButton_Click" BorderBrush="{x:Null}" Background="Black"/>
-            <Button x:Name="nextSongButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="538,510,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.025,0.503" Height="30" Width="30" Click="nextSongButton_Click" BorderBrush="{x:Null}" Background="Black" MouseEnter="nextSongButton_MouseEnter" MouseLeave="nextSongButton_MouseLeave"/>
-            <Button x:Name="previousSongButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="433,510,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.025,0.503" Height="30" Width="30" Click="previousSongButton_Click" BorderBrush="{x:Null}" Background="Black" MouseEnter="previousSongButton_MouseEnter" MouseLeave="previousSongButton_MouseLeave"/>
-            <Image x:Name="imageContainer" HorizontalAlignment="Left" Height="150" Margin="46,371,0,0" VerticalAlignment="Top" Width="150"/>
-            <Label x:Name="songNameLabel" Content="" HorizontalAlignment="Left" Margin="46,524,0,0" VerticalAlignment="Top" Background="{x:Null}" Width="204" Height="26" Foreground="White"/>
-            <Label x:Name="artistNameLabel" Content="" HorizontalAlignment="Left" Margin="46,543,0,0" VerticalAlignment="Top" Background="{x:Null}" Width="204" Height="26" Foreground="#FFE7CAFF"/>
-            <ContentControl x:Name="contentControl" Content="&#xA;" HorizontalAlignment="Center" Margin="0,72,0,0" VerticalAlignment="Top" Height="410" Width="440"/>
-            <Button x:Name="searchButton" BorderBrush="#00AA7F" Content="Search" HorizontalAlignment="Left" Height="37" Margin="445,25,0,0" VerticalAlignment="Top" Width="90" Click="searchButton_Click" Background="#FF282828" Foreground="White" MouseEnter="searchButton_MouseEnter" MouseLeave="searchButton_MouseLeave"/>
-            <Label x:Name="timePassedLabel" Content="00:00" HorizontalAlignment="Left" Margin="245,548,0,0" VerticalAlignment="Top" Width="45" Height="26" Foreground="White"/>
-            <Label x:Name="timeMaxLabel" Content="00:00" HorizontalAlignment="Left" Margin="711,548,0,0" VerticalAlignment="Top" Width="44" Height="27" Foreground="White"/>
-            <ScrollViewer x:Name="queueScrollViewer" Margin="751,116,20,74" Height="410" Foreground="{x:Null}" Width="229" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Slider x:Name="progressBar" HorizontalAlignment="Center"  Width="404" Maximum="100" Value="-1" PreviewMouseLeftButtonDown="progressBar_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="progressBar_PreviewMouseLeftButtonUp" Height="34" VerticalAlignment="Bottom" Margin="0,0,0,4" SnapsToDevicePixels="True"/>
+            <Button x:Name="playButton" Style="{StaticResource MyButton}"  Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="playButton_Click" BorderBrush="{x:Null}" Background="Black" Margin="0,0,0,40"/>
+            <Button x:Name="nextSongButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="nextSongButton_Click" BorderBrush="{x:Null}" Background="Black" MouseEnter="nextSongButton_MouseEnter" MouseLeave="nextSongButton_MouseLeave" Margin="100,0,0,40"/>
+            <Button x:Name="previousSongButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="previousSongButton_Click" BorderBrush="{x:Null}" Background="Black" MouseEnter="previousSongButton_MouseEnter" MouseLeave="previousSongButton_MouseLeave" Margin="0,0,100,40"/>
+            <Image x:Name="imageContainer" HorizontalAlignment="Left" Height="180" VerticalAlignment="Bottom" Width="180" Margin="30,0,0,70"/>
+            <Label x:Name="songNameLabel" Content="" HorizontalAlignment="Left" Margin="30,656,0,0" VerticalAlignment="Top" Background="{x:Null}" Width="204" Height="20" Foreground="White"/>
+            <Label x:Name="artistNameLabel" Content="" HorizontalAlignment="Left" Margin="30,680,0,0" VerticalAlignment="Top" Background="{x:Null}" Width="204" Height="20" Foreground="#FFE7CAFF"/>
+            <ContentControl x:Name="contentControl" Content="&#xA;" HorizontalAlignment="Center" Margin="0,100,0,0" VerticalAlignment="Top" Height="520" Width="460"/>
+            <Button x:Name="searchButton" Style="{StaticResource ButtonSimple}" Content="Search" HorizontalAlignment="Center" Height="37" VerticalAlignment="Top" Width="90" Click="searchButton_Click" Background="#FF282828" Foreground="White" Margin="0,40,0,-2" Cursor="Hand" BorderBrush="#FF00AA7F"/>
+            <Label x:Name="timePassedLabel" Content="00:00" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="45" Height="20" Foreground="White" Margin="352,0,0,12"/>
+            <Label x:Name="timeMaxLabel" Content="00:00" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="44" Height="20" Foreground="White" Margin="813,0,0,11"/>
+            <ScrollViewer x:Name="queueScrollViewer" Margin="0,120,20,-9" Height="550" Width="290" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="{x:Null}">
                 <StackPanel x:Name="queueStackPanel"/>
             </ScrollViewer>
-            <Label Content="Next from queue" HorizontalAlignment="Left" Margin="753,74,0,0" VerticalAlignment="Top" Foreground="White" Width="132" FontSize="16" Height="32"/>
-            <Button x:Name="removeQueueButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="896,80,0,0" VerticalAlignment="Top" Height="23" Width="26" Click="removeQueueButton_Click" MouseEnter="removeQueueButton_MouseEnter" MouseLeave="removeQueueButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
-            <Label x:Name="volumeLabel" Content="100" HorizontalAlignment="Left" Margin="934,535,0,0" VerticalAlignment="Top" Foreground="White" Width="38" Height="26.6"/>
-            <Slider x:Name="volumeBar" HorizontalAlignment="Left" Margin="832,539,0,0" VerticalAlignment="Top" Width="100" Height="18" Maximum="100" Value="100" ValueChanged="volumeBar_ValueChanged"/>
-            <ScrollViewer x:Name="playlistScrollViewer" Margin="18,115,760,242" Foreground="{x:Null}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Label Content="Next from queue" HorizontalAlignment="Left" Margin="890,80,0,0" VerticalAlignment="Top" Foreground="White" Width="159" FontSize="20" Height="30"/>
+            <Button x:Name="removeQueueButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="26" Click="removeQueueButton_Click" MouseEnter="removeQueueButton_MouseEnter" MouseLeave="removeQueueButton_MouseLeave" BorderBrush="{x:Null}" Background="Black" Margin="0,84,120,0"/>
+            <Label x:Name="volumeLabel" Content="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" Width="38" Height="20" Margin="0,0,8,11"/>
+            <Slider x:Name="volumeBar" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Height="34" Maximum="100" Value="100" ValueChanged="volumeBar_ValueChanged" Margin="0,0,50,4"/>
+            <ScrollViewer x:Name="playlistScrollViewer" Foreground="{x:Null}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="380" Width="290" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,120,0,0">
                 <StackPanel x:Name="playlistStackPanel"/>
             </ScrollViewer>
-            <Label Content="Playlists&#xA;" HorizontalAlignment="Left" Margin="45,74,0,0" VerticalAlignment="Top" Foreground="White" Width="71" FontSize="16" Height="33"/>
-            <Button x:Name="addPlaylistButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="132,80,0,0" VerticalAlignment="Top" Height="24" Width="26" Click="addPlaylistButton_Click" MouseEnter="addPlaylistButton_MouseEnter" MouseLeave="addPlaylistButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
-            <Button x:Name="repeatButton" Style="{StaticResource MyButton}" Content="&#xA;" HorizontalAlignment="Left" Margin="598,510,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.025,0.503" Height="30" Width="30" Click="repeatButton_Click" BorderBrush="{x:Null}" Background="Black"/>
-            <Button x:Name="shuffleButton" Style="{StaticResource MyButton}" Content="&#xA;" HorizontalAlignment="Left" Margin="374,510,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.025,0.503" Height="30" Width="30" Click="shuffleButton_Click" BorderBrush="{x:Null}" Background="Black"/>
-            <Button x:Name="logOutButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="13,25,0,0" VerticalAlignment="Top" Height="24" Width="26" Click="logOutButton_Click" MouseEnter="logOutButton_MouseEnter" MouseLeave="logOutButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
-            <Label x:Name="currentUserLabel" Content="" HorizontalAlignment="Left" Margin="56,23,0,0" VerticalAlignment="Top" Height="28" Foreground="#FFFFFBFB" FontStyle="Italic" Width="300" FontWeight="UltraLight"/>
-            <Ellipse x:Name="connectionIndicator" HorizontalAlignment="Left" Height="10" Margin="45,32,0,0" VerticalAlignment="Top" Width="10" Fill="#FF00A000"/>
-
+            <Label Content="Playlists&#xA;" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" Foreground="White" Width="82" FontSize="20" Height="30"/>
+            <Button x:Name="addPlaylistButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="104,84,0,0" VerticalAlignment="Top" Height="24" Width="26" Click="addPlaylistButton_Click" MouseEnter="addPlaylistButton_MouseEnter" MouseLeave="addPlaylistButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
+            <Button x:Name="repeatButton" Style="{StaticResource MyButton}" Content="&#xA;" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="repeatButton_Click" BorderBrush="{x:Null}" Background="Black" Margin="200,0,0,40"/>
+            <Button x:Name="shuffleButton" Style="{StaticResource MyButton}" Content="&#xA;" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="shuffleButton_Click" BorderBrush="{x:Null}" Background="Black" Margin="0,0,200,40"/>
+            <Button x:Name="logOutButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="13,13,0,0" VerticalAlignment="Top" Height="24" Width="26" Click="logOutButton_Click" MouseEnter="logOutButton_MouseEnter" MouseLeave="logOutButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
+            <Label x:Name="currentUserLabel" Content="" HorizontalAlignment="Left" Margin="58,14,0,0" VerticalAlignment="Top" Height="22" Foreground="#FFFFFBFB" FontStyle="Italic" Width="300" FontWeight="UltraLight" FontSize="14"/>
+            <Ellipse x:Name="connectionIndicator" HorizontalAlignment="Left" Height="10" Margin="44,20,0,0" VerticalAlignment="Top" Width="10" Fill="#FF00A000"/>
+            
         </Grid>
-        <Grid x:Name="loginGrid" Visibility="Visible">
-            <TextBox x:Name="emailTextBox" HorizontalAlignment="Left" Margin="378,194,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="240" Height="25" FontSize="16" TextChanged="emailTextBox_TextChanged"/>
-            <PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="378,255,0,0" VerticalAlignment="Top" Width="240" Height="25" FontSize="16" Password="" PasswordChanged="passwordBox_PasswordChanged"/>
-            <Button x:Name="loginButton" Content="Login&#xD;&#xA;" HorizontalAlignment="Left" Margin="408,322,0,0" VerticalAlignment="Top" Width="180" Height="24" FontSize="15" FontWeight="Bold" BorderBrush="#FF6B1A1A" Background="#FF969696" Cursor="Hand" Click="loginButton_Click"/>
-
-            <Label x:Name="passwordLabel" Content="Password&#xD;&#xA;" HorizontalAlignment="Left" Margin="372,230,0,0" VerticalAlignment="Top" Foreground="White" Width="74" Height="30" FontWeight="Bold" FontSize="14"/>
-            <Label x:Name="emailLabel" Content="Email&#xA;" HorizontalAlignment="Left" Margin="372,169,0,0" VerticalAlignment="Top" Foreground="White" Width="48" Height="30" FontSize="14" FontWeight="Bold"/>
-            <Label x:Name="emailErrorLabel" Content="" HorizontalAlignment="Left" Margin="630,191,0,0" VerticalAlignment="Top" Foreground="#FFCA4848" Width="230" Height="31" FontSize="14"/>
-            <Label x:Name="errorPasswordLabel" Content="" HorizontalAlignment="Left" Margin="630,252,0,0" VerticalAlignment="Top" Foreground="#FFCA4848" Width="230" Height="30" FontSize="14"/>
-            <Label x:Name="loginErrorLabel" Content="" HorizontalAlignment="Left" Margin="393,131,0,0" VerticalAlignment="Top" Foreground="#FFCA4848" Width="210" Height="30" FontSize="14"/>
-            <CheckBox x:Name="rememeberMeCheckBox" Content="Remember Me?" HorizontalAlignment="Left" Margin="377,0,0,0" VerticalAlignment="Center" Foreground="White" IsChecked="False"/>
+        <Grid x:Name="loginGrid" Visibility="Visible" >
+            <Grid HorizontalAlignment="Left" Height="292" Margin="485,190,0,0" VerticalAlignment="Top" Width="486">
+                <Label x:Name="loginErrorLabel" Content="" HorizontalAlignment="Left" Margin="15,0,0,0" VerticalAlignment="Top" Foreground="#FFCA4848" Width="210" Height="30" FontSize="14"/>
+                <TextBox x:Name="emailTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="240" Height="35" FontSize="16" TextChanged="emailTextBox_TextChanged" Margin="6,76,0,0" TabIndex="1"/>
+                <Button x:Name="loginButton" Content="Login&#xA;" VerticalAlignment="Top" Width="240" Height="34" FontSize="15" FontWeight="Bold" Background="#FF00AA7F" Cursor="Hand" Click="loginButton_Click" Margin="5,195,0,0" TabIndex="3"/>
+                <Label x:Name="passwordLabel" Content="Password&#xA;" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" Width="74" Height="30" FontWeight="Bold" FontSize="14" Margin="5,117,0,0"/>
+                <Label x:Name="emailLabel" Content="Email&#xA;" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" Width="48" Height="30" FontSize="14" FontWeight="Bold" Margin="5,51,0,0"/>
+                <Label x:Name="emailErrorLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FFCA4848" Width="230" Height="24" FontSize="16" Margin="256,82,0,0"/>
+                <Label x:Name="errorPasswordLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FFCA4848" Width="230" Height="24" FontSize="16" Margin="256,147,0,0"/>
+                <CheckBox x:Name="rememeberMeCheckBox" Content="Remember Me?" VerticalAlignment="Top" IsChecked="False" Margin="5,240,0,0" Foreground="#E4FFFFFF" TabIndex="4"/>
+                <PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="5,141,0,0" VerticalAlignment="Top" Width="240" Height="35" TabIndex="2"/>
+            </Grid>
+            <ui:ProgressRing x:Name="progressRing" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Height="50" Margin="0,340,0,0" Visibility="Collapsed"/>
         </Grid>
     </Grid>
 </Window>

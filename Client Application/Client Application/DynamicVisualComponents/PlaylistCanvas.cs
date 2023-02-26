@@ -1,5 +1,7 @@
 ﻿using Client_Application.Client;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,7 +29,6 @@ namespace Client_Application.DynamicVisualComponents
         public PlaylistCanvas(ImageBrush playButtonImageBrush, ImageBrush moreButtonImageBrush) : base()
         {
             Width = 440;
-            Height = 420;
             _playButtonImageBrush = playButtonImageBrush;
             _moreButtonImageBrush = moreButtonImageBrush;
             _playlistSearchBox = new PlaylistSearchBox();
@@ -93,38 +94,38 @@ namespace Client_Application.DynamicVisualComponents
 
         private void DeletePlaylist_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.DeletePlaylist, true);
+            ClientEvent.Fire(EventType.DeletePlaylist);
         }
 
         private void AddToQueue_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.AddPlaylistToQueue, true);
+            ClientEvent.Fire(EventType.AddPlaylistToQueue);
         }
 
 
         private void InitializeCurrentPlaylistLabel(Label currentPlaylistLabel)
         {
             currentPlaylistLabel.Content = CurrentPlaylistName;
-            Canvas.SetTop(currentPlaylistLabel, 0);
-            Canvas.SetLeft(currentPlaylistLabel, 40);
+            Canvas.SetTop(currentPlaylistLabel, 1);
+            Canvas.SetLeft(currentPlaylistLabel, 32);
             currentPlaylistLabel.Foreground = new SolidColorBrush(Colors.White);
-            currentPlaylistLabel.FontSize = 22;
+            currentPlaylistLabel.FontSize = 26;
         }
 
         private void InitializePlayThisPlaylistButton(Button playThisPlaylistButton)
         {
             playThisPlaylistButton.Style = (Style)FindResource("MyButton");
-            playThisPlaylistButton.Width = 25;
-            playThisPlaylistButton.Height = 25;
-            Canvas.SetTop(playThisPlaylistButton, 8);
-            Canvas.SetLeft(playThisPlaylistButton, 10);
+            playThisPlaylistButton.Width = 22;
+            playThisPlaylistButton.Height = 22;
+            Canvas.SetTop(playThisPlaylistButton, 9);
+            Canvas.SetLeft(playThisPlaylistButton, 00);
             playThisPlaylistButton.Background = _playButtonImageBrush;
             playThisPlaylistButton.Click += PlayThisPlaylistButton_Click;
         }
 
         private void PlayThisPlaylistButton_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.PlayCurrentPlaylist, true);
+            ClientEvent.Fire(EventType.PlayCurrentPlaylist);
         }
 
         public void SetPlaylistLinks(List<string> playlistLinks)
@@ -142,17 +143,21 @@ namespace Client_Application.DynamicVisualComponents
             }
         }
 
-        public void DisplaySongs(List<Song> songs)
+        public void DisplaySongsByOne(List<Song> songs)
         {
-            foreach (Song song in songs)
+            foreach(Song song in songs)
             {
-                _scrollablePlaylistStackPanel.Add(new PlaylistSongContainer(song, CurrentPlaylistName, _playlistLinks.ToArray(), _playButtonImageBrush, _moreButtonImageBrush));
+                Dispatcher.Invoke(() =>
+                {
+                    _scrollablePlaylistStackPanel.Add(new PlaylistSongContainer(song, CurrentPlaylistName, _playlistLinks.ToArray(), _playButtonImageBrush, _moreButtonImageBrush));
+                });
             }
         }
 
+
         public void RemoveAllSongs()
         {
-            _scrollablePlaylistStackPanel.Children.Clear();
+            _scrollablePlaylistStackPanel.Clear();
         }
     }
 
@@ -160,10 +165,10 @@ namespace Client_Application.DynamicVisualComponents
     {
         public PlaylistSearchBox() : base()
         {
-            Canvas.SetLeft(this, 10);
+            Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, 40);
             TextWrapping = TextWrapping.Wrap;
-            Width = 380;
+            Width = 390;
             Height = 30;
             FontSize = 18;
             TextChanged += PlaylistSearchBox_TextChanged;
@@ -177,7 +182,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlaylistSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            new ClientEvent(EventType.SearchPlaylist, true, Text);
+            ClientEvent.Fire(EventType.SearchPlaylist, Text);
         }
     }
 
@@ -192,7 +197,7 @@ namespace Client_Application.DynamicVisualComponents
             _playlistStackPanel = new StackPanel();
             Content = _playlistStackPanel;
             Width = 440;
-            Height = 340;
+            Height = 420;
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
             Canvas.SetTop(this, 80);
@@ -209,6 +214,7 @@ namespace Client_Application.DynamicVisualComponents
         {
             PlaylistSongContainers.Clear();
             Children.Clear();
+            GC.Collect();
         }
     }
 
@@ -228,7 +234,7 @@ namespace Client_Application.DynamicVisualComponents
         {
             Song = song;
             Height = 60;
-            Width = 420;
+            Width = 440;
             Background = new SolidColorBrush(Color.FromRgb(35, 35, 35));
             Margin = new Thickness(0, 6, 0, 0);
 
@@ -278,20 +284,22 @@ namespace Client_Application.DynamicVisualComponents
         private void InitializePlaylistSongNameInnerLabel(Label songNameInnerLabel)
         {
             songNameInnerLabel.Width = 180;
-            songNameInnerLabel.Height = 26;
-            Canvas.SetTop(songNameInnerLabel, 3);
-            Canvas.SetLeft(songNameInnerLabel, 62);
+            songNameInnerLabel.Height = 24;
+            Canvas.SetTop(songNameInnerLabel, 6);
+            Canvas.SetLeft(songNameInnerLabel, 66);
             songNameInnerLabel.Foreground = new SolidColorBrush(Colors.White);
+            songNameInnerLabel.FontSize = 15;
             songNameInnerLabel.Content = Song.SongName;
         }
 
         private void InitializePlaylistArtistNameInnerLabel(Label artistNameInnerLabel)
         {
             artistNameInnerLabel.Width = 180;
-            artistNameInnerLabel.Height = 26;
-            Canvas.SetBottom(artistNameInnerLabel, 3);
-            Canvas.SetLeft(artistNameInnerLabel, 62);
+            artistNameInnerLabel.Height = 20;
+            Canvas.SetBottom(artistNameInnerLabel, 5);
+            Canvas.SetLeft(artistNameInnerLabel, 66);
             artistNameInnerLabel.Foreground = new SolidColorBrush(Colors.White);
+            artistNameInnerLabel.FontSize = 14;
             artistNameInnerLabel.Content = Song.ArtistName;
         }
 
@@ -309,7 +317,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlayThisButton_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.InternalRequest, true, InternalRequestType.PlayThis, Song);
+            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
         }
 
         private void InitializePlaylistMoreButton(Button moreButton, string[] playlistLinks)
@@ -338,7 +346,7 @@ namespace Client_Application.DynamicVisualComponents
                 if (playlistLink != ThisPlaylist)
                 {
                     CustomMenuItem item = new CustomMenuItem(Song, playlistLink);
-                    moreButton.ContextMenu.Items.Add(item);
+                    moreButton.ContextMenu.Items.Add(item.MenuItem);
                 }
             }
 
@@ -362,7 +370,7 @@ namespace Client_Application.DynamicVisualComponents
             foreach (string playlistLink in playlistLinks)
             {
                 CustomMenuItem item = new CustomMenuItem(Song, playlistLink);
-                MoreButton.ContextMenu.Items.Add(item);
+                MoreButton.ContextMenu.Items.Add(item.MenuItem);
             }
         }
         private void ShowMoreButtonMenu(object sender, RoutedEventArgs e)
@@ -372,12 +380,12 @@ namespace Client_Application.DynamicVisualComponents
 
         private void RemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.RemoveSongFromPlaylist, true, Song, ThisPlaylist);
+            ClientEvent.Fire(EventType.RemoveSongFromPlaylist, Song, ThisPlaylist);
         }
 
         private void AddToQueue_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.InternalRequest, true, InternalRequestType.AddSongToQueue, Song);
+            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.AddSongToQueue, Song);
         }
     }
 }

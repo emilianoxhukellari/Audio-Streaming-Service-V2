@@ -107,17 +107,18 @@ namespace Client_Application.Client
 
         private void OnSearchSongOrArtist(params object[] parameters)
         {
-            Task.Run(() =>
+            new Task(() =>
             {
                 string search = (string)parameters[0];
                 List<Song> foundSongs = _communicationManager.SearchSongOrArtist(search);
-                new ClientEvent(EventType.DisplaySongs, true, foundSongs);
-            });
+                ClientEvent.Fire(EventType.DisplaySongs, foundSongs);
+
+            }).Start();
         }
 
         private void ConnectionStateUpdate(bool connected)
         {
-            new ClientEvent(EventType.UpdateConnectionState, true, connected);
+            ClientEvent.Fire(EventType.UpdateConnectionState, connected);
         }
 
         private void RecoverSession()
@@ -130,6 +131,7 @@ namespace Client_Application.Client
         {
             Task.Run(() =>
             {
+                ClientEvent.Fire(EventType.LogInStartEnd, true);
                 string email = (string)parameters[0];
                 string password = (string)parameters[1];
                 bool rememberMe = (bool)parameters[2];
@@ -147,6 +149,7 @@ namespace Client_Application.Client
                         MessageBox.Show($"Could not sync playlists.", "Sync Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
+                ClientEvent.Fire(EventType.LogInStartEnd, false);
             });
         }
 
@@ -156,7 +159,7 @@ namespace Client_Application.Client
             {
                 _communicationManager.DisconnectFromServer();
                 _authenticationManager.NewSession();
-                new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogOut, "");
+                ClientEvent.Fire(EventType.LogInStateUpdate, LogInState.LogOut, "");
                 FillRememberMe();
                 if (!_authenticationManager.IsRememberMe())
                 {
@@ -169,7 +172,7 @@ namespace Client_Application.Client
         private void ResetApp()
         {
             _mediaPlayer.ResetMediaPlayer();
-            new ClientEvent(EventType.ResetWindow, true);
+            ClientEvent.Fire(EventType.ResetWindow);
         }
 
 
@@ -219,9 +222,12 @@ namespace Client_Application.Client
         private void OnSearchPlaylist(params object[] parameters)
         {
             string searchString = (string)parameters[0];
-            List<Song> songs = _playlistManager.SearchPlaylistSong(searchString);
+            Task.Run(() =>
+            {
+                List<Song> songs = _playlistManager.SearchPlaylistSong(searchString);
+                ClientEvent.Fire(EventType.DisplayPlaylistSongs, songs, _playlistManager.CurrentPlaylist);
 
-            new ClientEvent(EventType.DisplayPlaylistSongs, true, songs, _playlistManager.CurrentPlaylist);
+            }).Start();
         }
 
         /// <summary>
@@ -280,7 +286,7 @@ namespace Client_Application.Client
 
             if(result == PlaylistResult.AlreadyExists)
             {
-                new ClientEvent(EventType.PlaylistExists, true, newName);
+                ClientEvent.Fire(EventType.PlaylistExists, newName);
             }
 
             else if(result == PlaylistResult.Success)
@@ -305,7 +311,7 @@ namespace Client_Application.Client
             }
             else if(result == PlaylistResult.AlreadyExists)
             {
-                new ClientEvent(EventType.PlaylistExists, true, playlistName);
+                ClientEvent.Fire(EventType.PlaylistExists, playlistName);
             }
         }
 
@@ -376,7 +382,7 @@ namespace Client_Application.Client
 
             if (rememberMe && email != null && password != null)
             {
-                new ClientEvent(EventType.UpdateRememberMe, true, email, password);
+                ClientEvent.Fire(EventType.UpdateRememberMe, email, password);
             }
         }
 
@@ -462,7 +468,7 @@ namespace Client_Application.Client
         /// <param name="repeatState"></param>
         private void UpdateRepeatState(RepeatState repeatState)
         {
-            new ClientEvent(EventType.UpdateRepeatState, true, repeatState);
+            ClientEvent.Fire(EventType.UpdateRepeatState, true, repeatState);
         }
 
         /// <summary>
@@ -474,11 +480,11 @@ namespace Client_Application.Client
         {
             if (displayPlaylistLinksMode == DisplayPlaylistLinksMode.None || displayPlaylistLinksMode == DisplayPlaylistLinksMode.Delete)
             {
-                new ClientEvent(EventType.DisplayPlaylistLinks, true, playlistLinks, displayPlaylistLinksMode);
+                ClientEvent.Fire(EventType.DisplayPlaylistLinks, playlistLinks, displayPlaylistLinksMode);
             }
             else if (displayPlaylistLinksMode == DisplayPlaylistLinksMode.New || displayPlaylistLinksMode == DisplayPlaylistLinksMode.Rename)
             {
-                new ClientEvent(EventType.DisplayPlaylistLinks, true, playlistLinks, displayPlaylistLinksMode, active);
+                ClientEvent.Fire(EventType.DisplayPlaylistLinks, playlistLinks, displayPlaylistLinksMode, active);
             }
         }
 
@@ -488,8 +494,11 @@ namespace Client_Application.Client
         /// <param name="playlistLink"></param>
         private void UpdatePlaylist(string playlistLink)
         {
-            _playlistManager.CurrentPlaylist = playlistLink;
-            new ClientEvent(EventType.DisplayPlaylistSongs, true, _playlistManager.GetPlaylistSongs(playlistLink), _playlistManager.CurrentPlaylist);
+            Task.Run(() =>
+            {
+                _playlistManager.CurrentPlaylist = playlistLink;
+                ClientEvent.Fire(EventType.DisplayPlaylistSongs, _playlistManager.GetPlaylistSongs(playlistLink), _playlistManager.CurrentPlaylist);
+            });
         }
 
         /// <summary>
@@ -498,7 +507,11 @@ namespace Client_Application.Client
         /// <param name="songs"></param>
         private void DisplayQueue(List<(Song, int)> songs)
         {
-            new ClientEvent(EventType.DisplayQueue, true, songs);
+            Task.Run(() =>
+            {
+                ClientEvent.Fire(EventType.DisplayQueue, songs);
+            });
+           
         }
 
         /// <summary>
@@ -512,7 +525,7 @@ namespace Client_Application.Client
                 if (_progressBarState == ProgressBarState.Free)
                 {
                     (double Progress, string CurrentTime) progress = _mediaPlayer.GetCurrentSongProgress();
-                    new ClientEvent(EventType.UpdateProgress, true, progress.Progress, progress.CurrentTime);
+                    ClientEvent.Fire(EventType.UpdateProgress, progress.Progress, progress.CurrentTime);
                 }
             }
         }
@@ -539,7 +552,7 @@ namespace Client_Application.Client
 
         private void UpdateCurrentSongInfo(Song song)
         {
-            new ClientEvent(EventType.DisplayCurrentSong, true, song.SongName, song.ArtistName, song.DurationString, song.ImageBinary);
+            ClientEvent.Fire(EventType.DisplayCurrentSong, song.SongName, song.ArtistName, song.DurationString, song.ImageBinary);
         }
 
         private void TerminateSongDataReceiveRequest()
@@ -558,7 +571,7 @@ namespace Client_Application.Client
 
         private void SendPlayState(PlayButtonState playButtonState)
         {
-            new ClientEvent(EventType.ChangePlayState, true, playButtonState);
+            ClientEvent.Fire(EventType.ChangePlayState, playButtonState);
         }
 
         private void OnAddInternalRequest(params object[] parameters)

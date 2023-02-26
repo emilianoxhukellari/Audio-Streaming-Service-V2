@@ -40,7 +40,8 @@ namespace Client_Application
         LogIn,
         ResetWindow,
         UpdateConnectionState,
-        SearchSongOrArtist
+        SearchSongOrArtist,
+        LogInStartEnd,
     }
 
     public enum LogInState

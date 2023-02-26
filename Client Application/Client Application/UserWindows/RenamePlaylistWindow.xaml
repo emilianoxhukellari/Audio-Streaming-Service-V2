@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client_Application"
         mc:Ignorable="d"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
         Title="Rename Playlist" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    <Grid>
-        <TextBox x:Name="newPlaylistNameTextBox" HorizontalAlignment="Left" Margin="78,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="148"/>
-        <Button x:Name="renamePlaylistButton" Content="Rename" HorizontalAlignment="Left" Margin="92,83,0,0" VerticalAlignment="Top" Width="50" Height="20" Click="renamePlaylistButton_Click"/>
-        <Button x:Name="cancelRenamePlaylistButton" Content="Cancel" HorizontalAlignment="Left" Margin="163,83,0,0" VerticalAlignment="Top" Width="50" Height="20" Click="cancelRenamePlaylistButton_Click"/>
+    <Grid Background="#FF323232">
+        <TextBox x:Name="newPlaylistNameTextBox" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Width="220" Margin="0,20,0,0"/>
+        <Button x:Name="renamePlaylistButton" Content="Rename" VerticalAlignment="Bottom" Width="78" Height="32" Background="#FF00AA7F" BorderBrush="{x:Null}" Margin="60,0,0,20" Click="renamePlaylistButton_Click"/>
+        <Button x:Name="cancelRenamePlaylistButton" Content="Cancel" VerticalAlignment="Bottom" Width="78" Height="32" Background="#FF00AA7F" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,60,20" Click="cancelRenamePlaylistButton_Click"/>
     </Grid>
 </Window>

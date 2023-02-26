@@ -92,7 +92,7 @@ namespace Client_Application.Client
 
         private void ExecuteValidLogIn(string email, string password, bool rememberMe)
         {
-            new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogInValid, email);
+            ClientEvent.Fire(EventType.LogInStateUpdate, LogInState.LogInValid, email);
 
             if (rememberMe)
             {
@@ -106,7 +106,7 @@ namespace Client_Application.Client
 
         private void ExecuteInvalidLogIn(string email, string password, bool rememberMe)
         {
-            new ClientEvent(EventType.LogInStateUpdate, true, LogInState.LogInInvalid);
+            ClientEvent.Fire(EventType.LogInStateUpdate, LogInState.LogInInvalid);
             if (!rememberMe)
             {
                 RemoveRememberMe();

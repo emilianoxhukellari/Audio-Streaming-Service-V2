@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Client_Application.Client
 {
@@ -25,27 +27,15 @@ namespace Client_Application.Client
     /// When you create an instance of this class, and set selfFire to true, it will immediately call the callback from the class that 
     /// is listening for this specific event.
     /// </summary>
-    public sealed class ClientEvent
+    public static class ClientEvent
     {
-        private readonly EventType _eventType;
-        private readonly object[] _parameters;
-
-        public ClientEvent(EventType eventType, bool selfFire, params object[] parameters)
-        {
-            _eventType = eventType;
-            _parameters = parameters;
-            if (selfFire)
-            {
-                Fire();
-            }
-        }
-        public void Fire()
+        public static void Fire(EventType eventType, params object[] parameters)
         {
             foreach (var listener in ClientListener.Listeners)
             {
-                if (listener.ListeningFor.ContainsKey(_eventType)) // Check if there are any subscribers
+                if (listener.ListeningFor.ContainsKey(eventType)) // Check if there are any subscribers
                 {
-                    listener.ListeningFor[_eventType](_parameters); // Call method
+                    listener.ListeningFor[eventType](parameters); // Call method
                 }
             }
         }

@@ -9,4 +9,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ModernWpfUI" Version="0.9.7-preview.2" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Client_Application.Client;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Client_Application.DynamicVisualComponents
@@ -19,9 +20,9 @@ namespace Client_Application.DynamicVisualComponents
         private ImageBrush _removeImageBrush;
         public QueueSongContainer(Song song, int currentIndex, ImageBrush moveUpImageBrush, ImageBrush moveDownImageBrush, ImageBrush removeImageBrush) : base()
         {
-            Height = 35;
+            Height = 40;
             Background = new SolidColorBrush(Color.FromRgb(35, 35, 35));
-            Margin = new Thickness(0, 2, 0, 0);
+            Margin = new Thickness(0, 10, 0, 0);
             _song = song;
             _currentIndex = currentIndex;
             _songNameQueueLabel = new Label();
@@ -49,66 +50,64 @@ namespace Client_Application.DynamicVisualComponents
         private void InitializeSongNameQueueLabel(Label songNameQueueLabel)
         {
             songNameQueueLabel.Width = 114;
-            songNameQueueLabel.Height = 22;
             songNameQueueLabel.Background = null;
-            songNameQueueLabel.FontSize = 10;
+            songNameQueueLabel.FontSize = 13;
             songNameQueueLabel.Foreground = new SolidColorBrush(Colors.White);
-            Canvas.SetTop(songNameQueueLabel, 0);
-            Canvas.SetLeft(songNameQueueLabel, 0);
+            Canvas.SetTop(songNameQueueLabel, -2);
+            Canvas.SetLeft(songNameQueueLabel, 4);
             songNameQueueLabel.Content = _song.SongName;
         }
 
         private void InitializeArtistNameQueueLabel(Label artistNameQueueLabel)
         {
             artistNameQueueLabel.Width = 114;
-            artistNameQueueLabel.Height = 22;
             artistNameQueueLabel.Background = null;
-            artistNameQueueLabel.FontSize = 9;
+            artistNameQueueLabel.FontSize = 11;
             artistNameQueueLabel.Foreground = new SolidColorBrush(Color.FromRgb(85, 255, 255));
-            Canvas.SetTop(artistNameQueueLabel, 13);
-            Canvas.SetLeft(artistNameQueueLabel, 0);
+            Canvas.SetTop(artistNameQueueLabel, 18);
+            Canvas.SetLeft(artistNameQueueLabel, 4);
             artistNameQueueLabel.Content = _song.ArtistName;
         }
 
         private void InitializeMoveUpButton(Button moveUpButton)
         {
-            moveUpButton.Style = (Style)FindResource("MyButton");
-            Canvas.SetLeft(moveUpButton, 125);
-            Canvas.SetTop(moveUpButton, 12);
-            moveUpButton.Width = 14;
-            moveUpButton.Height = 14;
+            Canvas.SetRight(moveUpButton, 80);
+            Canvas.SetTop(moveUpButton, 14);
+            moveUpButton.Style = (Style)FindResource("MyButton"); 
+            moveUpButton.Width = 15;
+            moveUpButton.Height = 15;
             moveUpButton.Background = _moveUpImageBrush;
             moveUpButton.Click += MoveUpButton_Click;
         }
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.MoveSongUpQueue, true, _currentIndex);
+            ClientEvent.Fire(EventType.MoveSongUpQueue, _currentIndex);
         }
 
         private void InitializeMoveDownButton(Button moveDownButton)
         {
+            Canvas.SetRight(moveDownButton, 50);
+            Canvas.SetTop(moveDownButton, 14);
             moveDownButton.Style = (Style)FindResource("MyButton");
-            Canvas.SetLeft(moveDownButton, 150);
-            Canvas.SetTop(moveDownButton, 12);
-            moveDownButton.Width = 14;
-            moveDownButton.Height = 14;
+            moveDownButton.Width = 15;
+            moveDownButton.Height = 15;
             moveDownButton.Background = _moveDownImageBrush;
             moveDownButton.Click += MoveDownButton_Click;
         }
 
         private void MoveDownButton_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.MoveSongDownQueue, true, _currentIndex);
+            ClientEvent.Fire(EventType.MoveSongDownQueue, _currentIndex);
         }
 
         private void InitializeRemoveFromQueueButton(Button removeFromQueueButton)
         {
-            removeFromQueueButton.Style = (Style)FindResource("MyButton");
-            Canvas.SetLeft(removeFromQueueButton, 175);
-            Canvas.SetTop(removeFromQueueButton, 12);
-            removeFromQueueButton.Width = 14;
-            removeFromQueueButton.Height = 14;
+            Canvas.SetRight(removeFromQueueButton, 20);
+            Canvas.SetTop(removeFromQueueButton, 14);
+            removeFromQueueButton.Style = (Style)FindResource("MyButton"); 
+            removeFromQueueButton.Width = 15;
+            removeFromQueueButton.Height = 15;
             removeFromQueueButton.Foreground = new SolidColorBrush(Colors.Black);
             removeFromQueueButton.Background = _removeImageBrush;
             removeFromQueueButton.Click += RemoveFromQueueButton_Click;
@@ -116,7 +115,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void RemoveFromQueueButton_Click(object sender, RoutedEventArgs e)
         {
-            new ClientEvent(EventType.RemoveSongQueue, true, _currentIndex);
+            ClientEvent.Fire(EventType.RemoveSongQueue, _currentIndex);
         }
     }
 }

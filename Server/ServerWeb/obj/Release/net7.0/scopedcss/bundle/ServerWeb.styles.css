@@ -1,0 +1,334 @@
+/* _content/ServerWeb/Pages/Administrator/Components/SideBarAdministrator.razor.rz.scp.css */
+.navbar-toggler[b-od9onyjkpd] {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.navbar-brand[b-od9onyjkpd] {
+    font-size: 1.1rem;
+}
+
+.oi[b-od9onyjkpd] {
+    width: 2rem;
+    font-size: 1.1rem;
+    vertical-align: text-top;
+    top: -2px;
+}
+
+.nav-item[b-od9onyjkpd] {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item:first-of-type[b-od9onyjkpd] {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type[b-od9onyjkpd] {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item[b-od9onyjkpd]  a {
+        color: #d7d7d7;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+    }
+
+.nav-item[b-od9onyjkpd]  a.active {
+    background-color: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.nav-item[b-od9onyjkpd]  a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler[b-od9onyjkpd] {
+        display: none;
+    }
+
+    .collapse[b-od9onyjkpd] {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+    }
+    
+    .nav-scrollable[b-od9onyjkpd] {
+        /* Allow sidebar to scroll for tall menus */
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+}
+/* _content/ServerWeb/Pages/Administrator/_LayoutAdministrator.cshtml.rz.scp.css */
+.sidebar[b-aeeug6bcar] {
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    float: left;
+}
+
+@media (min-width: 641px) {
+    .page[b-aeeug6bcar] {
+        flex-direction: row;
+    }
+
+    .sidebar[b-aeeug6bcar] {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .top-row[b-aeeug6bcar] {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row[b-aeeug6bcar], article[b-aeeug6bcar] {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+/* _content/ServerWeb/Pages/EngineAdministrator/Components/EngineStart.razor.rz.scp.css */
+/* _content/ServerWeb/Pages/EngineAdministrator/Components/SideBarEngineAdministrator.razor.rz.scp.css */
+.navbar-toggler[b-1me7w2vzt1] {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.navbar-brand[b-1me7w2vzt1] {
+    font-size: 1.1rem;
+}
+
+.oi[b-1me7w2vzt1] {
+    width: 2rem;
+    font-size: 1.1rem;
+    vertical-align: text-top;
+    top: -2px;
+}
+
+.nav-item[b-1me7w2vzt1] {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item:first-of-type[b-1me7w2vzt1] {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type[b-1me7w2vzt1] {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item[b-1me7w2vzt1]  a {
+        color: #d7d7d7;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+    }
+
+.nav-item[b-1me7w2vzt1]  a.active {
+    background-color: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.nav-item[b-1me7w2vzt1]  a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler[b-1me7w2vzt1] {
+        display: none;
+    }
+
+    .collapse[b-1me7w2vzt1] {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+    }
+    
+    .nav-scrollable[b-1me7w2vzt1] {
+        /* Allow sidebar to scroll for tall menus */
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+}
+/* _content/ServerWeb/Pages/EngineAdministrator/_LayoutEngineAdministrator.cshtml.rz.scp.css */
+.sidebar[b-ecgm4b3ktq] {
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    float: left;
+}
+
+@media (min-width: 641px) {
+    .page[b-ecgm4b3ktq] {
+        flex-direction: row;
+    }
+
+    .sidebar[b-ecgm4b3ktq] {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .top-row[b-ecgm4b3ktq] {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row[b-ecgm4b3ktq], article[b-ecgm4b3ktq] {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+/* _content/ServerWeb/Pages/Shared/_Layout.cshtml.rz.scp.css */
+/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand[b-nillcgl4di] {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a[b-nillcgl4di] {
+  color: #0077cc;
+}
+
+.btn-primary[b-nillcgl4di] {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active[b-nillcgl4di], .nav-pills .show > .nav-link[b-nillcgl4di] {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-top[b-nillcgl4di] {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom[b-nillcgl4di] {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow[b-nillcgl4di] {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy[b-nillcgl4di] {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+.footer[b-nillcgl4di] {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+/* _content/ServerWeb/Pages/SU/Components/SideBarSU.razor.rz.scp.css */
+.navbar-toggler[b-76yl0lcfrg] {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.navbar-brand[b-76yl0lcfrg] {
+    font-size: 1.1rem;
+}
+
+.oi[b-76yl0lcfrg] {
+    width: 2rem;
+    font-size: 1.1rem;
+    vertical-align: text-top;
+    top: -2px;
+}
+
+.nav-item[b-76yl0lcfrg] {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item:first-of-type[b-76yl0lcfrg] {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type[b-76yl0lcfrg] {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item[b-76yl0lcfrg]  a {
+        color: #d7d7d7;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+    }
+
+.nav-item[b-76yl0lcfrg]  a.active {
+    background-color: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.nav-item[b-76yl0lcfrg]  a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler[b-76yl0lcfrg] {
+        display: none;
+    }
+
+    .collapse[b-76yl0lcfrg] {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+    }
+    
+    .nav-scrollable[b-76yl0lcfrg] {
+        /* Allow sidebar to scroll for tall menus */
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+}
+/* _content/ServerWeb/Pages/SU/_LayoutSU.cshtml.rz.scp.css */
+.sidebar[b-zguhctgehv] {
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    float: left;
+}
+@media (min-width: 641px) {
+    .page[b-zguhctgehv] {
+        flex-direction: row;
+    }
+
+    .sidebar[b-zguhctgehv] {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .top-row[b-zguhctgehv] {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row[b-zguhctgehv], article[b-zguhctgehv] {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+/* _content/ServerWeb/Pages/User/_LayoutUser.cshtml.rz.scp.css */
+body[b-l74jm36n1z] {
+}

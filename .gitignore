@@ -1,7 +1,9 @@
 /Server/.vs/
 /Client Application/.vs/
-/Server/DataAccess/Data
-[Pp]playlists/**
+/Server/DataAccess/Data/AudioFiles/*
+/Server/DataAccess/Data/Confidential/*
+/ImageFiles/DataAccess/Data/ImageFiles/*
+[Pp]laylists/*
 
 # User-specific files
 *.suo
@@ -19,8 +21,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-[Dd]ebug/**
-[Rr]elease/**
+[Dd]ebug/*
+[Rr]elease/*
 
 # Benchmark Results
 BenchmarkDotNet.Artifacts/

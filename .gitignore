@@ -3,7 +3,6 @@
 /Server/DataAccess/Data/AudioFiles/**
 /Server/DataAccess/Data/Confidential/**
 /Server/DataAccess/Data/ImageFiles/**
-/Client Application/bin/Playlists/*/
 
 # User-specific files
 *.suo

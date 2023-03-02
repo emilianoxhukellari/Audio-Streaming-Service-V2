@@ -2,7 +2,7 @@
 /Client Application/.vs/
 /Server/DataAccess/Data/AudioFiles/*
 /Server/DataAccess/Data/Confidential/*
-/ImageFiles/DataAccess/Data/ImageFiles/*
+/Server/DataAccess/Data/ImageFiles/*
 [Pp]laylists/*
 
 # User-specific files

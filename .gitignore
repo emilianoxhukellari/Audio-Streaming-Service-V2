@@ -1,6 +1,7 @@
 /Server/.vs/
 /Client Application/.vs/
 /Server/DataAccess/Data
+[Pp]playlists/**
 
 # User-specific files
 *.suo

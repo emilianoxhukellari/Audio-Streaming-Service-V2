@@ -17,7 +17,10 @@ namespace Client_Application
         private void renamePlaylistButton_Click(object sender, RoutedEventArgs e)
         {
             string playlistName = newPlaylistNameTextBox.Text;
-            ClientEvent.Fire(EventType.RenamePlaylist, true, playlistName);
+            if (playlistName != null && playlistName != string.Empty)
+            {
+                ClientEvent.Fire(EventType.RenamePlaylist, playlistName);
+            }
             Close();
         }
 

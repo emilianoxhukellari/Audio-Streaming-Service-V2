@@ -75,6 +75,8 @@ namespace Client_Application.DynamicVisualComponents
             Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, 40);
             TextWrapping = TextWrapping.Wrap;
+            Background = new SolidColorBrush(Color.FromRgb(40, 40, 40));
+            Foreground = new SolidColorBrush(Colors.White);
             Width = 440;
             Height = 30;
             FontSize = 18;
@@ -127,8 +129,8 @@ namespace Client_Application.DynamicVisualComponents
             Song = song;
             Height = 60;
             Width = 440;
-            Background = new SolidColorBrush(Color.FromRgb(35, 35, 35));
-            Margin = new Thickness(0, 6, 0, 0);
+            Background = null;
+            Margin = new Thickness(0, 8, 0, 0);
             HorizontalAlignment = HorizontalAlignment.Left;
 
             Image = new Image();
@@ -153,6 +155,28 @@ namespace Client_Application.DynamicVisualComponents
             Children.Add(DurationLabel);
             Children.Add(PlayThisButton);
             Children.Add(MoreButton);
+
+            MouseEnter += SearchSongContainer_MouseEnter;
+            MouseLeave += SearchSongContainer_MouseLeave;
+            MouseLeftButtonDown += SearchSongContainer_MouseLeftButtonDown;
+        }
+
+        private void SearchSongContainer_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if(e.ClickCount == 2)
+            {
+                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
+            }
+        }
+
+        private void SearchSongContainer_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Background = null;
+        }
+
+        private void SearchSongContainer_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Background = new SolidColorBrush(Color.FromRgb(40, 40, 40));
         }
 
         private void InitializeSearchSongContainerDurationLabel(Label label)

@@ -53,7 +53,7 @@ namespace Client_Application.DynamicVisualComponents
             songNameQueueLabel.Background = null;
             songNameQueueLabel.FontSize = 13;
             songNameQueueLabel.Foreground = new SolidColorBrush(Colors.White);
-            Canvas.SetTop(songNameQueueLabel, -2);
+            Canvas.SetTop(songNameQueueLabel, 2);
             Canvas.SetLeft(songNameQueueLabel, 4);
             songNameQueueLabel.Content = _song.SongName;
         }
@@ -64,7 +64,7 @@ namespace Client_Application.DynamicVisualComponents
             artistNameQueueLabel.Background = null;
             artistNameQueueLabel.FontSize = 11;
             artistNameQueueLabel.Foreground = new SolidColorBrush(Color.FromRgb(85, 255, 255));
-            Canvas.SetTop(artistNameQueueLabel, 18);
+            Canvas.SetTop(artistNameQueueLabel, 22);
             Canvas.SetLeft(artistNameQueueLabel, 4);
             artistNameQueueLabel.Content = _song.ArtistName;
         }

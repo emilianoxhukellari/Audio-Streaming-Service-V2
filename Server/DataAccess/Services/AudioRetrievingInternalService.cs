@@ -153,6 +153,11 @@ namespace DataAccess.Services
                         Duration = song.Duration,
                         ImageFileName = song.ImageFileName
                     };
+
+            //if(songs.Count() > 5)
+            //{
+            //    return songs.Take(5);
+            //}
             return songs;
         }
     }

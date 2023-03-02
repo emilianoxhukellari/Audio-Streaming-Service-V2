@@ -21,7 +21,10 @@ namespace Client_Application
         private void createNewPlaylistButton_Click(object sender, RoutedEventArgs e)
         {
             string playlistName = newPlaylistTextbox.Text;
-            ClientEvent.Fire(EventType.CreateNewPlaylist, true, playlistName);
+            if (playlistName != null && playlistName != string.Empty)
+            {
+                ClientEvent.Fire(EventType.CreateNewPlaylist, playlistName);
+            }
             Close();
         }
     }

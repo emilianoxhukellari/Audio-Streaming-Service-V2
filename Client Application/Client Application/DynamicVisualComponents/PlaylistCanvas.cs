@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Client_Application.DynamicVisualComponents
@@ -89,7 +90,7 @@ namespace Client_Application.DynamicVisualComponents
         private void RenamePlaylist_Click(object sender, RoutedEventArgs e)
         {
             RenamePlaylistWindow renamePlaylistWindow = new RenamePlaylistWindow();
-            renamePlaylistWindow.Show();
+            renamePlaylistWindow.ShowDialog();
         }
 
         private void DeletePlaylist_Click(object sender, RoutedEventArgs e)
@@ -168,6 +169,8 @@ namespace Client_Application.DynamicVisualComponents
             Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, 40);
             TextWrapping = TextWrapping.Wrap;
+            Background = new SolidColorBrush(Color.FromRgb(40, 40, 40));
+            Foreground = new SolidColorBrush(Colors.White);
             Width = 390;
             Height = 30;
             FontSize = 18;
@@ -235,8 +238,8 @@ namespace Client_Application.DynamicVisualComponents
             Song = song;
             Height = 60;
             Width = 440;
-            Background = new SolidColorBrush(Color.FromRgb(35, 35, 35));
-            Margin = new Thickness(0, 6, 0, 0);
+            Background = null;
+            Margin = new Thickness(0, 8, 0, 0);
 
             Image = new Image();
             SongNameInner = new Label();
@@ -261,7 +264,32 @@ namespace Client_Application.DynamicVisualComponents
             Children.Add(DurationLabel);
             Children.Add(PlayThisButton);
             Children.Add(MoreButton);
+
+            MouseEnter += PlaylistSongContainer_MouseEnter;
+            MouseLeave += PlaylistSongContainer_MouseLeave;
+            MouseLeftButtonDown += PlaylistSongContainer_MouseLeftButtonDown;
         }
+
+        private void PlaylistSongContainer_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
+            }
+        }
+
+        private void PlaylistSongContainer_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Background = null;
+        }
+
+        private void PlaylistSongContainer_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Background = new SolidColorBrush(Color.FromRgb(60, 10, 60));
+        }
+
+
+
         private void InitializeSearchSongContainerDurationLabel(Label label)
         {
             label.Width = 45;

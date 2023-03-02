@@ -1,5 +1,6 @@
 ﻿using Client_Application.Client;
 using Client_Application.DynamicVisualComponents;
+using Client_Application.UserWindows;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -18,7 +19,6 @@ namespace Client_Application
     /// 
     public partial class MainWindow : Window
     {
-
         private ClientListener _clientListener;
         private SearchCanvas _searchCanvas;
         private PlaylistCanvas _playlistCanvas;
@@ -571,7 +571,7 @@ namespace Client_Application
         private void addPlaylistButton_Click(object sender, RoutedEventArgs e)
         {
             AddPlaylistWindow addPlaylistWindow = new AddPlaylistWindow();
-            addPlaylistWindow.Show();
+            addPlaylistWindow.ShowDialog();
         }
 
         private void removeQueueButton_Click(object sender, RoutedEventArgs e)
@@ -619,11 +619,8 @@ namespace Client_Application
 
         private void logOutButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to log out?", "Confirmation", MessageBoxButton.YesNo);
-            if (result == MessageBoxResult.Yes)
-            {
-                ClientEvent.Fire(EventType.LogOut);
-            }
+            LogOut window = new LogOut();
+            window.ShowDialog();
         }
 
         private void logOutButton_MouseEnter(object sender, MouseEventArgs e)

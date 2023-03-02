@@ -226,8 +226,7 @@ namespace Client_Application.Client
             {
                 List<Song> songs = _playlistManager.SearchPlaylistSong(searchString);
                 ClientEvent.Fire(EventType.DisplayPlaylistSongs, songs, _playlistManager.CurrentPlaylist);
-
-            }).Start();
+            });
         }
 
         /// <summary>

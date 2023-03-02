@@ -1,5 +1,6 @@
 /Server/.vs/
 /Client Application/.vs/
+/Server/DataAccess/Data
 
 # User-specific files
 *.suo

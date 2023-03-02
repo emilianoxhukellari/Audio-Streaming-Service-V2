@@ -11,18 +11,10 @@
 *.userosscache
 *.sln.docstates
 
-
-[Ll]og/
-[Ll]ogs/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
-[Dd]ebug/*
-[Rr]elease/*
+[bB]in/Debug/
+[bB]in/Release/
+[oO]bj/
+[pP]ackages/
 
 # Benchmark Results
 BenchmarkDotNet.Artifacts/

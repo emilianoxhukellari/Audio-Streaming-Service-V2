@@ -10,34 +10,104 @@ namespace Client_Application.Client
     public sealed class ClientListener
     {
         public static List<ClientListener> Listeners = new List<ClientListener>();
-        public Dictionary<EventType, ClientEventCallback> ListeningFor;
+        public Dictionary<EventType, Delegate> ListeningFor;
 
         public ClientListener()
         {
             Listeners.Add(this);
-            ListeningFor = new Dictionary<EventType, ClientEventCallback>();
+            ListeningFor = new Dictionary<EventType, Delegate>();
         }
-        public void Listen(EventType eventType, ClientEventCallback callback)
+        public void Listen<T>(EventType eventType, ClientEventCallback<T> callback) where T : EventArgs
         {
             ListeningFor.Add(eventType, callback);
         }
     }
 
     /// <summary>
-    /// When you create an instance of this class, and set selfFire to true, it will immediately call the callback from the class that 
-    /// is listening for this specific event.
+    /// Call Fire() to execute on the current thread a method that is listening fo
     /// </summary>
     public static class ClientEvent
     {
-        public static void Fire(EventType eventType, params object[] parameters)
+        /// <summary>
+        /// Executes on the current thread.
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <param name="parameters"></param>
+        public static void Fire<T>(EventType eventType, T args) where T : EventArgs
         {
             foreach (var listener in ClientListener.Listeners)
             {
                 if (listener.ListeningFor.ContainsKey(eventType)) // Check if there are any subscribers
                 {
-                    listener.ListeningFor[eventType](parameters); // Call method
+                    Delegate callback = listener.ListeningFor[eventType];
+
+                    if (callback is ClientEventCallback<T>)
+                    {
+                        ((ClientEventCallback<T>)callback)(args);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("Invalid Event Args for Event Delegate");
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes on the current thread async.
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static async Task FireAsync<T>(EventType eventType, T args) where T : EventArgs
+        {
+            await Task.Run(() =>
+            {
+                foreach (var listener in ClientListener.Listeners)
+                {
+                    if (listener.ListeningFor.ContainsKey(eventType)) // Check if there are any subscribers
+                    {
+                        Delegate callback = listener.ListeningFor[eventType];
+
+                        if (callback is ClientEventCallback<T>)
+                        {
+                            ((ClientEventCallback<T>)callback)(args);
+                        }
+                        else
+                        {
+                            throw new InvalidCastException("Invalid Event Args for Event Delegate");
+                        }
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// Adds the event to ThreadPool.
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <param name="parameters"></param>
+        public static void FireForget<T>(EventType eventType, T args) where T : EventArgs
+        {
+            Task.Run(() =>
+            {
+                foreach (var listener in ClientListener.Listeners)
+                {
+                    if (listener.ListeningFor.ContainsKey(eventType)) // Check if there are any subscribers
+                    {
+                        Delegate callback = listener.ListeningFor[eventType];
+
+                        if (callback is ClientEventCallback<T>)
+                        {
+                            ((ClientEventCallback<T>)callback)(args);
+                        }
+                        else
+                        {
+                            throw new InvalidCastException("Invalid Event Args for Event Delegate");
+                        }
+                    }
+                }
+            });
         }
     }
 }

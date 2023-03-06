@@ -82,7 +82,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.MoveSongUpQueue, _currentIndex);
+            ClientEvent.Fire(EventType.MoveSongUpQueue, new MoveSongArgs { Index = _currentIndex });
         }
 
         private void InitializeMoveDownButton(Button moveDownButton)
@@ -98,7 +98,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void MoveDownButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.MoveSongDownQueue, _currentIndex);
+            ClientEvent.Fire(EventType.MoveSongDownQueue, new MoveSongArgs { Index = _currentIndex});
         }
 
         private void InitializeRemoveFromQueueButton(Button removeFromQueueButton)
@@ -115,7 +115,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void RemoveFromQueueButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.RemoveSongQueue, _currentIndex);
+            ClientEvent.Fire(EventType.RemoveSongQueue, new RemoveSongQueueArgs { Index = _currentIndex });
         }
     }
 }

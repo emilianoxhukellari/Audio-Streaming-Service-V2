@@ -83,42 +83,42 @@ namespace Client_Application.Client
                 new CallbackUpdateRepeatState(UpdateRepeatState));
 
             // Listen for events from Windows
-            Listen(EventType.InternalRequest, new ClientEventCallback(OnAddInternalRequest));
-            Listen(EventType.UpdateProgressBarState, new ClientEventCallback(OnSetProgressBarState));
-            Listen(EventType.MoveSongUpQueue, new ClientEventCallback(OnMoveSongUpQueue));
-            Listen(EventType.MoveSongDownQueue, new ClientEventCallback(OnMoveSongDownQueue));
-            Listen(EventType.RemoveSongQueue, new ClientEventCallback(OnRemoveSongQueue));
-            Listen(EventType.DeleteQueue, new ClientEventCallback(OnDeleteQueue));
-            Listen(EventType.ChangeVolume, new ClientEventCallback(OnChangeVolume));
-            Listen(EventType.CreateNewPlaylist, new ClientEventCallback(OnCreateNewPlaylist));
-            Listen(EventType.WindowReady, new ClientEventCallback(OnWindowReady));
-            Listen(EventType.UpdatePlaylist, new ClientEventCallback(OnUpdatePlaylist));
-            Listen(EventType.AddSongToPlaylist, new ClientEventCallback(OnAddSongToPlaylist));
-            Listen(EventType.RemoveSongFromPlaylist, new ClientEventCallback(OnRemoveSongFromPlaylist));
-            Listen(EventType.PlayCurrentPlaylist, new ClientEventCallback(OnPlayCurrentPlaylist));
-            Listen(EventType.RenamePlaylist, new ClientEventCallback(OnRenamePlaylist));
-            Listen(EventType.AddPlaylistToQueue, new ClientEventCallback(OnAddPlaylistToQueue));
-            Listen(EventType.DeletePlaylist, new ClientEventCallback(OnDeletePlaylist));
-            Listen(EventType.SearchPlaylist, new ClientEventCallback(OnSearchPlaylist));
-            Listen(EventType.LogOut, new ClientEventCallback(OnLogOut));
-            Listen(EventType.SearchSongOrArtist, new ClientEventCallback(OnSearchSongOrArtist));
-            Listen(EventType.LogIn, new ClientEventCallback(OnLogIn));
+            Listen(EventType.InternalRequest, new ClientEventCallback<InternalRequestArgs>(OnAddInternalRequest));
+            Listen(EventType.UpdateProgressBarState, new ClientEventCallback<UpdateProgressBarStateArgs>(OnUpdateProgressBarState));
+            Listen(EventType.MoveSongUpQueue, new ClientEventCallback<MoveSongArgs>(OnMoveSongUpQueue));
+            Listen(EventType.MoveSongDownQueue, new ClientEventCallback<MoveSongArgs>(OnMoveSongDownQueue));
+            Listen(EventType.RemoveSongQueue, new ClientEventCallback<RemoveSongQueueArgs>(OnRemoveSongQueue));
+            Listen(EventType.DeleteQueue, new ClientEventCallback<EventArgs>(OnDeleteQueue));
+            Listen(EventType.ChangeVolume, new ClientEventCallback<ChangeVolumeArgs>(OnChangeVolume));
+            Listen(EventType.CreateNewPlaylist, new ClientEventCallback<CreateNewPlaylistArgs>(OnCreateNewPlaylist));
+            Listen(EventType.WindowReady, new ClientEventCallback<EventArgs>(OnWindowReady));
+            Listen(EventType.UpdatePlaylist, new ClientEventCallback<UpdatePlaylistArgs>(OnUpdatePlaylist));
+            Listen(EventType.AddSongToPlaylist, new ClientEventCallback<AddSongToPlaylistArgs>(OnAddSongToPlaylist));
+            Listen(EventType.RemoveSongFromPlaylist, new ClientEventCallback<RemoveSongFromPlaylistArgs>(OnRemoveSongFromPlaylist));
+            Listen(EventType.PlayCurrentPlaylist, new ClientEventCallback<EventArgs>(OnPlayCurrentPlaylist));
+            Listen(EventType.RenamePlaylist, new ClientEventCallback<RenamePlaylistArgs>(OnRenamePlaylist));
+            Listen(EventType.AddPlaylistToQueue, new ClientEventCallback<EventArgs>(OnAddPlaylistToQueue));
+            Listen(EventType.DeletePlaylist, new ClientEventCallback<EventArgs>(OnDeletePlaylist));
+            Listen(EventType.SearchPlaylist, new ClientEventCallback<SearchSongOrArtistArgs>(OnSearchPlaylist));
+            Listen(EventType.LogOut, new ClientEventCallback<EventArgs>(OnLogOut));
+            Listen(EventType.SearchSongOrArtist, new ClientEventCallback<SearchSongOrArtistArgs>(OnSearchSongOrArtist));
+            Listen(EventType.LogIn, new ClientEventCallback<LogInArgs>(OnLogIn));
         }
 
-        private void OnSearchSongOrArtist(params object[] parameters)
+        private void OnSearchSongOrArtist(SearchSongOrArtistArgs args)
         {
             new Task(() =>
             {
-                string search = (string)parameters[0];
+                string search = args.Search;
                 List<Song> foundSongs = _communicationManager.SearchSongOrArtist(search);
-                ClientEvent.Fire(EventType.DisplaySongs, foundSongs);
+                ClientEvent.Fire(EventType.DisplaySongs, new DisplaySongsArgs { Songs = foundSongs }) ;
 
             }).Start();
         }
 
         private void ConnectionStateUpdate(bool connected)
         {
-            ClientEvent.Fire(EventType.UpdateConnectionState, connected);
+            ClientEvent.Fire(EventType.UpdateConnectionState, new UpdateConnectionStateArgs { Connected = connected });
         }
 
         private void RecoverSession()
@@ -127,16 +127,13 @@ namespace Client_Application.Client
             _authenticationManager.RecoverSession();
         }
 
-        private void OnLogIn(params object[] parameters)
+        private void OnLogIn(LogInArgs args)
         {
             Task.Run(() =>
             {
-                ClientEvent.Fire(EventType.LogInStartEnd, true);
-                string email = (string)parameters[0];
-                string password = (string)parameters[1];
-                bool rememberMe = (bool)parameters[2];
+                ClientEvent.Fire(EventType.LogInStartEnd, new LogInStartEndArgs { Started = true });
                 _dualSocket.Connect();
-                bool success = _authenticationManager.LogIn(email, password, rememberMe);
+                bool success = _authenticationManager.LogIn(args.Email, args.Password, args.RememberMe);
                 if (success)
                 {
                     PlaylistResult result = _playlistManager.Sync();
@@ -149,58 +146,55 @@ namespace Client_Application.Client
                         MessageBox.Show($"Could not sync playlists.", "Sync Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
-                ClientEvent.Fire(EventType.LogInStartEnd, false);
+                ClientEvent.Fire(EventType.LogInStartEnd, new LogInStartEndArgs { Started = false });
             });
         }
 
-        private void OnLogOut(params object[] parameters)
+        private void OnLogOut(EventArgs args)
         {
-            new Thread(() =>
+            Task.Run(() =>
             {
                 _communicationManager.DisconnectFromServer();
                 _authenticationManager.NewSession();
-                ClientEvent.Fire(EventType.LogInStateUpdate, LogInState.LogOut, "");
+                ClientEvent.Fire(EventType.LogInStateUpdate, new LogInStateUpdateArgs { LogInState = LogInState.LogOut });
                 FillRememberMe();
                 if (!_authenticationManager.IsRememberMe())
                 {
                     PlaylistResult result = _playlistManager.DeleteAllPlaylistsLocal();
                 }
                 ResetApp();
-            }).Start();
+            });
         }
 
         private void ResetApp()
         {
             _mediaPlayer.ResetMediaPlayer();
-            ClientEvent.Fire(EventType.ResetWindow);
+            ClientEvent.Fire(EventType.ResetWindow, EventArgs.Empty);
         }
-
 
         /// <summary>
         /// Expects (int)index. It will ask the media player to move the song at index up the queue.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnMoveSongUpQueue(params object[] parameters)
+        private void OnMoveSongUpQueue(MoveSongArgs args)
         {
-            int index = (int)parameters[0];
-            _mediaPlayer.MoveSongUp(index);
+            _mediaPlayer.MoveSongUp(args.Index);
         }
 
         /// <summary>
         /// Expects (int)index. It will ask the media player to move the song at index down the queue.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnMoveSongDownQueue(params object[] parameters)
+        private void OnMoveSongDownQueue(MoveSongArgs args)
         {
-            int index = (int)parameters[0];
-            _mediaPlayer.MoveSongDown(index);
+            _mediaPlayer.MoveSongDown(args.Index);
         }
 
         /// <summary>
         /// Expects no parameters. It will ask the media player to delete the entire queue.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnDeleteQueue(params object[] parameters)
+        private void OnDeleteQueue(EventArgs args)
         {
             _mediaPlayer.DeleteQueue();
         }
@@ -209,23 +203,26 @@ namespace Client_Application.Client
         /// Expects (int)index. It will ask the media player to remove song at index from queue.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnRemoveSongQueue(params object[] parameters)
+        private void OnRemoveSongQueue(RemoveSongQueueArgs args)
         {
-            int index = (int)parameters[0];
-            _mediaPlayer.RemoveSongFromQueue(index);
+            _mediaPlayer.RemoveSongFromQueue(args.Index);
         }
 
         /// <summary>
         /// Expects (string)search. It will Seach for a song in the current playlist.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnSearchPlaylist(params object[] parameters)
+        private void OnSearchPlaylist(SearchSongOrArtistArgs args)
         {
-            string searchString = (string)parameters[0];
             Task.Run(() =>
             {
-                List<Song> songs = _playlistManager.SearchPlaylistSong(searchString);
-                ClientEvent.Fire(EventType.DisplayPlaylistSongs, songs, _playlistManager.CurrentPlaylist);
+                List<Song> songs = _playlistManager.SearchPlaylistSong(args.Search);
+                ClientEvent.Fire(EventType.DisplayPlaylistSongs, 
+                    new DisplayPlaylistSongsArgs 
+                    { 
+                        Songs = songs, 
+                        CurrentPlaylist = _playlistManager.CurrentPlaylist 
+                    });
             });
         }
 
@@ -233,10 +230,9 @@ namespace Client_Application.Client
         /// Expects (float)volume from 0 to 100. It will ask the media player to change the volume from 0 to 1.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnChangeVolume(params object[] parameters)
+        private void OnChangeVolume(ChangeVolumeArgs args)
         {
-            float volume100 = (float)parameters[0];
-            float volume = volume100 / 100;
+            float volume = args.Volume100 / 100;
             _mediaPlayer.SetVolume(volume);
         }
 
@@ -244,7 +240,7 @@ namespace Client_Application.Client
         /// Expects no parameters. It delets the current playlist.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnDeletePlaylist(params object[] parameters)
+        private void OnDeletePlaylist(EventArgs args)
         {
             PlaylistResult result = _playlistManager.DeleteCurrentPlaylist();
             if(result == PlaylistResult.Success)
@@ -257,10 +253,10 @@ namespace Client_Application.Client
         /// Expects (Song)song and (string) playlist name. It will add the specified song to the specified playlist.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnAddSongToPlaylist(params object[] parameters)
+        private void OnAddSongToPlaylist(AddSongToPlaylistArgs args)
         {
-            Song song = (Song)parameters[0];
-            string playlistLink = (string)parameters[1];
+            Song song = args.Song;
+            string playlistLink = args.PlaylistLink;
 
             PlaylistResult result = _playlistManager.AddSongToPlaylist(song, playlistLink);
 
@@ -277,15 +273,15 @@ namespace Client_Application.Client
         /// Expects (string)new name. It renames the current playlist with the new name.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnRenamePlaylist(params object[] parameters)
+        private void OnRenamePlaylist(RenamePlaylistArgs args)
         {
-            string newName = (string)parameters[0];
+            string newName = args.NewName;
 
             PlaylistResult result = _playlistManager.RenameCurrentPlaylist(newName);
 
             if(result == PlaylistResult.AlreadyExists)
             {
-                ClientEvent.Fire(EventType.PlaylistExists, newName);
+                ClientEvent.Fire(EventType.PlaylistExists, new PlaylistExistsArgs { PlaylistName = newName });
             }
 
             else if(result == PlaylistResult.Success)
@@ -298,9 +294,9 @@ namespace Client_Application.Client
         /// Expects (string)name. It will create an empty playlist with the name and display empty playlist window.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnCreateNewPlaylist(params object[] parameters)
+        private void OnCreateNewPlaylist(CreateNewPlaylistArgs args)
         {
-            string playlistName = (string)parameters[0];
+            string playlistName = args.PlaylistName;
 
             PlaylistResult result = _playlistManager.CreateNewPlaylist(playlistName);
 
@@ -310,7 +306,7 @@ namespace Client_Application.Client
             }
             else if(result == PlaylistResult.AlreadyExists)
             {
-                ClientEvent.Fire(EventType.PlaylistExists, playlistName);
+                ClientEvent.Fire(EventType.PlaylistExists, new PlaylistExistsArgs { PlaylistName = playlistName });
             }
         }
 
@@ -318,7 +314,7 @@ namespace Client_Application.Client
         /// Expects no parameters. It will add the current playlist to queue.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnAddPlaylistToQueue(params object[] parameters)
+        private void OnAddPlaylistToQueue(EventArgs args)
         {
             List<Song> playlistSongs = _playlistManager.GetCurrentPlaylistSongs();
             _mediaPlayer.AddPlaylistSongsToQueue(playlistSongs);
@@ -328,7 +324,7 @@ namespace Client_Application.Client
         /// Expects no parameters. It will play the current playlist.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnPlayCurrentPlaylist(params object[] parameters)
+        private void OnPlayCurrentPlaylist(EventArgs args)
         {
             List<Song> playlistSongs = _playlistManager.GetCurrentPlaylistSongs();
             if (playlistSongs.Any())
@@ -342,20 +338,19 @@ namespace Client_Application.Client
         /// Expects (string)playlist name. It will update that playlist.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnUpdatePlaylist(params object[] parameters)
+        private void OnUpdatePlaylist(UpdatePlaylistArgs args)
         {
-            string playlistLink = (string)parameters[0];
-            UpdatePlaylist(playlistLink);
+            UpdatePlaylist(args.PlaylistLink);
         }
 
         /// <summary>
         /// Expects (Song)song and (string)playlist name. It will remove that song from that playlist.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnRemoveSongFromPlaylist(params object[] parameters)
+        private void OnRemoveSongFromPlaylist(RemoveSongFromPlaylistArgs args)
         {
-            Song song = (Song)parameters[0];
-            string playlistLink = (string)parameters[1];
+            Song song = args.Song;
+            string playlistLink = args.PlaylistLink;
             PlaylistResult result = _playlistManager.RemoveSongFromPlaylist(song, playlistLink);
             if(result == PlaylistResult.Success)
             {
@@ -367,7 +362,7 @@ namespace Client_Application.Client
         /// Expects no parameters. It will execute methods after Main Window is ready.
         /// </summary>
         /// <param name="parameters"></param>
-        private void OnWindowReady(params object[] parameters)
+        private void OnWindowReady(EventArgs args)
         {
             AuthenticationManager.WaitForInstance();
             FillRememberMe();
@@ -381,7 +376,12 @@ namespace Client_Application.Client
 
             if (rememberMe && email != null && password != null)
             {
-                ClientEvent.Fire(EventType.UpdateRememberMe, email, password);
+                ClientEvent.Fire(EventType.UpdateRememberMe, 
+                    new UpdateRememberMeArgs 
+                    { 
+                        Email = email, 
+                        Password = password
+                    });
             }
         }
 
@@ -397,7 +397,7 @@ namespace Client_Application.Client
             }
             else if (internalRequest.Type == InternalRequestType.PlayThis)
             {
-                Song song = (Song)internalRequest.Parameters[0];
+                Song song = internalRequest.Args.Song!;
                 ExecutePlayThis(song);
             }
             else if (internalRequest.Type == InternalRequestType.NextSong)
@@ -410,17 +410,17 @@ namespace Client_Application.Client
             }
             else if (internalRequest.Type == InternalRequestType.AddSongToQueue)
             {
-                Song song = (Song)internalRequest.Parameters[0];
+                Song song = internalRequest.Args.Song!;
                 ExecuteAddToQueue(song);
             }
             else if (internalRequest.Type == InternalRequestType.RepeatStateChange)
             {
-                RepeatState repeatState = (RepeatState)internalRequest.Parameters[0];
+                RepeatState repeatState = internalRequest.Args.RepeatState;
                 ExecuteRepeatStateChange(repeatState);
             }
             else if (internalRequest.Type == InternalRequestType.ShuffleStateChange)
             {
-                ShuffleState shuffleState = (ShuffleState)internalRequest.Parameters[0];
+                ShuffleState shuffleState = internalRequest.Args.ShuffleState;
                 ExecuteShuffleStateChange(shuffleState);
             }
         }
@@ -467,7 +467,7 @@ namespace Client_Application.Client
         /// <param name="repeatState"></param>
         private void UpdateRepeatState(RepeatState repeatState)
         {
-            ClientEvent.Fire(EventType.UpdateRepeatState, true, repeatState);
+            ClientEvent.Fire(EventType.UpdateRepeatState, new UpdateRepeatStateArgs { RepeatState = repeatState });
         }
 
         /// <summary>
@@ -479,11 +479,22 @@ namespace Client_Application.Client
         {
             if (displayPlaylistLinksMode == DisplayPlaylistLinksMode.None || displayPlaylistLinksMode == DisplayPlaylistLinksMode.Delete)
             {
-                ClientEvent.Fire(EventType.DisplayPlaylistLinks, playlistLinks, displayPlaylistLinksMode);
+                ClientEvent.Fire(EventType.DisplayPlaylistLinks, 
+                    new DisplayPlaylistLinksArgs 
+                    { 
+                        PlaylistLinks = playlistLinks, 
+                        DisplayPlaylistLinksMode = displayPlaylistLinksMode 
+                    });
             }
             else if (displayPlaylistLinksMode == DisplayPlaylistLinksMode.New || displayPlaylistLinksMode == DisplayPlaylistLinksMode.Rename)
             {
-                ClientEvent.Fire(EventType.DisplayPlaylistLinks, playlistLinks, displayPlaylistLinksMode, active);
+                ClientEvent.Fire(EventType.DisplayPlaylistLinks,
+                    new DisplayPlaylistLinksArgs
+                    {
+                        PlaylistLinks = playlistLinks,
+                        DisplayPlaylistLinksMode = displayPlaylistLinksMode,
+                        Active = active
+                    }); 
             }
         }
 
@@ -496,7 +507,12 @@ namespace Client_Application.Client
             Task.Run(() =>
             {
                 _playlistManager.CurrentPlaylist = playlistLink;
-                ClientEvent.Fire(EventType.DisplayPlaylistSongs, _playlistManager.GetPlaylistSongs(playlistLink), _playlistManager.CurrentPlaylist);
+                ClientEvent.Fire(EventType.DisplayPlaylistSongs, 
+                    new DisplayPlaylistSongsArgs
+                    {
+                        Songs = _playlistManager.GetPlaylistSongs(playlistLink),
+                        CurrentPlaylist = _playlistManager.CurrentPlaylist
+                    });
             });
         }
 
@@ -508,9 +524,12 @@ namespace Client_Application.Client
         {
             Task.Run(() =>
             {
-                ClientEvent.Fire(EventType.DisplayQueue, songs);
+                ClientEvent.Fire(EventType.DisplayQueue, 
+                    new DisplayQueueArgs
+                    {
+                        Songs = songs
+                    });;
             });
-           
         }
 
         /// <summary>
@@ -524,17 +543,22 @@ namespace Client_Application.Client
                 if (_progressBarState == ProgressBarState.Free)
                 {
                     (double Progress, string CurrentTime) progress = _mediaPlayer.GetCurrentSongProgress();
-                    ClientEvent.Fire(EventType.UpdateProgress, progress.Progress, progress.CurrentTime);
+                    ClientEvent.Fire(EventType.UpdateProgress, 
+                        new UpdateProgressArgs
+                        {
+                            Progress = progress.Progress,
+                            CurrentTime = progress.CurrentTime
+                        });
                 }
             }
         }
 
-        private void OnSetProgressBarState(params object[] parameters)
+        private void OnUpdateProgressBarState(UpdateProgressBarStateArgs args)
         {
-            ProgressBarState state = (ProgressBarState)parameters[0];
+            ProgressBarState state = args.ProgressBarState;
             if (state == ProgressBarState.Free)
             {
-                double progress = (double)parameters[1];
+                double progress = args.Progress;
                 ExecuteChangeProgress(progress);
             }
             _progressBarState = state;
@@ -551,7 +575,14 @@ namespace Client_Application.Client
 
         private void UpdateCurrentSongInfo(Song song)
         {
-            ClientEvent.Fire(EventType.DisplayCurrentSong, song.SongName, song.ArtistName, song.DurationString, song.ImageBinary);
+            ClientEvent.Fire(EventType.DisplayCurrentSong, 
+                new DisplayCurrentSongArgs
+                {
+                    SongName = song.SongName,
+                    ArtistName = song.ArtistName,
+                    DurationString = song.DurationString,
+                    ImageBytes= song.ImageBinary,
+                });
         }
 
         private void TerminateSongDataReceiveRequest()
@@ -570,12 +601,12 @@ namespace Client_Application.Client
 
         private void SendPlayState(PlayButtonState playButtonState)
         {
-            ClientEvent.Fire(EventType.ChangePlayState, playButtonState);
+            ClientEvent.Fire(EventType.ChangePlayState, new ChangePlayStateArgs { PlayButtonState = playButtonState });
         }
 
-        private void OnAddInternalRequest(params object[] parameters)
+        private void OnAddInternalRequest(InternalRequestArgs args)
         {
-            _internalRequestQueue.Enqueue(new InternalRequest(parameters));
+            _internalRequestQueue.Enqueue(new InternalRequest(args.InternalRequestType, args));
             _newInternalRequestFlag.Set();
         }
 
@@ -634,7 +665,7 @@ namespace Client_Application.Client
         /// </summary>
         /// <param name="eventType"></param>
         /// <param name="callback"></param>
-        private void Listen(EventType eventType, ClientEventCallback callback)
+        private void Listen<T>(EventType eventType, ClientEventCallback<T> callback) where T : EventArgs
         {
             _clientListener.Listen(eventType, callback);
         }

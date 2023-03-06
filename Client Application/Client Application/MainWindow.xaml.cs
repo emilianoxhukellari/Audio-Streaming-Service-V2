@@ -1,6 +1,7 @@
 ﻿using Client_Application.Client;
 using Client_Application.DynamicVisualComponents;
 using Client_Application.UserWindows;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -68,36 +69,34 @@ namespace Client_Application
             _repeatState = RepeatState.RepeatOff;
             _shuffleState = ShuffleState.Unshuffled;
 
-            Listen(EventType.DisplaySongs, new ClientEventCallback(DisplaySongs));
-            Listen(EventType.ChangePlayState, new ClientEventCallback(ChangePlayPauseButton));
-            Listen(EventType.DisplayCurrentSong, new ClientEventCallback(DisplayCurrentSong));
-            Listen(EventType.UpdateProgress, new ClientEventCallback(DisplayCurrentProgress));
-            Listen(EventType.DisplayQueue, new ClientEventCallback(DisplayQueue));
-            Listen(EventType.PlaylistExists, new ClientEventCallback(DisplayPlaylistExsitsError));
-            Listen(EventType.DisplayPlaylistLinks, new ClientEventCallback(DisplayPlaylistLinks));
-            Listen(EventType.UpdatePlaylistCanvas, new ClientEventCallback(ExecuteUpdatePlaylistCanvas));
-            Listen(EventType.ShowPlaylistCanvas, new ClientEventCallback(ExecuteShowPlaylistCanvas));
-            Listen(EventType.DisplayPlaylistSongs, new ClientEventCallback(ExecuteDisplayPlaylistSongs));
-            Listen(EventType.UpdateRepeatState, new ClientEventCallback(ExecuteUpdateRepeatState));
-            Listen(EventType.LogInStateUpdate, new ClientEventCallback(ExecuteLogInStateUpdate));
-            Listen(EventType.UpdateRememberMe, new ClientEventCallback(ExecuteUpdateRememberMe));
-            Listen(EventType.ResetWindow, new ClientEventCallback(ExecuteResetWindow));
-            Listen(EventType.UpdateConnectionState, new ClientEventCallback(ExecuteUpdateConnectionState));
-            Listen(EventType.LogInStartEnd, new ClientEventCallback(ExecuteLogInStartEnd));
+            Listen(EventType.DisplaySongs, new ClientEventCallback<DisplaySongsArgs>(DisplaySongs));
+            Listen(EventType.ChangePlayState, new ClientEventCallback<ChangePlayStateArgs>(ChangePlayPauseButton));
+            Listen(EventType.DisplayCurrentSong, new ClientEventCallback<DisplayCurrentSongArgs>(DisplayCurrentSong));
+            Listen(EventType.UpdateProgress, new ClientEventCallback<UpdateProgressArgs>(DisplayCurrentProgress));
+            Listen(EventType.DisplayQueue, new ClientEventCallback<DisplayQueueArgs>(DisplayQueue));
+            Listen(EventType.PlaylistExists, new ClientEventCallback<PlaylistExistsArgs>(DisplayPlaylistExsitsError));
+            Listen(EventType.DisplayPlaylistLinks, new ClientEventCallback<DisplayPlaylistLinksArgs>(DisplayPlaylistLinks));
+            Listen(EventType.UpdatePlaylistCanvas, new ClientEventCallback<UpdatePlaylistCanvasArgs>(ExecuteUpdatePlaylistCanvas));
+            Listen(EventType.ShowPlaylistCanvas, new ClientEventCallback<EventArgs>(ExecuteShowPlaylistCanvas));
+            Listen(EventType.DisplayPlaylistSongs, new ClientEventCallback<DisplayPlaylistSongsArgs>(ExecuteDisplayPlaylistSongs));
+            Listen(EventType.UpdateRepeatState, new ClientEventCallback<UpdateRepeatStateArgs>(ExecuteUpdateRepeatState));
+            Listen(EventType.LogInStateUpdate, new ClientEventCallback<LogInStateUpdateArgs>(ExecuteLogInStateUpdate));
+            Listen(EventType.UpdateRememberMe, new ClientEventCallback<UpdateRememberMeArgs>(ExecuteUpdateRememberMe));
+            Listen(EventType.ResetWindow, new ClientEventCallback<EventArgs>(ExecuteResetWindow));
+            Listen(EventType.UpdateConnectionState, new ClientEventCallback<UpdateConnectionStateArgs>(ExecuteUpdateConnectionState));
+            Listen(EventType.LogInStartEnd, new ClientEventCallback<LogInStartEndArgs>(ExecuteLogInStartEnd));
 
-            ClientEvent.Fire(EventType.WindowReady);
+            ClientEvent.Fire(EventType.WindowReady, EventArgs.Empty);
 
             SetButtonIconsInitialState();
         }
 
 
-        private void ExecuteUpdateConnectionState(params object[] parameters)
+        private void ExecuteUpdateConnectionState(UpdateConnectionStateArgs args)
         {
-            bool connected = (bool)parameters[0];
-
             Dispatcher.Invoke(() =>
             {
-                if (connected)
+                if (args.Connected)
                 {
                     connectionIndicator.Fill = Brushes.Green;
                 }
@@ -108,7 +107,7 @@ namespace Client_Application
             });
         }
 
-        private void ExecuteResetWindow(params object[] parameters)
+        private void ExecuteResetWindow(EventArgs args)
         {
             Dispatcher.Invoke(() =>
             {
@@ -132,16 +131,13 @@ namespace Client_Application
             });
         }
 
-        private void ExecuteUpdateRememberMe(params object[] parameters)
+        private void ExecuteUpdateRememberMe(UpdateRememberMeArgs args)
         {
-            string email = (string)parameters[0];
-            string password = (string)parameters[1];
-
             Dispatcher.Invoke(() =>
             {
                 rememeberMeCheckBox.IsChecked = true;
-                emailTextBox.Text = email;
-                passwordBox.Password = password;
+                emailTextBox.Text = args.Email;
+                passwordBox.Password = args.Password;
             });
         }
 
@@ -149,13 +145,13 @@ namespace Client_Application
         /// The user email and password did not match.
         /// </summary>
         /// <param name="parameters"></param>
-        private void ExecuteLogInStateUpdate(params object[] parameters)
+        private void ExecuteLogInStateUpdate(LogInStateUpdateArgs args)
         {
-            LogInState logInState = (LogInState)parameters[0];
+            LogInState logInState = args.LogInState;
 
             if(logInState == LogInState.LogInValid)
             {
-                string email = (string)parameters[1];
+                string email = args.Email;
                 Dispatcher.Invoke(() =>
                 {
                     currentUserLabel.Content = email;
@@ -178,12 +174,11 @@ namespace Client_Application
             }
         }
 
-        private void ExecuteUpdateRepeatState(params object[] parameters)
+        private void ExecuteUpdateRepeatState(UpdateRepeatStateArgs args)
         {
-            RepeatState repeatState = (RepeatState)parameters[0];
             Dispatcher.Invoke(() =>
             {
-                SetRepeatState(repeatState);
+                SetRepeatState(args.RepeatState);
             });
         }
 
@@ -239,12 +234,12 @@ namespace Client_Application
             _logOutButtonHoverImageBrush = GetImageBrush("log_out_hover.png");
         }
 
-        private void ExecuteLogInStartEnd(params object[] parameters)
+        private void ExecuteLogInStartEnd(LogInStartEndArgs args)
         {
-            bool state = (bool)parameters[0];
+            bool started = args.Started;
             Dispatcher.Invoke(() =>
             {
-                if(state == true)
+                if(started)
                 {
                     progressRing.IsActive = true;
                     progressRing.Visibility = Visibility.Visible;
@@ -257,43 +252,47 @@ namespace Client_Application
             });
         }
 
-        private void ExecuteDisplayPlaylistSongs(params object[] parameters)
+        private void ExecuteDisplayPlaylistSongs(DisplayPlaylistSongsArgs args)
         {
             Dispatcher.Invoke(() =>
             {
                 _playlistCanvas.RemoveAllSongs();
             });
-            _playlistCanvas.DisplaySongsByOne((List<Song>)parameters[0]);
+            _playlistCanvas.DisplaySongsByOne(args.Songs);
         }
 
-        private void ExecuteUpdatePlaylistCanvas(params object[] parameters)
+        private void ExecuteUpdatePlaylistCanvas(UpdatePlaylistCanvasArgs args)
         {
-            string playlistLink = (string)parameters[0];
+            string playlistLink = args.PlaylistLink;
             _playlistCanvas.CurrentPlaylistName = playlistLink;
             SetSearchButtonInactive();
             SetActivePlaylistLink(playlistLink);
-            ClientEvent.Fire(EventType.UpdatePlaylist, playlistLink);
+            ClientEvent.Fire(EventType.UpdatePlaylist, 
+                new UpdatePlaylistArgs
+                {
+                    PlaylistLink = playlistLink
+                });
         }
 
-        private void ExecuteShowPlaylistCanvas(params object[] parameters)
+        private void ExecuteShowPlaylistCanvas(EventArgs args)
         {
             contentControl.Content = _playlistCanvas;
         }
 
-        private void DisplayPlaylistLinks(params object[] parameters)
+        private void DisplayPlaylistLinks(DisplayPlaylistLinksArgs args)
         {
-            string[] playlistLinks = (string[])parameters[0];
-            DisplayPlaylistLinksMode displayPlaylistLinksMode = (DisplayPlaylistLinksMode)parameters[1];
+            string[] playlistLinks = args.PlaylistLinks;
+            DisplayPlaylistLinksMode displayPlaylistLinksMode = args.DisplayPlaylistLinksMode;
             if (playlistLinks.Any())
             {
                 if (displayPlaylistLinksMode == DisplayPlaylistLinksMode.Rename)
                 {
-                    ActiveLink = (string)parameters[2];
+                    ActiveLink = args.Active;
                     _playlistCanvas.CurrentPlaylistName = ActiveLink;
                 }
                 else if (displayPlaylistLinksMode == DisplayPlaylistLinksMode.New)
                 {
-                    ActiveLink = (string)parameters[2];
+                    ActiveLink = args.Active;
                     contentControl.Content = _playlistCanvas;
                     _playlistCanvas.CurrentPlaylistName = ActiveLink;
                     Dispatcher.Invoke(() =>
@@ -357,12 +356,11 @@ namespace Client_Application
             });
         }
 
-        private void DisplayPlaylistExsitsError(params object[] parameters)
+        private void DisplayPlaylistExsitsError(PlaylistExistsArgs args)
         {
-            string playlistName = (string)parameters[0];
             Dispatcher.Invoke(() =>
             {
-                MessageBox.Show($"Playlist \"{playlistName}\" Already Exists", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Playlist \"{args.PlaylistName}\" Already Exists", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             });
         }
 
@@ -382,16 +380,14 @@ namespace Client_Application
         }
 
 
-        private void DisplayQueue(params object[] parameters)
+        private void DisplayQueue(DisplayQueueArgs args)
         {
-            List<(Song, int)> songs = (List<(Song, int)>)parameters[0];
-
             Dispatcher.Invoke(() =>
             {
                 queueStackPanel.Children.Clear();
             });
 
-            foreach(var song in songs)
+            foreach(var song in args.Songs)
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -400,30 +396,23 @@ namespace Client_Application
             }
         }
 
-        private void DisplayCurrentProgress(params object[] parameters)
+        private void DisplayCurrentProgress(UpdateProgressArgs args)
         {
-            double progress = (double)parameters[0];
-            string currentTime = (string)parameters[1];
-
             Dispatcher.Invoke(() =>
             {
-                progressBar.Value = 100 * progress;
-                timePassedLabel.Content = currentTime;
+                progressBar.Value = 100 * args.Progress;
+                timePassedLabel.Content = args.CurrentTime;
             });
         }
 
-        private void DisplayCurrentSong(params object[] parameters)
+        private void DisplayCurrentSong(DisplayCurrentSongArgs args)
         {
-            string songName = (string)parameters[0];
-            string artistName = (string)parameters[1];
-            string durationString = (string)parameters[2];
-            byte[] imageBinary = (byte[])parameters[3];
             Dispatcher.Invoke(() =>
             {
-                songNameLabel.Content = songName;
-                artistNameLabel.Content = artistName;
-                timeMaxLabel.Content = durationString;
-                imageContainer.Source = BinaryToImageSource(imageBinary);
+                songNameLabel.Content = args.SongName;
+                artistNameLabel.Content = args.ArtistName;
+                timeMaxLabel.Content = args.DurationString;
+                imageContainer.Source = BinaryToImageSource(args.ImageBytes);
             });
         }
 
@@ -432,9 +421,9 @@ namespace Client_Application
             return (ImageSource?)new ImageSourceConverter().ConvertFrom(imageBinary);
         }
 
-        private void ChangePlayPauseButton(params object[] parameters)
+        private void ChangePlayPauseButton(ChangePlayStateArgs args)
         {
-            PlayButtonState playButtonState = (PlayButtonState)parameters[0];
+            PlayButtonState playButtonState = args.PlayButtonState;
             if (playButtonState == PlayButtonState.Play)
             {
                 Dispatcher.Invoke(() =>
@@ -451,9 +440,9 @@ namespace Client_Application
             }
         }
 
-        private void DisplaySongs(params object[] parameters)
+        private void DisplaySongs(DisplaySongsArgs args)
         {
-            List<Song> results = (List<Song>)parameters[0];
+            List<Song> results = args.Songs;
 
             Dispatcher.Invoke(() =>
             {
@@ -462,14 +451,89 @@ namespace Client_Application
             _searchCanvas.DisplaySongsByOne(results);
         }
 
-        private void Listen(EventType eventType, ClientEventCallback serverEventCallback)
+        private void loginButton_Click(object sender, RoutedEventArgs e)
         {
-            _clientListener.Listen(eventType, serverEventCallback);
+            string email = emailTextBox.Text;
+            string password = passwordBox.Password;
+
+            if (email == string.Empty)
+            {
+                emailErrorLabel.Content = "You must supply an Email";
+            }
+
+            if (password == string.Empty)
+            {
+                errorPasswordLabel.Content = "You must supply a Password";
+            }
+
+            if (email != string.Empty && password != string.Empty)
+            {
+                bool rememberMe;
+                if (rememeberMeCheckBox.IsChecked == true)
+                {
+                    rememberMe = true;
+                }
+                else
+                {
+                    rememberMe = false;
+                }
+
+                ClientEvent.Fire(EventType.LogIn, 
+                    new LogInArgs
+                    {
+                        Email = email,
+                        Password = password,
+                        RememberMe = rememberMe
+                    });
+            }
+        }
+
+        private void InvalidLoginNotify()
+        {
+            loginErrorLabel.Content = "Username or Password Incorrect";
+        }
+
+        private void DisplayLogInPage()
+        {
+            grid.Visibility = Visibility.Collapsed;
+            loginGrid.Visibility = Visibility.Visible;
+        }
+
+        private void DisplayLoggedInPage()
+        {
+            grid.Visibility = Visibility.Visible;
+            loginGrid.Visibility = Visibility.Collapsed;
+            emailErrorLabel.Content = string.Empty;
+            errorPasswordLabel.Content = string.Empty;
+            loginErrorLabel.Content = string.Empty;
+            emailTextBox.Text = string.Empty;
+            passwordBox.Password = string.Empty;
+        }
+
+        private void emailTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            emailErrorLabel.Content = string.Empty;
+            loginErrorLabel.Content = string.Empty;
+        }
+
+        private void passwordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            errorPasswordLabel.Content = string.Empty;
+            loginErrorLabel.Content = string.Empty;
+        }
+
+        private void Listen<T>(EventType eventType, ClientEventCallback<T> callback) where T : EventArgs
+        {
+            _clientListener.Listen(eventType, callback);
         }
 
         private void playButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayPauseStateChange);
+            ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.PlayPauseStateChange,
+                    });
         }
 
         private void shuffleButton_Click(object sender, RoutedEventArgs e)
@@ -482,13 +546,24 @@ namespace Client_Application
             if (_shuffleState == ShuffleState.Unshuffled)
             {
                 _shuffleState = ShuffleState.Shuffled;
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.ShuffleStateChange, _shuffleState);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.ShuffleStateChange,
+                        ShuffleState = _shuffleState
+                    }) ;
+
                 shuffleButton.Background = _shuffleButtonOnImageBrush;
             }
             else if (_shuffleState == ShuffleState.Shuffled)
             {
                 _shuffleState = ShuffleState.Unshuffled;
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.ShuffleStateChange, _shuffleState);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.ShuffleStateChange,
+                        ShuffleState = _shuffleState
+                    });
                 shuffleButton.Background = _shuffleButtonOffImageBrush;
             }
         }
@@ -506,17 +581,32 @@ namespace Client_Application
 
             if (_repeatState == RepeatState.RepeatOff)
             {
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.RepeatStateChange, RepeatState.RepeatOff);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.RepeatStateChange,
+                        RepeatState = RepeatState.RepeatOff
+                    });
                 repeatButton.Background = _repeatButtonOffImageBrush;
             }
             else if (_repeatState == RepeatState.RepeatOn)
             {
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.RepeatStateChange, RepeatState.RepeatOn);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.RepeatStateChange,
+                        RepeatState = RepeatState.RepeatOn
+                    });
                 repeatButton.Background = _repeatButtonOnImageBrush;
             }
             else if (_repeatState == RepeatState.OnRepeat)
             {
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.RepeatStateChange, RepeatState.OnRepeat);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.RepeatStateChange,
+                        RepeatState = RepeatState.OnRepeat
+                    });
                 repeatButton.Background = _repeatButtonOneImageBrush;
             }
         }
@@ -543,29 +633,34 @@ namespace Client_Application
         }
 
         private void nextSongButton_Click(object sender, RoutedEventArgs e)
-            {
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.NextSong);
+        {
+            ClientEvent.Fire(EventType.InternalRequest, new InternalRequestArgs { InternalRequestType = InternalRequestType.NextSong});
         }
 
         private void previousSongButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PreviousSong);
+            ClientEvent.Fire(EventType.InternalRequest, new InternalRequestArgs { InternalRequestType = InternalRequestType.PreviousSong });
         }
 
         private void progressBar_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ClientEvent.Fire(EventType.UpdateProgressBarState, ProgressBarState.Busy);
+            ClientEvent.Fire(EventType.UpdateProgressBarState, new UpdateProgressBarStateArgs { ProgressBarState = ProgressBarState.Busy});
         }
 
         private void progressBar_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            ClientEvent.Fire(EventType.UpdateProgressBarState, ProgressBarState.Free, progressBar.Value);
+            ClientEvent.Fire(EventType.UpdateProgressBarState,
+                new UpdateProgressBarStateArgs
+                {
+                    ProgressBarState = ProgressBarState.Free,
+                    Progress = progressBar.Value
+                }) ;
         }
 
         private void volumeBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             volumeLabel.Content = (int)volumeBar.Value;
-            ClientEvent.Fire(EventType.ChangeVolume, (float)volumeBar.Value);
+            ClientEvent.Fire(EventType.ChangeVolume, new ChangeVolumeArgs { Volume100 = (float)volumeBar.Value });
         }
 
         private void addPlaylistButton_Click(object sender, RoutedEventArgs e)
@@ -576,7 +671,7 @@ namespace Client_Application
 
         private void removeQueueButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.DeleteQueue);
+            ClientEvent.Fire(EventType.DeleteQueue, EventArgs.Empty);
         }
 
         private void searchButton_Click(object sender, RoutedEventArgs e)
@@ -595,7 +690,6 @@ namespace Client_Application
         {
             searchButton.BorderBrush = null;
         }
-
 
         private void addPlaylistButton_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -652,72 +746,6 @@ namespace Client_Application
         private void previousSongButton_MouseLeave(object sender, MouseEventArgs e)
         {
             previousSongButton.Background = _previousSongButtonDefaultImageBrush;
-        }
-
-        private void loginButton_Click(object sender, RoutedEventArgs e)
-        {
-            string email = emailTextBox.Text;
-            string password = passwordBox.Password;
-
-            if(email == string.Empty)
-            {
-                emailErrorLabel.Content = "You must supply an Email";
-            }    
-
-            if(password == string.Empty)
-            {
-                errorPasswordLabel.Content = "You must supply a Password";
-            }
-
-            if(email != string.Empty && password != string.Empty)
-            {
-                bool rememberMe;
-                if(rememeberMeCheckBox.IsChecked == true)
-                {
-                    rememberMe = true;
-                }
-                else
-                {
-                    rememberMe = false;
-                }
-
-                ClientEvent.Fire(EventType.LogIn, email, password, rememberMe);
-            }
-        }
-
-        private void InvalidLoginNotify()
-        {
-            loginErrorLabel.Content = "Username or Password Incorrect";
-        }
-
-        private void DisplayLogInPage()
-        {
-            grid.Visibility = Visibility.Collapsed;
-            loginGrid.Visibility = Visibility.Visible;
-        }
-
-        private void DisplayLoggedInPage()
-        {
-            grid.Visibility = Visibility.Visible;
-            loginGrid.Visibility = Visibility.Collapsed;
-            emailErrorLabel.Content = string.Empty;
-            errorPasswordLabel.Content = string.Empty;
-            loginErrorLabel.Content = string.Empty;
-            emailTextBox.Text = string.Empty;
-            passwordBox.Password = string.Empty;
-        }
-
-
-        private void emailTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            emailErrorLabel.Content = string.Empty;
-            loginErrorLabel.Content = string.Empty;
-        }
-
-        private void passwordBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            errorPasswordLabel.Content = string.Empty;
-            loginErrorLabel.Content = string.Empty;
         }
 
         

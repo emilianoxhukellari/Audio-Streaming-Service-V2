@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
-    public class AudioStoringService
+    public class AudioStoringService : IAudioStoringService
     {
         private readonly StreamingDbContext _streamingDbContext;
-        private readonly DataAccessConfigurationService _dataAccessConfigurationService;
+        private readonly IDataAccessConfigurationService _dataAccessConfigurationService;
         public string RelativeSongsPath { get; private set; }
         public string RelativeImagesPath { get; private set; }
 
-        public AudioStoringService(StreamingDbContext streamingDbContext, IConfiguration configuration, DataAccessConfigurationService dataAccessConfigurationService)
+        public AudioStoringService(StreamingDbContext streamingDbContext, IDataAccessConfigurationService dataAccessConfigurationService)
         {
             _streamingDbContext = streamingDbContext;
             _dataAccessConfigurationService = dataAccessConfigurationService;
@@ -93,12 +93,12 @@ namespace DataAccess.Services
         private async Task<byte[]> WriteAudioBytesAsync(IFormFile audioFile, string relativeFilePath)
         {
             StandardWaveBuilder standardWaveBuilder;
-            using(var stream = new MemoryStream()) // This can be optimized with FileStream
+            using (var stream = new MemoryStream()) // This can be optimized with FileStream
             {
                 await audioFile.CopyToAsync(stream);
                 standardWaveBuilder = new StandardWaveBuilder(stream.ToArray());
             }
-            
+
             GC.Collect();
 
             byte[] audioFileBytes = AudioFile.GetAudioBytes(standardWaveBuilder.GetStandardWave());

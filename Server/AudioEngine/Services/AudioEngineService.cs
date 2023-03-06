@@ -10,19 +10,19 @@ using System.Threading.Tasks;
 
 namespace AudioEngine.Services
 {
-    public class AudioEngineService
+    public class AudioEngineService : IAudioEngineService
     {
-        private readonly IDbContextFactory<StreamingDbContext> _dbContextFactory;   
+        private readonly IDbContextFactory<StreamingDbContext> _dbContextFactory;
         private readonly IServiceProvider _serviceProvider;
-        private readonly AudioEngineConfigurationService _audioEngineConfigurationService;
+        private readonly IAudioEngineConfigurationService _audioEngineConfigurationService;
         private readonly Controller _controller;
 
         public event EventHandler<bool>? ServerStateChanged;
         public bool IsRunning { get; set; }
 
-        public AudioEngineService(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, AudioEngineConfigurationService audioEngineConfigurationService)
+        public AudioEngineService(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, IAudioEngineConfigurationService audioEngineConfigurationService)
         {
-            _dbContextFactory = dbContextFactory;  
+            _dbContextFactory = dbContextFactory;
             _serviceProvider = serviceProvider;
             _audioEngineConfigurationService = audioEngineConfigurationService;
             _controller = new Controller(_dbContextFactory, _serviceProvider, _audioEngineConfigurationService);
@@ -48,9 +48,9 @@ namespace AudioEngine.Services
             {
                 _controller.Stop();
             });
-            
 
-            if(IsRunning != _controller.IsRunning)
+
+            if (IsRunning != _controller.IsRunning)
             {
                 IsRunning = _controller.IsRunning;
                 ServerStateChanged?.Invoke(this, IsRunning);

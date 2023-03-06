@@ -12,9 +12,9 @@ namespace ServerWeb.Extensions
         public static async Task<WebApplication> Initialize(this WebApplication app)
         {
             using var scope = app.Services.CreateScope();
-            var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
-            var authDbContext = scope.ServiceProvider.GetService<UserDbContext>();
-            var userManager = scope.ServiceProvider.GetService<UserManager<IdentityUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var authDbContext = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
             var roles = app.Configuration.GetSection("Roles").Get<List<string>>();
 
@@ -46,14 +46,8 @@ namespace ServerWeb.Extensions
             }
             else
             {
-                var SUUsers = await userManager.GetUsersInRoleAsync("SU");
-                int numberOfSUUsers = SUUsers.Count();
-                if(numberOfSUUsers <= 0) 
-                {
-                    var userControlService = scope.ServiceProvider.GetRequiredService<UserControlService>();
-                    await userControlService.ChangeUserRoleToAsync(suData[0], "SU");
-                    return app;
-                }
+                var userControlService = scope.ServiceProvider.GetRequiredService<IUserControlService>(); 
+                await userControlService.ChangeUserRoleToAsync(suData[0], "SU");
                 return app;
             }
         }

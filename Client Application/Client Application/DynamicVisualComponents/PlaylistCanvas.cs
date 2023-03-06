@@ -19,12 +19,12 @@ namespace Client_Application.DynamicVisualComponents
         Label _currentPlaylistLabel;
         ScrollablePlaylistStackPanel _scrollablePlaylistStackPanel;
         List<string> _playlistLinks = new List<string>();
-        private string myVar = "";
+        private string _currentPlaylistName = "";
 
         public string CurrentPlaylistName
         {
-            get { return myVar; }
-            set { myVar = value; _currentPlaylistLabel.Content = value; }
+            get { return _currentPlaylistName; }
+            set { _currentPlaylistName = value; _currentPlaylistLabel.Content = value; }
         }
 
         public PlaylistCanvas(ImageBrush playButtonImageBrush, ImageBrush moreButtonImageBrush) : base()
@@ -95,12 +95,12 @@ namespace Client_Application.DynamicVisualComponents
 
         private void DeletePlaylist_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.DeletePlaylist);
+            ClientEvent.Fire(EventType.DeletePlaylist, EventArgs.Empty);
         }
 
         private void AddToQueue_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.AddPlaylistToQueue);
+            ClientEvent.Fire(EventType.AddPlaylistToQueue, EventArgs.Empty);
         }
 
 
@@ -126,7 +126,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlayThisPlaylistButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.PlayCurrentPlaylist);
+            ClientEvent.Fire(EventType.PlayCurrentPlaylist, EventArgs.Empty);
         }
 
         public void SetPlaylistLinks(List<string> playlistLinks)
@@ -185,7 +185,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlaylistSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ClientEvent.Fire(EventType.SearchPlaylist, Text);
+            ClientEvent.Fire(EventType.SearchPlaylist, new SearchSongOrArtistArgs { Search = Text});
         }
     }
 
@@ -274,7 +274,12 @@ namespace Client_Application.DynamicVisualComponents
         {
             if (e.ClickCount == 2)
             {
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.PlayThis,
+                        Song = Song
+                    });
             }
         }
 
@@ -345,7 +350,12 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlayThisButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
+            ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.PlayThis,
+                        Song = Song
+                    });
         }
 
         private void InitializePlaylistMoreButton(Button moreButton, string[] playlistLinks)
@@ -408,12 +418,22 @@ namespace Client_Application.DynamicVisualComponents
 
         private void RemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.RemoveSongFromPlaylist, Song, ThisPlaylist);
+            ClientEvent.Fire(EventType.RemoveSongFromPlaylist, 
+                new RemoveSongFromPlaylistArgs
+                {
+                    Song = Song,
+                    PlaylistLink = ThisPlaylist
+                });
         }
 
         private void AddToQueue_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.AddSongToQueue, Song);
+            ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.AddSongToQueue,
+                        Song = Song
+                    });
         }
     }
 }

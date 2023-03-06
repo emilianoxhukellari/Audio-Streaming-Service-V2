@@ -11,7 +11,7 @@ namespace Client_Application.Config
         public static string GetHost()
         {
             var configHost = ConfigurationManager.AppSettings["Host"];
-            return configHost != null ? configHost : "";
+            return configHost != null ? configHost : string.Empty;
         }
 
         public static int GetPortCommunication()
@@ -29,19 +29,25 @@ namespace Client_Application.Config
         public static string GetPlaylistsRelativePath()
         {
             var playlistsRelativePath = ConfigurationManager.AppSettings["PlaylistsRelativePath"];
-            return playlistsRelativePath != null ? playlistsRelativePath : "";
+            return playlistsRelativePath != null ? playlistsRelativePath : string.Empty;
         }
 
         public static string GetIconsRelativePath()
         {
             var iconsRelativePath = ConfigurationManager.AppSettings["IconsRelativePath"];
-            return iconsRelativePath != null ? iconsRelativePath : "";
+            return iconsRelativePath != null ? iconsRelativePath : string.Empty;
         }
 
         public static string GetClientId()
         {
             var clientId = ConfigurationManager.AppSettings["ClientId"];
             return clientId != null ? clientId : "000000";
+        }
+
+        public static string GetCertificateHash()
+        {
+            var certificateHash = ConfigurationManager.AppSettings["CertificateHash"];
+            return certificateHash != null ? certificateHash : string.Empty;
         }
     }
 }

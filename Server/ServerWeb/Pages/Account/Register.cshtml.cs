@@ -16,13 +16,13 @@ namespace ServerWeb.Pages.Account
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly RegistrationService _registrationService;
+        private readonly IRegistrationService _registrationService;
 
         [BindProperty]
         public Register Register { get; set; }
 
         public RegisterModel(
-            RegistrationService registrationService,
+            IRegistrationService registrationService,
             SignInManager<IdentityUser> signInManager)
         {
             _registrationService = registrationService;

@@ -91,7 +91,7 @@ namespace Client_Application.DynamicVisualComponents
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ClientEvent.Fire(EventType.SearchSongOrArtist, Text);
+            ClientEvent.Fire(EventType.SearchSongOrArtist, new SearchSongOrArtistArgs { Search = Text });
         }
     }
 
@@ -165,7 +165,12 @@ namespace Client_Application.DynamicVisualComponents
         {
             if(e.ClickCount == 2)
             {
-                ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
+                ClientEvent.Fire(EventType.InternalRequest,
+                    new InternalRequestArgs
+                    {
+                        InternalRequestType = InternalRequestType.PlayThis,
+                        Song = Song
+                    });
             }
         }
 
@@ -234,7 +239,12 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlayThisButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.PlayThis, Song);
+            ClientEvent.Fire(EventType.InternalRequest,
+                new InternalRequestArgs
+                {
+                    InternalRequestType = InternalRequestType.PlayThis,
+                    Song = Song
+                });
         }
 
         private void InitializeMoreButton(Button moreButton, string[] playlistLinks)
@@ -284,7 +294,12 @@ namespace Client_Application.DynamicVisualComponents
 
         private void AddToQueue_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.InternalRequest, InternalRequestType.AddSongToQueue, Song);
+            ClientEvent.Fire(EventType.InternalRequest,
+                new InternalRequestArgs
+                {
+                    InternalRequestType = InternalRequestType.AddSongToQueue,
+                    Song = Song
+                });
         }
     }
 
@@ -304,7 +319,12 @@ namespace Client_Application.DynamicVisualComponents
 
         private void CustomMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.AddSongToPlaylist, _song, _playlistLink);
+            ClientEvent.Fire(EventType.AddSongToPlaylist, 
+                new AddSongToPlaylistArgs
+                {
+                    Song = _song,
+                    PlaylistLink = _playlistLink
+                });
         }
     }
 }

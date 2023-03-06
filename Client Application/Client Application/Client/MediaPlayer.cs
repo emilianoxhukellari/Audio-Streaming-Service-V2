@@ -178,7 +178,6 @@ namespace Client_Application.Client
         {
             _autoSongFlag.Set();
         }
-
         
         private void AutoSong() // Auto next song
         {

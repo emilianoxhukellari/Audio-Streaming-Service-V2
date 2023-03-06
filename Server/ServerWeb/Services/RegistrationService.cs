@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ServerWeb.Services
 {
-    public class RegistrationService
+    public class RegistrationService : IRegistrationService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly StreamingDbContext _streamingDbContext;
@@ -24,7 +24,7 @@ namespace ServerWeb.Services
 
             var registerResult = await _userManager.CreateAsync(user, password);
 
-            if(registerResult.Succeeded)
+            if (registerResult.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, "User"); // Add role
 

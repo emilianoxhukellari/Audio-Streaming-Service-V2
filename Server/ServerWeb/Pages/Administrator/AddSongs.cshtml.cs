@@ -15,9 +15,9 @@ namespace ServerWeb.Pages.Administrator
     {
         [BindProperty]
         public SongInput SongInput { get; set; }
-        private readonly AudioStoringService _audioStoringService;
+        private readonly IAudioStoringService _audioStoringService;
 
-        public AddSongsModel(AudioStoringService audioStoringService)
+        public AddSongsModel(IAudioStoringService audioStoringService)
         {
             _audioStoringService = audioStoringService;
         }

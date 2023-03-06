@@ -27,7 +27,7 @@ namespace Client_Application.UserWindows
 
         private void yesLogOutButton_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.LogOut);
+            ClientEvent.Fire(EventType.LogOut, EventArgs.Empty);
             Close();
         }
 

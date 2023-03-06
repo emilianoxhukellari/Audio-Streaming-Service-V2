@@ -59,23 +59,26 @@ namespace ServerWeb
                 options.MaxRequestBodySize = 3000000000;
             });
 
-            builder.Services.AddSingleton<DataAccessConfigurationService>();
 
-            builder.Services.AddSingleton<AudioEngineConfigurationService>();
+            builder.Services.AddScoped<IDataAccessConfigurationService, DataAccessConfigurationService>();
 
-            builder.Services.AddScoped<UserControlService>();
+            builder.Services.AddSingleton<IAudioEngineConfigurationService, AudioEngineConfigurationService>(); 
 
-            builder.Services.AddScoped<IndexRedirection>();
+            builder.Services.AddScoped<IUserControlService, UserControlService>();
 
-            builder.Services.AddScoped<AudioStoringService>();
+            builder.Services.AddScoped<IIndexRedirection, IndexRedirection>();
 
-            builder.Services.AddSingleton<AudioEngineService>();
+            builder.Services.AddScoped<IAudioStoringService, AudioStoringService>();
 
-            builder.Services.AddScoped<RegistrationService>();
+            builder.Services.AddSingleton<IAudioEngineService, AudioEngineService>();
+
+            builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+
+
 
             //builder.Services.ConfigureApplicationCookie(options =>
             //{
-            //    options.Cookie.Name = ".AspNetCore.Identity.Application";
+            //    options.Cookie.Name = "AspNetCore.Identity.Application";
             //    options.AccessDeniedPath = "/Error";
             //});
 

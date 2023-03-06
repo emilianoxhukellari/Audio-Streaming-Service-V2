@@ -13,11 +13,11 @@ namespace ServerWeb.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IndexRedirection _indexRedirection;
+        private readonly IIndexRedirection _indexRedirection;
         [BindProperty]
         public Login Login { get; set; }    
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IndexRedirection indexRedirection)
+        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IIndexRedirection indexRedirection)
         {
             _signInManager = signInManager;
             _userManager = userManager;

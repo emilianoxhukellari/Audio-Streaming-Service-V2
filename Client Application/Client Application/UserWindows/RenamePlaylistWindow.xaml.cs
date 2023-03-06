@@ -19,7 +19,11 @@ namespace Client_Application
             string playlistName = newPlaylistNameTextBox.Text;
             if (playlistName != null && playlistName != string.Empty)
             {
-                ClientEvent.Fire(EventType.RenamePlaylist, playlistName);
+                ClientEvent.Fire(EventType.RenamePlaylist, 
+                    new RenamePlaylistArgs
+                    {
+                        NewName = playlistName,
+                    });
             }
             Close();
         }

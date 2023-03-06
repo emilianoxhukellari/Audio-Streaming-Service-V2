@@ -51,7 +51,7 @@ namespace Server_Application.Server
 
         private readonly IDbContextFactory<StreamingDbContext> _dbContextFactory;
         private readonly IServiceProvider _serviceProvider;
-        private readonly AudioEngineConfigurationService _audioEngineConfigurationService;
+        private readonly IAudioEngineConfigurationService _audioEngineConfigurationService;
         private readonly X509Certificate _x509Certificate;
 
         private volatile bool _exitCommunicationListeningLoop;
@@ -62,7 +62,7 @@ namespace Server_Application.Server
 
         public bool IsRunning { get; private set; }
 
-        public Controller(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, AudioEngineConfigurationService audioEngineConfigurationService) 
+        public Controller(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, IAudioEngineConfigurationService audioEngineConfigurationService) 
         {
             _dbContextFactory = dbContextFactory;
             _serviceProvider = serviceProvider;

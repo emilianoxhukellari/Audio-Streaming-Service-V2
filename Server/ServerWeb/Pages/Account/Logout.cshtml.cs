@@ -8,8 +8,8 @@ namespace ServerWeb.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly IndexRedirection _indexRedirection;
-        public LogoutModel(SignInManager<IdentityUser> signInManager, IndexRedirection indexRedirection) 
+        private readonly IIndexRedirection _indexRedirection;
+        public LogoutModel(SignInManager<IdentityUser> signInManager, IIndexRedirection indexRedirection) 
         { 
             _signInManager= signInManager;  
             _indexRedirection = indexRedirection;

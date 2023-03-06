@@ -1,4 +1,5 @@
 ﻿using Client_Application.Client;
+using System;
 using System.Collections.Generic;
 
 namespace Client_Application
@@ -43,6 +44,8 @@ namespace Client_Application
         SearchSongOrArtist,
         LogInStartEnd,
     }
+
+    
 
     public enum LogInState
     {
@@ -100,7 +103,7 @@ namespace Client_Application
     public delegate void BufferFillEventHandler(byte[] data, int size);
     public delegate void CallbackDelegate(int id);
     public delegate void CallbackOptimize(int start, int end);
-    public delegate void ClientEventCallback(params object[] args);
+    public delegate void ClientEventCallback<T>(T args) where T : EventArgs;
     public delegate void CallbackEndOfStream();
     public delegate void CallbackSendProgressInfo(double progress);
     public delegate void CallbackTerminateSongDataReceive();

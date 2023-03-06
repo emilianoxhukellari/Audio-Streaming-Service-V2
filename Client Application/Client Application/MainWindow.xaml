@@ -57,5 +57,8 @@
             </Grid>
             <ui:ProgressRing x:Name="progressRing" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Height="50" Margin="0,340,0,0" Visibility="Collapsed"/>
         </Grid>
+        <UserControl x:Name="currentUserControl">
+            
+       </UserControl>
     </Grid>
 </Window>

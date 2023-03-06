@@ -6,7 +6,7 @@ using System.Net;
 
 namespace ServerWeb.Services
 {
-    public class UserControlService
+    public class UserControlService : IUserControlService
     {
         private readonly UserManager<IdentityUser> _userManager;
         public UserControlService(UserManager<IdentityUser> userManager)
@@ -56,8 +56,11 @@ namespace ServerWeb.Services
         {
             var roles = await _userManager.GetRolesAsync(identityUser);
             var oldRole = roles.ElementAt(0);
-
-            return await ChangeUserRoleAsync(identityUser, oldRole, newRole);
+            if (oldRole != newRole)
+            {
+                return await ChangeUserRoleAsync(identityUser, oldRole, newRole);
+            }
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> ChangeUserRoleToAsync(string Email, string newRole)
@@ -65,7 +68,11 @@ namespace ServerWeb.Services
             var identityUser = await _userManager.FindByEmailAsync(Email);
             var roles = await _userManager.GetRolesAsync(identityUser);
             var oldRole = roles.ElementAt(0);
-            return await ChangeUserRoleAsync(identityUser, oldRole, newRole);
+            if (oldRole != newRole)
+            {
+                return await ChangeUserRoleAsync(identityUser, oldRole, newRole);
+            }
+            return IdentityResult.Success;
         }
 
         public async Task<IdentityResult> RemoveUserFromRoleAsync(IdentityUser identityUser)
@@ -75,7 +82,7 @@ namespace ServerWeb.Services
             return await ChangeUserRoleAsync(identityUser, oldRole, "User");
         }
 
-        public async Task<IdentityResult> RemoveUserFromRoleAsync(String Email)
+        public async Task<IdentityResult> RemoveUserFromRoleAsync(string Email)
         {
             var identityUser = await _userManager.FindByEmailAsync(Email);
             var roles = await _userManager.GetRolesAsync(identityUser);

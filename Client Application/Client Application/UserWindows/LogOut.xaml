@@ -7,10 +7,14 @@
         mc:Ignorable="d"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="LogOut" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-        <Grid Background="#FF323232">
-            <Button x:Name="yesLogOutButton" Content="Yes" VerticalAlignment="Bottom" Width="78" Height="32" Background="#FF00AA7F" BorderBrush="{x:Null}" Margin="60,0,0,20" Click="yesLogOutButton_Click"/>
-            <Button x:Name="noLogOutButton" Content="No" VerticalAlignment="Bottom" Width="78" Height="32"  Background="#FF00AA7F" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,60,20" Click="noLogOutButton_Click"/>
-            <Label Content="Are you sure you want to log out?" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" Background="{x:Null}" Foreground="White" FontSize="16"/>
+        Title="Log Out" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Background="#FF323232">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="23*"/>
+            <ColumnDefinition Width="277*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="yesLogOutButton" Content="Yes" VerticalAlignment="Bottom" Width="78" Height="32" Background="#FF00AA7F" BorderBrush="{x:Null}" Margin="37,0,0,20" Click="yesLogOutButton_Click" Grid.Column="1"/>
+        <Button x:Name="noLogOutButton" Content="No" VerticalAlignment="Bottom" Width="78" Height="32"  Background="#FF00AA7F" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,60,20" Click="noLogOutButton_Click" Grid.Column="1"/>
+        <Label Content="Are you sure you want to log out?" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="7,20,0,0" Background="{x:Null}" Foreground="White" FontSize="16" Grid.Column="1"/>
     </Grid>
 </Window>

@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace ServerWeb.Services
 {
-    public class IndexRedirection
+    public class IndexRedirection : IIndexRedirection
     {
         private readonly UserManager<IdentityUser> _userManager;
         public IndexRedirection(UserManager<IdentityUser> userManager)

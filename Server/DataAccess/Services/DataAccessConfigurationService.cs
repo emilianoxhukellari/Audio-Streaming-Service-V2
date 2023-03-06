@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
-    public class DataAccessConfigurationService
+    public class DataAccessConfigurationService : IDataAccessConfigurationService
     {
         private readonly IConfiguration _configuration;
         public string AudioFilesRelativePath { get; }

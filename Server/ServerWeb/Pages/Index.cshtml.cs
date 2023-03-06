@@ -9,8 +9,8 @@ namespace ServerWeb.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly IndexRedirection _indexRedirection;
-        public IndexModel(ILogger<IndexModel> logger, IndexRedirection indexRedirection)
+        private readonly IIndexRedirection _indexRedirection;
+        public IndexModel(ILogger<IndexModel> logger, IIndexRedirection indexRedirection)
         {
             _logger = logger;
             _indexRedirection = indexRedirection;

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ServerWeb</RootNamespace>
+    <UserSecretsId>7e9af627-820a-46f4-9c47-ef7b05cdc5cd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

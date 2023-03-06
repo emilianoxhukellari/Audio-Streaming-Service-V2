@@ -20,13 +20,12 @@ namespace Client_Application.Client
     /// </summary>
     public sealed class InternalRequest
     {
-        public object[] Parameters { get; }
+        public InternalRequestArgs Args { get; }
         public InternalRequestType Type { get; }
-        public InternalRequest(params object[] parameters)
+        public InternalRequest(InternalRequestType type, InternalRequestArgs args)
         {
-            Type = (InternalRequestType)parameters[0];
-            Parameters = new object[parameters.Length - 1];
-            Array.Copy(parameters, 1, Parameters, 0, parameters.Length - 1);
+            Type = type;
+            Args = args;
         }
     }
 }

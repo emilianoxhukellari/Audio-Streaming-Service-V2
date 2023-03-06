@@ -19,7 +19,7 @@ namespace Client_Application.Client
         private NetworkStream? _networkStream;
         private SslStream? _sslStream;
         private readonly IPEndPoint _iPEndPoint;
-        private readonly string _HASH = "2D446D7827184CFD82A3BDA15A70A52908BEB849";
+        private readonly string _HASH = Config.Config.GetCertificateHash();
         public bool IsReadyForSSL { get; private set; }
         public bool IsSocketConnected { get; set; }
 

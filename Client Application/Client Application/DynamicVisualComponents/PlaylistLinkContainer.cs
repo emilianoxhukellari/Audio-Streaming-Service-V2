@@ -1,4 +1,5 @@
 ﻿using Client_Application.Client;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -35,8 +36,8 @@ namespace Client_Application.DynamicVisualComponents
 
         private void PlaylistLinkContainer_Click(object sender, RoutedEventArgs e)
         {
-            ClientEvent.Fire(EventType.UpdatePlaylistCanvas, PlaylistLink);
-            ClientEvent.Fire(EventType.ShowPlaylistCanvas, PlaylistLink);
+            ClientEvent.Fire(EventType.UpdatePlaylistCanvas, new UpdatePlaylistCanvasArgs { PlaylistLink = PlaylistLink });
+            ClientEvent.Fire(EventType.ShowPlaylistCanvas, EventArgs.Empty);
         }   
 
 

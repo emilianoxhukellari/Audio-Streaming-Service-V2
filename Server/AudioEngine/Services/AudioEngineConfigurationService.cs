@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace AudioEngine.Services
 {
-    public class AudioEngineConfigurationService
+    public class AudioEngineConfigurationService : IAudioEngineConfigurationService
     {
         private readonly IConfiguration _configuration;
+        private int _searchSongLimit; // make it so that it accesses a static method to get the limit each time it is called.
         public int PortCommunication { get; private set; }
         public int PortStreaming { get; private set; }
         public string Host { get; private set; }
-
         public X509Certificate X509Certificate { get; private set; }
 
         public AudioEngineConfigurationService(IConfiguration configuration)

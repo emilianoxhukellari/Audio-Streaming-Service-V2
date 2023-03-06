@@ -23,7 +23,11 @@ namespace Client_Application
             string playlistName = newPlaylistTextbox.Text;
             if (playlistName != null && playlistName != string.Empty)
             {
-                ClientEvent.Fire(EventType.CreateNewPlaylist, playlistName);
+                ClientEvent.Fire(EventType.CreateNewPlaylist, 
+                    new CreateNewPlaylistArgs
+                    {
+                        PlaylistName = playlistName
+                    });
             }
             Close();
         }

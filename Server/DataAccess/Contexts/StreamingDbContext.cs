@@ -14,7 +14,8 @@ namespace DataAccess.Contexts
         public DbSet<Song> Songs { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
-        public DbSet <StreamingUser> StreamingUsers { get; set; }
+        public DbSet<StreamingUser> StreamingUsers { get; set; }
+        public DbSet<Issue> Issues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

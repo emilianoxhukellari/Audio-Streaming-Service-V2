@@ -78,18 +78,22 @@ namespace DataAccess.Services
                 };
 
                 _streamingDbContext.PlaylistSongs.Add(playlistSong);
+                playlist.Duration += song.Duration;
                 _streamingDbContext.SaveChanges();
             }
         }
 
         public void DeleteSongFromPlaylist(int playlistId, int songId)
         {
+            var playlist = _streamingDbContext.Playlists.Find(playlistId);
+            var song = _streamingDbContext.Songs.Find(songId);
             var playlistSong = _streamingDbContext.PlaylistSongs
                 .SingleOrDefault(ps => ps.PlaylistId == playlistId && ps.SongId == songId);
 
-            if (playlistSong != null)
+            if (playlist != null && song != null && playlistSong != null)
             {
                 _streamingDbContext.PlaylistSongs.Remove(playlistSong);
+                playlist.Duration -= song.Duration;
                 _streamingDbContext.SaveChanges();
             }
         }

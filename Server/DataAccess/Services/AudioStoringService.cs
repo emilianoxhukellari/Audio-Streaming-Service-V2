@@ -124,8 +124,6 @@ namespace DataAccess.Services
             }
         }
 
-
-
         private double GetDurationSeconds(byte[] header)
         {
             int bytesPerSecond = BitConverter.ToInt32(header.Take(new Range(28, 32)).ToArray());
@@ -134,26 +132,6 @@ namespace DataAccess.Services
             return (double)dataSize / bytesPerSecond;
         }
 
-
-        private string GetSerializedForDatabase(string input)
-        {
-            List<char> result = new List<char>();
-
-            foreach (char c in input)
-            {
-                if (c.Equals('\''))
-                {
-                    result.Add('\'');
-                    result.Add(c);
-                }
-                else
-                {
-                    result.Add(c);
-                }
-            }
-
-            return new string(result.ToArray());
-        }
 
         private string GetNormalized(string input)
         {

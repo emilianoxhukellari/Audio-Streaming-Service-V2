@@ -1,0 +1,74 @@
+﻿@page
+@model ServerWeb.Pages.Administrator.IssuesModel
+@{
+    ViewData["Title"] = "Issues";
+}
+
+<style>
+
+    .issue-container {
+        width: 250px;
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #ffffff;
+        transition: background-color 0.3s;
+        margin: 0 10px 20px 10px;
+    }
+
+        .issue-container:hover {
+            background-color: #d0e8ff;
+        }
+
+    .search-container {
+        max-width: 500px; 
+        margin-right: 0; 
+        margin-bottom: 20px;
+        margin-left:40px;
+    }
+
+    .search-input {
+        border-radius: 0 20px 20px 0;
+    }
+
+    .search-button {
+        border-radius: 20px 0 0 20px;
+    }
+
+</style>
+
+<div class="container text-center mt-5">
+    <h1>Issues</h1>
+</div>
+
+<form method="post" class="search-container">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <button class="btn btn-primary search-button" type="submit">Search</button>
+        </div>
+        <input type="text" class="form-control search-input" placeholder="Search Issue" aria-label="Search" aria-describedby="basic-addon2" asp-for="Pattern" required>
+    </div>
+</form>
+
+
+<div class="container-fluid">
+    <div class="row">
+        @foreach (var issue in Model.Issues)
+        {
+            <div class="col-6 col-sm-4 col-md-3 col-lg-3 d-flex justify-content-center">
+                <a asp-page-handler="Solve" asp-route-id="@issue.Id" class="text-decoration-none">
+                    <div class="issue-container">
+                        <div class="text-center">
+                            <h5 class="mb-0">@issue.Title</h5>
+                            <p class="text-muted">@issue.Type</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+

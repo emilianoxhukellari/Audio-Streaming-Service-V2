@@ -356,6 +356,10 @@ namespace Server_Application.Server
                 {
                     LogIn().Wait();
                 }
+                else if (translate[0] == "REGISTER")
+                {
+                    Register().Wait();
+                }
             }
         }
 
@@ -666,6 +670,55 @@ namespace Server_Application.Server
             SendSSL(replyBytes, replyLength, _communcationSSL);
         }
 
+        private async Task Register()
+        {
+
+            byte[] emailLengthBytes = ReceiveSSL(4, _communcationSSL);
+            int emailLength = BitConverter.ToInt32(emailLengthBytes);
+            byte[] emailBytes = ReceiveSSL(emailLength, _communcationSSL);
+            string email = Encoding.UTF8.GetString(emailBytes);
+
+            byte[] passwordLengthBytes = ReceiveSSL(4, _communcationSSL);
+            int passwordLength = BitConverter.ToInt32(passwordLengthBytes);
+            byte[] passwordBytes = ReceiveSSL(passwordLength, _communcationSSL);
+            string password = Encoding.UTF8.GetString(passwordBytes);
+
+            Trace.WriteLine($"-0-------------------------------------- {email} {password}");
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                IRegistrationService registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();
+
+                IdentityUser? user;
+                IdentityResult identityResult;
+
+                (user, identityResult) = await registrationService.Register(email, password);
+
+                if (identityResult.Succeeded)
+                {
+                    int errorCount = 0;
+                    byte[] errorCountBytes = BitConverter.GetBytes(errorCount);
+                    SendSSL(errorCountBytes, 4, _communcationSSL);
+                }
+                else
+                {
+                    int errorCount = identityResult.Errors.Count();
+                    byte[] errorCountBytes = BitConverter.GetBytes(errorCount);
+                    SendSSL(errorCountBytes, 4, _communcationSSL);
+
+                    for (int i = 0; i < errorCount; i++)
+                    {
+                        int errorLength = identityResult.Errors.ElementAt(i).Description.Length;
+                        byte[] errorLengthBytes = BitConverter.GetBytes(errorLength);
+                        SendSSL(errorLengthBytes, 4, _communcationSSL);
+
+                        byte[] errorBytes = Encoding.UTF8.GetBytes(identityResult.Errors.ElementAt(i).Description);
+                        SendSSL(errorBytes, errorLength, _communcationSSL);
+                    }
+                }
+            }
+        }
+
         private async Task LogIn()
         {
             IdentityUser? identityUser = null;
@@ -683,22 +736,19 @@ namespace Server_Application.Server
             bool validRequest = false;
             using (var scope = _serviceProvider.CreateScope())
             {
-                UserManager<IdentityUser>? userManager = scope.ServiceProvider.GetService<UserManager<IdentityUser>>();
-                if(userManager != null)
-                {
-                    identityUser = await userManager.FindByEmailAsync(email);
+                UserManager<IdentityUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                identityUser = await userManager.FindByEmailAsync(email);
 
-                    if (identityUser != null && await userManager.IsInRoleAsync(identityUser, "User"))
-                    {
-                        validRequest = await userManager.CheckPasswordAsync(identityUser, password);
-                    }
-                    else
-                    {
-                        validRequest = false;
-                    }
+                if (identityUser != null && await userManager.IsInRoleAsync(identityUser, "User"))
+                {
+                    validRequest = await userManager.CheckPasswordAsync(identityUser, password);
+                }
+                else
+                {
+                    validRequest = false;
                 }
             }
-            
+
 
             byte[] replyBytes;
 

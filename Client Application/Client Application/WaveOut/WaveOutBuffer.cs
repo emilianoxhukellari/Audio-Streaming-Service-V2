@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Client_Application.Client.Event;
 
 namespace Client_Application.WaveOut
 {

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Animation;
+using Client_Application.Client.Event;
 
 namespace Client_Application.WaveOut
 {

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="Client_Application.Wpf.UserControls.MainControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Client_Application.Wpf.UserControls"
+             mc:Ignorable="d" 
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             d:DesignHeight="750" d:DesignWidth="1200">
+    <Grid x:Name="grid" Background="#FD161616" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"> 
+            <Slider x:Name="progressBar" HorizontalAlignment="Center"  Width="404" Maximum="100" Value="-1" PreviewMouseLeftButtonDown="progressBar_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="progressBar_PreviewMouseLeftButtonUp" Height="34" VerticalAlignment="Bottom" Margin="0,0,0,4" SnapsToDevicePixels="True"/>
+            <Button x:Name="playButton" Style="{StaticResource MyButton}"  Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="playButton_Click" BorderBrush="{x:Null}" Background="Black" Margin="0,0,0,50"/>
+            <Button x:Name="nextSongButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="nextSongButton_Click" BorderBrush="{x:Null}" Background="Black" MouseEnter="nextSongButton_MouseEnter" MouseLeave="nextSongButton_MouseLeave" Margin="100,0,0,50"/>
+            <Button x:Name="previousSongButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="previousSongButton_Click" BorderBrush="{x:Null}" Background="Black" MouseEnter="previousSongButton_MouseEnter" MouseLeave="previousSongButton_MouseLeave" Margin="0,0,100,50"/>
+            <Image x:Name="imageContainer" HorizontalAlignment="Left" Height="180" VerticalAlignment="Bottom" Width="180" Margin="30,0,0,70"/>
+            <Label x:Name="songNameLabel" Content="" HorizontalAlignment="Left" Margin="30,656,0,0" VerticalAlignment="Top" Background="{x:Null}" Width="300" Height="20" Foreground="White"/>
+            <Label x:Name="artistNameLabel" Content="" HorizontalAlignment="Left" Margin="30,680,0,0" VerticalAlignment="Top" Background="{x:Null}" Width="300" Height="20" Foreground="#FFE7CAFF"/>
+            <ContentControl x:Name="contentControl" Content="&#xA;" HorizontalAlignment="Center" Margin="0,100,0,0" VerticalAlignment="Top" Height="520" Width="460"/>
+            <Button x:Name="searchButton" Style="{StaticResource ButtonSimple}" Content="Search" HorizontalAlignment="Center" Height="37" VerticalAlignment="Top" Width="90" Click="searchButton_Click" Background="#FF282828" Foreground="White" Margin="0,40,0,-2" Cursor="Hand" BorderBrush="#FF00AA7F"/>
+            <Label x:Name="timePassedLabel" Content="00:00" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="45" Height="20" Foreground="White" Margin="352,0,0,12"/>
+            <Label x:Name="timeMaxLabel" Content="00:00" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="44" Height="20" Foreground="White" Margin="813,0,0,11"/>
+            <ScrollViewer x:Name="queueScrollViewer" Margin="0,120,20,-9" Height="550" Width="290" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="{x:Null}">
+                <StackPanel x:Name="queueStackPanel"/>
+            </ScrollViewer>
+            <Label Content="Next from queue" HorizontalAlignment="Left" Margin="890,80,0,0" VerticalAlignment="Top" Foreground="White" Width="159" FontSize="20" Height="30"/>
+            <Button x:Name="removeQueueButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Right" VerticalAlignment="Top" Height="23" Width="26" Click="removeQueueButton_Click" MouseEnter="removeQueueButton_MouseEnter" MouseLeave="removeQueueButton_MouseLeave" BorderBrush="{x:Null}" Background="Black" Margin="0,84,120,0"/>
+            <Label x:Name="volumeLabel" Content="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" Width="38" Height="20" Margin="0,0,8,11"/>
+            <Slider x:Name="volumeBar" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Height="34" Maximum="100" Value="100" ValueChanged="volumeBar_ValueChanged" Margin="0,0,50,4"/>
+            <ScrollViewer x:Name="playlistScrollViewer" Foreground="{x:Null}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="380" Width="290" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,120,0,0">
+                <StackPanel x:Name="playlistStackPanel"/>
+            </ScrollViewer>
+            <Label Content="Playlists&#xA;" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" Foreground="White" Width="82" FontSize="20" Height="30"/>
+            <Button x:Name="addPlaylistButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="104,84,0,0" VerticalAlignment="Top" Height="24" Width="26" Click="addPlaylistButton_Click" MouseEnter="addPlaylistButton_MouseEnter" MouseLeave="addPlaylistButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
+            <Button x:Name="repeatButton" Style="{StaticResource MyButton}" Content="&#xA;" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="repeatButton_Click" BorderBrush="{x:Null}" Background="Black" Margin="200,0,0,50"/>
+            <Button x:Name="shuffleButton" Style="{StaticResource MyButton}" Content="&#xA;" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="-0.025,0.503" Height="25" Width="25" Click="shuffleButton_Click" BorderBrush="{x:Null}" Background="Black" Margin="0,0,200,50"/>
+            <Button x:Name="logOutButton" Style="{StaticResource MyButton}" Content="" HorizontalAlignment="Left" Margin="13,13,0,0" VerticalAlignment="Top" Height="24" Width="26" Click="logOutButton_Click" MouseEnter="logOutButton_MouseEnter" MouseLeave="logOutButton_MouseLeave" BorderBrush="{x:Null}" Background="Black"/>
+            <Label x:Name="currentUserLabel" Content="" HorizontalAlignment="Left" Margin="58,14,0,0" VerticalAlignment="Top" Height="22" Foreground="#FFFFFBFB" FontStyle="Italic" Width="300" FontWeight="UltraLight" FontSize="14"/>
+            <Ellipse x:Name="connectionIndicator" HorizontalAlignment="Left" Height="10" Margin="44,20,0,0" VerticalAlignment="Top" Width="10" Fill="#FF00A000"/>
+        </Grid>
+</UserControl>

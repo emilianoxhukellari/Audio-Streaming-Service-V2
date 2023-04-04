@@ -1,0 +1,17 @@
+﻿@{
+    var display = TempData["Display"] ?? "none";
+    var message = TempData["Message"] ?? string.Empty;
+}
+
+<div class="alert alert-success" id="notificationBox" style="display: @display">
+    @message
+</div>
+
+@if (display != "none")
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fadeNotificationBox();
+        });
+    </script>
+}

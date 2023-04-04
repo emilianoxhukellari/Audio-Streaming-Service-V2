@@ -36,7 +36,6 @@ namespace ServerWeb.Pages.Administrator
                 }
 
                 var result = await _userManager.ChangePasswordAsync(user, ChangePassword.CurrentPassword, ChangePassword.NewPassword);
-
                 if(!result.Succeeded)
                 {
                     foreach(var error in result.Errors)

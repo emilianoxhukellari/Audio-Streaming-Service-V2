@@ -70,17 +70,20 @@ namespace ServerWeb
 
             builder.Services.AddScoped<IAudioStoringService, AudioStoringService>();
 
+            builder.Services.AddScoped<PlaylistManagerService>();
+
+            builder.Services.AddScoped<IssueManagerService>();
+
             builder.Services.AddSingleton<IAudioEngineService, AudioEngineService>();
 
             builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
 
-
-            //builder.Services.ConfigureApplicationCookie(options =>
-            //{
-            //    options.Cookie.Name = "AspNetCore.Identity.Application";
-            //    options.AccessDeniedPath = "/Error";
-            //});
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "AspNetCore.Identity.Application";
+                options.AccessDeniedPath = "/AccessDenied"; // Change this
+            });
 
             var app = builder.Build();
 
@@ -113,6 +116,8 @@ namespace ServerWeb
                 context.Response.Redirect("/PageNotFound");
                 return Task.CompletedTask;
             });
+
+            app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
 
             app.Run();
         }

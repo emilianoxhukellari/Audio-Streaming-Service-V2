@@ -34,7 +34,8 @@ namespace ServerWeb.Pages.Administrator
             }
 
             await _audioStoringService.StoreSongAsync(SongInput);
-
+            TempData["Display"] = "block";
+            TempData["Message"] = "The operation was successful!";
             return Page();
         }
     }

@@ -1,4 +1,4 @@
-﻿using Client_Application.Client;
+﻿using Client_Application.Client.Core;
 using System.Windows;
 
 namespace Client_Application

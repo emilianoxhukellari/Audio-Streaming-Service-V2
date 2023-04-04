@@ -1,0 +1,47 @@
+﻿@page
+@model ServerWeb.Pages.User.PlaylistsModel
+@{
+    ViewData["Title"] = "Playlists";
+}
+
+<style>
+    .playlist-container:hover {
+        background-color: #89CFF0;
+        cursor: pointer;
+    }
+
+    .playlist-container .card-body {
+        position: relative;
+    }
+
+    .playlist-container .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+
+<div class="container text-center mt-5">
+    <h1>Current Playlists</h1>
+</div>
+<br />
+<div class="container">
+    @foreach (var playlist in Model.Playlists)
+    {
+        <div class="card text-dark mb-3 playlist-container" onclick="window.location.href='@Url.Page("/User/PlaylistDetails", new { id = playlist.PlaylistId })'">
+            <div class="card-body">
+                <div class="button-container">
+                    <span style="font-size: 1.2em; font-weight: bold;">Playlist: "@playlist.PlaylistName"</span>
+                    <div>
+                        <span style="margin-right: 20px;">Number of songs: @playlist.PlaylistSongs.Count</span>
+                        <span style="margin-right: 20px;">Duration: @Model.SecondsToString(playlist.Duration)</span>
+                        <form method="post" style="display: inline-flex;">
+                            <input type="hidden" name="id" value="@playlist.PlaylistId" />
+                            <button type="submit" class="btn btn-danger btn-sm" style="margin-left: 10px;" asp-page-handler="Delete">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

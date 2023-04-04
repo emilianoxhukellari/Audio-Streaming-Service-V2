@@ -1,0 +1,60 @@
+﻿@page "/{id:int}"
+@model ServerWeb.Pages.User.PlaylistDetailsModel
+@{
+    ViewData["Title"] = "Playlist Details";
+}
+
+<style>
+    .song-container {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        height: 70px;
+        padding: 10px;
+    }
+
+    .song-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .song-details {
+        font-size: 1rem;
+        margin-left: 15px;
+    }
+
+    .duration {
+        font-size: 1rem;
+        margin-left: auto;
+        margin-right: 15px;
+    }
+</style>
+
+<div class="container text-center mt-5">
+    <h1>@Model.Playlist.PlaylistName</h1>
+    @{
+        string hours, minutes;
+        (hours, minutes) = Model.GetPlaylistDuration();
+    }
+    <h5>@hours Hours and @minutes Minutes</h5>
+    <br />
+    <div class="row">
+        @foreach (var song in Model.Songs)
+        {
+            <div class="col-12 mb-2">
+                <div class="d-flex align-items-center song-container">
+                    @{
+                        byte[] imageBytes = System.IO.File.ReadAllBytes(song.ImageFileName);
+                        string base64String = Convert.ToBase64String(imageBytes);
+                    }
+                    <img src="data:image/png;base64,@base64String" class="img-thumbnail song-img" alt="@song.SongName" />
+                    <div class="song-details">
+                        <h5 class="mb-0">@song.SongName by @song.ArtistName</h5>
+                    </div>
+                    <div class="ml-auto duration">
+                        <span>@Model.SecondsToString(song.Duration)</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

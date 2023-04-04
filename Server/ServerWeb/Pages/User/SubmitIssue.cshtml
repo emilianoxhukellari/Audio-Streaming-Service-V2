@@ -1,0 +1,31 @@
+﻿@page
+@model ServerWeb.Pages.User.IssuesModel
+@{
+    ViewData["Title"] = "Submit Issue";
+}
+
+<div class="container my-5">
+    <h1 class="text-center">Submit Issue</h1>
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="IssueInput.Title" class="form-label"></label>
+            <input asp-for="IssueInput.Title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label asp-for="IssueInput.Type" class="form-label"></label>
+            <select class="form-select" asp-for="IssueInput.Type" required>
+                <option value="Other">Other</option>
+                <option value="Desktop Application">Desktop Application</option>
+                <option value="Web Application">Web Application</option>
+                <option value="Explicit Content">Explicit Content</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="IssueInput.Description" class="form-label"></label>
+            <textarea class="form-control" asp-for="IssueInput.Description" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<br />
+@await Html.PartialAsync("_NotificationPartial")

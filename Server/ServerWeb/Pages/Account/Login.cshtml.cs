@@ -16,7 +16,7 @@ namespace ServerWeb.Pages.Account
         private readonly IIndexRedirection _indexRedirection;
         [BindProperty]
         public Login Login { get; set; }    
-
+            
         public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IIndexRedirection indexRedirection)
         {
             _signInManager = signInManager;

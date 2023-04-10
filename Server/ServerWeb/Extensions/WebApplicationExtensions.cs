@@ -1,6 +1,8 @@
 ﻿using DataAccess.Contexts;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerWeb.Services;
 using System.Data;
 using System.Diagnostics;
@@ -50,6 +52,26 @@ namespace ServerWeb.Extensions
                 await userControlService.ChangeUserRoleToAsync(suData[0], "SU");
                 return app;
             }
+        }
+
+        public static void SetTempData(this PageModel pageModel, Status status, string message)
+        {
+            pageModel.TempData["Display"] = "block";
+            pageModel.TempData["Message"] = message;
+            if(status == Status.Success)
+            {
+                pageModel.TempData["Status"] = "success";
+            }
+            else if(status == Status.Fail)
+            {
+                pageModel.TempData["Status"] = "fail";
+            }
+        }
+
+        public enum Status
+        {
+            Success,
+            Fail
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿@{
     var display = TempData["Display"] ?? "none";
     var message = TempData["Message"] ?? string.Empty;
+    var status = TempData["Status"] ?? "success";
 }
 
-<div class="alert alert-success" id="notificationBox" style="display: @display">
+<div class="alert @((string)status == "success" ? "alert-success" : "alert-danger")" id="notificationBox" style="display: @display">
     @message
 </div>
 
-@if (display != "none")
+@if ((string)display != "none")
 {
     <script>
         document.addEventListener('DOMContentLoaded', function () {

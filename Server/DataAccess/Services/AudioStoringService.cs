@@ -16,14 +16,14 @@ namespace DataAccess.Services
 {
     public class AudioStoringService : IAudioStoringService
     {
-        private readonly StreamingDbContext _streamingDbContext;
+        private readonly SongManagerService _songManagerService;
         private readonly IDataAccessConfigurationService _dataAccessConfigurationService;
         public string RelativeSongsPath { get; private set; }
         public string RelativeImagesPath { get; private set; }
 
-        public AudioStoringService(StreamingDbContext streamingDbContext, IDataAccessConfigurationService dataAccessConfigurationService)
+        public AudioStoringService(SongManagerService songManagerService, IDataAccessConfigurationService dataAccessConfigurationService)
         {
-            _streamingDbContext = streamingDbContext;
+            _songManagerService = songManagerService;
             _dataAccessConfigurationService = dataAccessConfigurationService;
 
             RelativeSongsPath = _dataAccessConfigurationService.AudioFilesRelativePath;
@@ -54,8 +54,27 @@ namespace DataAccess.Services
                 ImageFileName = relativeImageFilePath
             };
 
-            _streamingDbContext.Add<Models.Song>(song);
-            _streamingDbContext.SaveChanges();
+            await _songManagerService.AddSongAsync(song);
+        }
+
+        public async Task<bool> UpdateSongFileAsync(int songId, IFormFile formFile)
+        {
+            var song = await _songManagerService.GetSongFromDatabaseAsync(songId);
+
+            if(song == null)
+            {
+                return false;
+            }
+
+            byte[] newSongFileHeader = await GetHeaderAsync(formFile);
+            double newSongFileDuration = GetDurationSeconds(newSongFileHeader);
+            double oldSongFileDuration = song.Duration;
+            if (oldSongFileDuration != newSongFileDuration)
+            {
+                return false;
+            }
+            await CreateAndStoreSongFileAsync(formFile, song.SongName, song.ArtistName, RelativeSongsPath);
+            return true;
         }
 
         private string GetRelativeImagePath(string songName, string artistName, string relativeImagesPath)
@@ -84,6 +103,7 @@ namespace DataAccess.Services
             return durationSeconds;
         }
 
+
         /// <summary>
         /// Returns header.
         /// </summary>
@@ -107,6 +127,21 @@ namespace DataAccess.Services
             return header;
         }
 
+        private async Task<byte[]> GetHeaderAsync(IFormFile audioFile)
+        {
+            StandardWaveBuilder standardWaveBuilder;
+            using (var stream = new MemoryStream()) // This can be optimized with FileStream
+            {
+                await audioFile.CopyToAsync(stream);
+                standardWaveBuilder = new StandardWaveBuilder(stream.ToArray());
+            }
+
+            GC.Collect();
+
+            byte[] audioFileBytes = AudioFile.GetAudioBytes(standardWaveBuilder.GetStandardWave());
+            byte[] header = audioFileBytes.Take(44).ToArray();
+            return header;
+        }
 
         /// <summary>
         /// Returns Relative File Path.

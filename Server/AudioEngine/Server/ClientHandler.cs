@@ -50,7 +50,6 @@ namespace Server_Application.Server
     /// </summary>
     public sealed class ClientHandler
     {
-        private readonly AudioRetrievingInternalService _audioRetrievingInternalService;
         private readonly PlaylistSynchronizerInternalService _playlistSynchronizerInternalService;
         private readonly IServiceProvider _serviceProvider;
         private SslStream? _streamingSSL;
@@ -75,8 +74,7 @@ namespace Server_Application.Server
 
         public ClientHandler(string clientId, SslStream streamingSSL, SslStream communicationSSL, StreamingDbContext  streamingDbContext, IServiceProvider serviceProvider)
         {
-            _audioRetrievingInternalService = new AudioRetrievingInternalService(streamingDbContext);
-            _playlistSynchronizerInternalService = new PlaylistSynchronizerInternalService(_audioRetrievingInternalService);
+            _playlistSynchronizerInternalService = new PlaylistSynchronizerInternalService(serviceProvider);
             _serviceProvider = serviceProvider;
             ClientId = clientId;
             _lastSongData = new byte[0];
@@ -180,7 +178,12 @@ namespace Server_Application.Server
         /// <param name="songId"></param>
         private void SendSongData(int songId)
         {
-            DataAccess.Models.Song? song = _audioRetrievingInternalService.GetSongFromDatabase(songId);
+            DataAccess.Models.Song? song = null;
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                SongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<SongManagerService>();
+                song = songManagerService.GetSongFromDatabase(songId);
+            }
 
             if (song != null)
             {
@@ -795,15 +798,21 @@ namespace Server_Application.Server
         {
             if (searchString != "")
             {
-                var query = _audioRetrievingInternalService.GetSongsForSearch(searchString);
-
                 List<Song> results = new List<Song>();
 
-                foreach (var song in query)
+                using(var scope = _serviceProvider.CreateScope())
                 {
-                    byte[] imageBytes = File.ReadAllBytes(song.ImageFileName);
-                    results.Add(new Song(song.SongId, song.SongName, song.ArtistName, song.Duration, imageBytes));
+                    SongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<SongManagerService>();
+                    IAudioEngineConfigurationService audioEngineConfigurationService = scope.ServiceProvider.GetRequiredService<IAudioEngineConfigurationService>();
+
+                    foreach (var song in songManagerService.GetSongsForDesktopApp(searchString, audioEngineConfigurationService.DesktopSongSearchLimit))
+                    {
+                        byte[] imageBytes = File.ReadAllBytes(song.ImageFileName);
+                        results.Add(new Song(song.SongId, song.SongName, song.ArtistName, song.Duration, imageBytes));
+                    }
                 }
+
+                
 
                 int numberOfSongs = results.Count;
                 byte[] numberOfSongsBytes = BitConverter.GetBytes(numberOfSongs);

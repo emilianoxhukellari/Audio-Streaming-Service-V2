@@ -2,6 +2,7 @@ using DataAccess.Models;
 using DataAccess.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ServerWeb.Extensions;
 using System.Diagnostics;
 
 namespace ServerWeb.Pages.User
@@ -27,8 +28,7 @@ namespace ServerWeb.Pages.User
             if(ModelState.IsValid) 
             {
                 await _issueManagerService.CreateIssueAsync(IssueInput.Title, IssueInput.Type, IssueInput.Description, User);
-                TempData["Display"] = "block";
-                TempData["Message"] = "The operation was successful!";
+                this.SetTempData(WebApplicationExtensions.Status.Success, "Issue created successfully.");
             }
             return RedirectToPage();
         }

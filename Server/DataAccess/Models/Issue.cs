@@ -25,9 +25,9 @@ namespace DataAccess.Models
         public DateTime Date { get; set; }
         public bool IsSolved { get; set; }
         [Required]
-        public int SubmitterId { get; set; }
+        public string SubmitterId { get; set; }
         [AllowNull]
-        public int? ResolverId { get; set; }
+        public string? ResolverId { get; set; }
         [AllowNull]
         public string? SolutionDescription { get; set; }
     }

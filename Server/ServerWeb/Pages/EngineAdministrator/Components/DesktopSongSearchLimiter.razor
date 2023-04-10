@@ -1,0 +1,21 @@
+﻿@inject AudioEngine.Services.IAudioEngineService AudioEngineService
+
+<p>Max number of songs that can be searched at one time: @MaxSongs</p>
+<input type="number" @bind="NewMaxSongs" min="1" step="1" />
+<button @onclick="UpdateMaxSongs">Update Max Songs</button>
+
+@code {
+    private int MaxSongs { get; set; } = 10;
+    private int NewMaxSongs { get; set; } = 10;
+
+    private void UpdateMaxSongs()
+    {
+        MaxSongs = NewMaxSongs;
+        AudioEngineService.SetDesktopSearchLimit(NewMaxSongs);
+    }
+
+    protected override void OnInitialized()
+    {
+        //AudioEngineService.SetDesktopSearchLimit(NewMaxSongs);
+    }
+}

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -30,27 +31,31 @@ namespace DataAccess.Services
             _userManager = userManager;
             _userDbContext = userDbContext;
         }
-        public async Task CreateIssueAsync(string title, string issueType, string description, ClaimsPrincipal user)
+        public async Task<bool> CreateIssueAsync(string title, string issueType, string description, ClaimsPrincipal user)
         {
-            var identityUser = _userManager.GetUserAsync(user);
-            var issue = new Issue
-            { 
-                Title = title,
-                TitleNormalized = GetNormalized(title),
-                Type = issueType,
-                Description = description,
-                Date = DateTime.Now,
-                SubmitterId = identityUser.Id
-            };
-
-            await _streamingDbContext.Issues.AddAsync(issue);
-            await _streamingDbContext.SaveChangesAsync();
+            var identityUser = await _userManager.GetUserAsync(user);
+            if(identityUser != null)
+            {
+                var issue = new Issue
+                {
+                    Title = title,
+                    TitleNormalized = GetNormalized(title),
+                    Type = issueType,
+                    Description = description,
+                    Date = DateTime.Now,
+                    SubmitterId = identityUser.Id
+                };
+                await _streamingDbContext.Issues.AddAsync(issue);
+                await _streamingDbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> SolveIssueAsync(int issueId, string solutionDescription, ClaimsPrincipal user)
         {
-            var issue = await _streamingDbContext.Issues.FindAsync(issueId);
-            var identityUser = _userManager.GetUserAsync(user);
+            var issue = await GetIssueAsync(issueId); 
+            var identityUser = await _userManager.GetUserAsync(user);
             if(issue is not null && identityUser is not null)
             {
                 issue.ResolverId = identityUser.Id;
@@ -62,20 +67,34 @@ namespace DataAccess.Services
             return false;
         }
 
+        public async Task<bool> UnresolveIssueAsync(int issueId)
+        {
+            var issue = await _streamingDbContext.Issues.FindAsync(issueId);
+            if(issue is not null)
+            {
+                issue.ResolverId = null;
+                issue.SolutionDescription = null;
+                issue.IsSolved = false;
+                await _streamingDbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
         public async Task<List<Issue>> GetIssuesFromPatternAsync(string pattern, IssueRetrieveMode issueRetrieveMode)
         {
             List<Issue> issues = new List<Issue>(0);
             if(issueRetrieveMode == IssueRetrieveMode.NonSolved)
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(pattern.ToUpper()) && i.IsSolved == false).ToListAsync();  
+                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == false).ToListAsync();  
             }
             else if(issueRetrieveMode == IssueRetrieveMode.Solved) 
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(pattern.ToUpper()) && i.IsSolved == true).ToListAsync();
+                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == true).ToListAsync();
             }
             else if(issueRetrieveMode == IssueRetrieveMode.All)
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(pattern.ToUpper())).ToListAsync();
+                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern))).ToListAsync();
             }
             return issues;
         }
@@ -136,6 +155,10 @@ namespace DataAccess.Services
 
         private string GetNormalized(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
             return new string(input.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray()).ToUpper();
         }
     }

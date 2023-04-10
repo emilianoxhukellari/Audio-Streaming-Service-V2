@@ -3,6 +3,7 @@ using DataAccess.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using ServerWeb.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
@@ -30,13 +31,13 @@ namespace ServerWeb.Pages.Administrator
         {
             if (!ModelState.IsValid)
             {
+                this.SetTempData(WebApplicationExtensions.Status.Fail, "Could not store song.");
                 return Page();
             }
 
             await _audioStoringService.StoreSongAsync(SongInput);
-            TempData["Display"] = "block";
-            TempData["Message"] = "The operation was successful!";
-            return Page();
+            this.SetTempData(WebApplicationExtensions.Status.Success, "Song stored successfully.");
+            return RedirectToPage();
         }
     }
 }

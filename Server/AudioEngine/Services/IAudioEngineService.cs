@@ -8,5 +8,7 @@
 
         Task StartEngineAsync();
         Task StopEngineAsync();
+
+        void SetDesktopSearchLimit(int limit);
     }
 }

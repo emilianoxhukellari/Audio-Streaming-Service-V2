@@ -98,6 +98,20 @@ namespace DataAccess.Services
             return true;
         }
 
+        public bool SoftDeletePlaylist(int playlistId)
+        {
+            var playlist = _streamingDbContext.Playlists.Find(playlistId);
+
+            if(playlist is null)
+            {
+                return false;
+            }
+
+            playlist.IsDeleted = true;
+            _streamingDbContext.SaveChanges();
+            return true;
+        }
+
         public async Task<List<Song>> GetSongsAsync(int playlistId)
         {
             var songs = await _streamingDbContext.PlaylistSongs
@@ -105,6 +119,81 @@ namespace DataAccess.Services
                 .Select(ps => ps.Song)
                 .ToListAsync();
             return songs;
+        }
+
+        public int AddPlaylist(string playlistName, string userId)
+        {
+            var playlist = new Playlist
+            {
+                PlaylistName = playlistName,
+                UserId = userId
+            };
+
+            _streamingDbContext.Playlists.Add(playlist);
+            _streamingDbContext.SaveChanges();
+
+            return playlist.PlaylistId;
+        }
+
+        public void RenamePlaylist(int playlistId, string newName)
+        {
+            var playlist = _streamingDbContext.Playlists.Find(playlistId);
+
+            if (playlist != null)
+            {
+                playlist.PlaylistName = newName;
+                _streamingDbContext.SaveChanges();
+            }
+        }
+
+        public void AddSongToPlaylist(int playlistId, int songId)
+        {
+            var playlist = _streamingDbContext.Playlists.Find(playlistId);
+            var song = _streamingDbContext.Songs.Find(songId);
+
+            if (playlist != null && song != null)
+            {
+                var playlistSong = new PlaylistSong
+                {
+                    PlaylistId = playlist.PlaylistId,
+                    SongId = song.SongId
+                };
+
+                _streamingDbContext.PlaylistSongs.Add(playlistSong);
+                playlist.Duration += song.Duration;
+                _streamingDbContext.SaveChanges();
+            }
+        }
+
+        public void DeleteSongFromPlaylist(int playlistId, int songId)
+        {
+            var playlist = _streamingDbContext.Playlists.Find(playlistId);
+            var song = _streamingDbContext.Songs.Find(songId);
+            var playlistSong = _streamingDbContext.PlaylistSongs
+                .SingleOrDefault(ps => ps.PlaylistId == playlistId && ps.SongId == songId);
+
+            if (playlist != null && song != null && playlistSong != null)
+            {
+                _streamingDbContext.PlaylistSongs.Remove(playlistSong);
+                playlist.Duration -= song.Duration;
+                _streamingDbContext.SaveChanges();
+            }
+        }
+
+        public List<int> GetPlaylistIds(string userId)
+        {
+            return _streamingDbContext.Playlists
+                .Where(p => p.UserId == userId && p.IsDeleted != true)
+                .Select(p => p.PlaylistId)
+                .ToList();
+        }
+
+        public string? GetPlaylistName(int playlistId)
+        {
+            return _streamingDbContext.Playlists
+                .Where(p => p.PlaylistId == playlistId)
+                .Select(p => p.PlaylistName)
+                .FirstOrDefault();
         }
     }
 }

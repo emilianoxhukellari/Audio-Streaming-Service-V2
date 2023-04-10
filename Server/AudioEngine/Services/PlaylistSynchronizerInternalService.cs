@@ -1,5 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DataAccess.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Server_Application.Server;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,20 @@ namespace AudioEngine.Services
 {
     public class PlaylistSynchronizerInternalService
     {
-        private readonly AudioRetrievingInternalService _audioRetrievingInternalService;
+        private readonly PlaylistManagerService _playlistManagerService;
+        private readonly SongManagerService _songManagerService;
+        private readonly IServiceScope _serviceScope;
         public string? UserId { get; set; }
-        public PlaylistSynchronizerInternalService(AudioRetrievingInternalService audioRetrievingInternalService)
+        public PlaylistSynchronizerInternalService(IServiceProvider serviceProvider)
         {
-            _audioRetrievingInternalService = audioRetrievingInternalService;
+            _serviceScope = serviceProvider.CreateScope();
+            _playlistManagerService = _serviceScope.ServiceProvider.GetRequiredService<PlaylistManagerService>();
+            _songManagerService = _serviceScope.ServiceProvider.GetRequiredService<SongManagerService>();
+        }
+
+        ~PlaylistSynchronizerInternalService() 
+        {
+            _serviceScope.Dispose();
         }
 
         public void SetUserId(string userId)
@@ -26,7 +36,7 @@ namespace AudioEngine.Services
 
         public void SyncDeletePlaylist(int playlistId)
         {
-            _audioRetrievingInternalService.DeletePlaylist(playlistId);
+            _playlistManagerService.SoftDeletePlaylist(playlistId);
         }
 
         public int SyncAddPlaylist(string playlistName)
@@ -35,7 +45,7 @@ namespace AudioEngine.Services
             {
                 throw new ArgumentNullException("User id is not set.");
             }
-            return _audioRetrievingInternalService.AddPlaylist(playlistName, UserId);
+            return _playlistManagerService.AddPlaylist(playlistName, UserId);
         }
 
         public void SyncRenamePlaylist(int playlistId, string newName)
@@ -44,7 +54,7 @@ namespace AudioEngine.Services
             {
                 throw new ArgumentNullException("User id is not set.");
             }
-            _audioRetrievingInternalService.RenamePlaylist(playlistId, newName);
+            _playlistManagerService.RenamePlaylist(playlistId, newName);
         }
 
         public void SyncDeleteSongFromPlaylist(int playlistId, int songId)
@@ -53,7 +63,7 @@ namespace AudioEngine.Services
             {
                 throw new ArgumentNullException("User id is not set.");
             }
-            _audioRetrievingInternalService.DeleteSongFromPlaylist(playlistId, songId);
+            _playlistManagerService.DeleteSongFromPlaylist(playlistId, songId);
         }
 
         public void SyncAddSongToPlaylist(int playlistId, int songId)
@@ -62,7 +72,7 @@ namespace AudioEngine.Services
             {
                 throw new ArgumentNullException("User id is not set.");
             }
-            _audioRetrievingInternalService.AddSongToPlaylist(playlistId, songId);
+            _playlistManagerService.AddSongToPlaylist(playlistId, songId);
         }
 
         public SyncDiff GetDiff(List<PlaylistSyncData> playlistsUp)
@@ -72,7 +82,7 @@ namespace AudioEngine.Services
                 throw new ArgumentNullException("User id is not set.");
             }
 
-            List<int> serverPlaylists = _audioRetrievingInternalService.GetPlaylistIds(UserId);
+            List<int> serverPlaylists = _playlistManagerService.GetPlaylistIds(UserId);
             List<int> clientPlaylists = playlistsUp.Select(p => p.PlaylistId).ToList();
             int[] intersectPlaylists = clientPlaylists.Intersect(serverPlaylists).ToArray();
 
@@ -84,13 +94,13 @@ namespace AudioEngine.Services
             List<(int playlistId, string playlistName)> addPlaylists = new();
             foreach(int playlistId in addPlaylistIds)
             {
-                addPlaylists.Add((playlistId, _audioRetrievingInternalService.GetPlaylistName(playlistId)!));
+                addPlaylists.Add((playlistId, _playlistManagerService.GetPlaylistName(playlistId)!));
             }
 
             List<(int playlistId, string playlistName)> renamePlaylists = new(); //RENAME
             foreach (int playlistId in intersectPlaylists)
             {
-                string? playlistName = _audioRetrievingInternalService.GetPlaylistName(playlistId);
+                string? playlistName = _playlistManagerService.GetPlaylistName(playlistId);
                 if (playlistName != playlistsUp.Where(p => p.PlaylistId == playlistId).Select(p => p.PlaylistName).FirstOrDefault())
                 {
                     renamePlaylists.Add((playlistId, playlistName!));
@@ -101,7 +111,7 @@ namespace AudioEngine.Services
             foreach(int playlistId in intersectPlaylists)
             {
                 List<int> clientSongIds = playlistsUp.Where(p => p.PlaylistId == playlistId).Select(p => p.SongIds).FirstOrDefault()!;
-                var deleteSongForPlaylist = clientSongIds.Except(_audioRetrievingInternalService.GetSongIds(playlistId));
+                var deleteSongForPlaylist = clientSongIds.Except(_songManagerService.GetSongIds(playlistId));
                 foreach(var deleteSong in deleteSongForPlaylist)
                 {
                     deleteSongs.Add((playlistId, deleteSong));
@@ -114,10 +124,10 @@ namespace AudioEngine.Services
             {
                 List<Song> songsToAdd = new(0);
                 List<int> clientSongIds = playlistsUp.Where(p => p.PlaylistId == playlistId).Select(p => p.SongIds).FirstOrDefault()!;
-                var addSongForPlaylistIds = _audioRetrievingInternalService.GetSongIds(playlistId).Except(clientSongIds);
+                var addSongForPlaylistIds = _songManagerService.GetSongIds(playlistId).Except(clientSongIds);
                 foreach (var addSongId in addSongForPlaylistIds)
                 {
-                    DataAccess.Models.Song? song = _audioRetrievingInternalService.GetSongFromDatabase(addSongId);
+                    DataAccess.Models.Song? song = _songManagerService.GetSongFromDatabase(addSongId);
                     if(song != null)
                     {
                         songsToAdd.Add(new Song(song.SongId, song.SongName, song.ArtistName, song.Duration, File.ReadAllBytes(song.ImageFileName)));
@@ -134,10 +144,10 @@ namespace AudioEngine.Services
             foreach(int playlistId in addPlaylistIds) // Add songs of playlists that the client did not have
             {
                 List<Song> songsToAdd = new(0);
-                var addSongForPlaylistIds = _audioRetrievingInternalService.GetSongIds(playlistId);
+                var addSongForPlaylistIds = _songManagerService.GetSongIds(playlistId);
                 foreach (var addSongId in addSongForPlaylistIds)
                 {
-                    DataAccess.Models.Song? song = _audioRetrievingInternalService.GetSongFromDatabase(addSongId);
+                    DataAccess.Models.Song? song = _songManagerService.GetSongFromDatabase(addSongId);
                     if (song != null)
                     {
                         songsToAdd.Add(new Song(song.SongId, song.SongName, song.ArtistName, song.Duration, File.ReadAllBytes(song.ImageFileName)));

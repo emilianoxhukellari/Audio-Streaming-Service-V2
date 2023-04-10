@@ -1,0 +1,69 @@
+﻿@page
+@model ServerWeb.Pages.Administrator.SongDetailsModel
+@{
+    ViewData["Title"] = "Song Details";
+}
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Song Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            @{
+                                byte[] imageBytes = System.IO.File.ReadAllBytes(Model.Song.ImageFileName);
+                                string base64String = Convert.ToBase64String(imageBytes);
+                            }
+                            <img src="data:image/png;base64,@base64String" class="img-fluid" alt="@Model.Song.SongName" />
+                        </div>
+                        <div class="col-md-8">
+                            <table class="table">
+                                <tr>
+                                    <th>Song ID</th>
+                                    <td>@Model.Song.SongId</td>
+                                </tr>
+                                <tr>
+                                    <th>Song Name</th>
+                                    <td>@Model.Song.SongName</td>
+                                </tr>
+                                <tr>
+                                    <th>Artist Name</th>
+                                    <td>@Model.Song.ArtistName</td>
+                                </tr>
+                                <tr>
+                                    <th>Duration</th>
+                                    <td>@Model.Song.Duration</td>
+                                </tr>
+                                <tr>
+                                    <th>Image File</th>
+                                    <td>@Model.Song.ImageFileName</td>
+                                </tr>
+                                <tr>
+                                    <th>Song File</th>
+                                    <td>@Model.Song.SongFileName</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <form method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="mb-3">
+                            <label asp-for="SongFile" class="form-label"></label>
+                            <input class="form-control" asp-for="SongFile">
+                            <span asp-validation-for="SongFile" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Song</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+@await Html.PartialAsync("_NotificationPartial")

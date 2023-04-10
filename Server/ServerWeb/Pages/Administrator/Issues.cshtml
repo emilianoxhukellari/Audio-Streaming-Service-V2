@@ -24,10 +24,7 @@
         }
 
     .search-container {
-        max-width: 500px; 
-        margin-right: 0; 
         margin-bottom: 20px;
-        margin-left:40px;
     }
 
     .search-input {
@@ -40,8 +37,13 @@
 
 </style>
 
-<div class="container text-center mt-5">
-    <h1>Issues</h1>
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-bug" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Issues</h4>
+    <div class="text-center">
+    </div>
 </div>
 
 <form method="post" class="search-container">
@@ -59,7 +61,7 @@
         @foreach (var issue in Model.Issues)
         {
             <div class="col-6 col-sm-4 col-md-3 col-lg-3 d-flex justify-content-center">
-                <a asp-page-handler="Solve" asp-route-id="@issue.Id" class="text-decoration-none">
+                <a asp-page="./IssueDetails" asp-route-id="@issue.Id" class="text-decoration-none">
                     <div class="issue-container">
                         <div class="text-center">
                             <h5 class="mb-0">@issue.Title</h5>

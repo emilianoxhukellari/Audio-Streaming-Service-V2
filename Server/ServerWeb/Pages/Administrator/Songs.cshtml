@@ -1,0 +1,97 @@
+﻿@page
+@model ServerWeb.Pages.Administrator.SongsModel
+@{
+    ViewData["Title"] = "Manage Songs";
+}
+
+<style>
+    .song-container {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        height: 70px;
+        padding: 10px;
+    }
+
+    .song-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .song-details {
+        font-size: 1rem;
+        margin-left: 15px;
+    }
+
+    .duration {
+        font-size: 1rem;
+        margin-left: auto;
+        margin-right: 15px;
+    }
+
+    .btn-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .search-container {
+        margin-bottom: 20px;
+    }
+
+    .search-input {
+        border-radius: 0 20px 20px 0;
+    }
+
+    .search-button {
+        border-radius: 20px 0 0 20px;
+    }
+
+</style>
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-list" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Songs</h4>
+    <div class="text-center">
+    </div>
+</div>
+
+<form method="post" class="search-container">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <button class="btn btn-primary search-button" type="submit">Search</button>
+        </div>
+        <input type="text" class="form-control search-input" placeholder="Search Issue" aria-label="Search" aria-describedby="basic-addon2" asp-for="Pattern" required>
+    </div>
+</form>
+
+<div class="container text-center mt-5">
+    <div class="row">
+        @foreach (var song in Model.Songs)
+        {
+            <div class="col-12 mb-2">
+                <div class="d-flex align-items-center song-container">
+                    @{
+                        byte[] imageBytes = System.IO.File.ReadAllBytes(song.ImageFileName);
+                        string base64String = Convert.ToBase64String(imageBytes);
+                    }
+                    <img src="data:image/png;base64,@base64String" class="img-thumbnail song-img" alt="@song.SongName" />
+                    <div class="song-details">
+                        <h5 class="mb-0">@song.SongName by @song.ArtistName</h5>
+                    </div>
+                    <div class="ml-auto duration">
+                        <span>@Model.SecondsToString(song.Duration)</span>
+                    </div>
+                    <form method="post" style="display: inline-flex;">
+                        <input type="hidden" asp-for="Pattern" />
+                        <div class="btn-container">
+                            <input type="hidden" name="songId" value="@song.SongId" />
+                            <button type="submit" class="btn btn-primary btn-sm" style="margin-right:6px;" asp-page-handler="Update">Update</button>
+                            <button type="submit" class="btn btn-danger btn-sm" asp-page-handler="Delete">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

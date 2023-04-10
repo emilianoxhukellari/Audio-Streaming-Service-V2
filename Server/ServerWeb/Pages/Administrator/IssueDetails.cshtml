@@ -1,0 +1,64 @@
+﻿@page
+@model ServerWeb.Pages.Administrator.IssueDetailsModel
+@{
+    ViewData["Title"] = "Issue Details";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>@Model.Issue.Title</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Issue.Id</dd>
+
+                <dt class="col-sm-3">Type</dt>
+                <dd class="col-sm-9">@Model.Issue.Type</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">
+                    <textarea class="form-control" readonly>@Model.Issue.Description</textarea>
+                </dd>
+
+                <dt class="col-sm-3">Date</dt>
+                <dd class="col-sm-9">@Model.Issue.Date.ToString("g")</dd>
+
+                <dt class="col-sm-3">Is Solved</dt>
+                <dd class="col-sm-9">@Model.Issue.IsSolved</dd>
+
+                <dt class="col-sm-3">Submitter ID</dt>
+                <dd class="col-sm-9">@Model.Issue.SubmitterId</dd>
+
+                <dt class="col-sm-3">Resolver ID</dt>
+                <dd class="col-sm-9">@Model.Issue.ResolverId</dd>
+            </dl>
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <div class="row mb-3">
+                    <dt class="col-sm-3">Solution Description</dt>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" asp-for="SolutionDescription"></textarea>
+                    </div>
+                    <input type="hidden" asp-for="Id" />
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" asp-page-handler="Solve" class="btn btn-primary me-2">Solve</button>
+                    @if (Model.Issue.IsSolved)
+                    {
+                        <button type="submit" asp-page-handler="Unresolve" class="btn btn-warning">Unresolve</button>
+                    }
+                    else
+                    {
+                        <button type="submit" asp-page-handler="Unresolve" class="btn btn-warning disabled">Unresolve</button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<br />
+@await Html.PartialAsync("_NotificationPartial")

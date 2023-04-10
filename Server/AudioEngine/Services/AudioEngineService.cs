@@ -28,6 +28,14 @@ namespace AudioEngine.Services
             _controller = new Controller(_dbContextFactory, _serviceProvider, _audioEngineConfigurationService);
         }
 
+        public void SetDesktopSearchLimit(int limit)
+        {
+            if(limit < 1) limit = 1; // At least one song to be displayed
+
+            _audioEngineConfigurationService.DesktopSongSearchLimit = limit; 
+
+        }
+
         public async Task StartEngineAsync()
         {
             await Task.Run(() =>

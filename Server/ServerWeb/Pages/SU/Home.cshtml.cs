@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace ServerWeb.Pages.SU
 {

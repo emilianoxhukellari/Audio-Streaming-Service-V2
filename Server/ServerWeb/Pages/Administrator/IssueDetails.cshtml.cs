@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerWeb.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace ServerWeb.Pages.Administrator
 {
@@ -18,7 +16,7 @@ namespace ServerWeb.Pages.Administrator
         public int Id { get; set; }
         [BindProperty]
         public string? SolutionDescription { get; set; }
-        public Issue Issue { get; set; } 
+        public Issue Issue { get; set; }
 
         public IssueDetailsModel(IIssueManagerService issueManagerService)
         {
@@ -29,7 +27,7 @@ namespace ServerWeb.Pages.Administrator
         public async Task OnGet()
         {
             var issue = await _issueManagerService.GetIssueAsync(Id);
-            if(issue is not null)
+            if (issue is not null)
             {
                 Issue = issue;
                 SolutionDescription = issue.SolutionDescription;
@@ -41,7 +39,7 @@ namespace ServerWeb.Pages.Administrator
             if (ModelState.IsValid)
             {
                 var issue = await _issueManagerService.GetIssueAsync(Id);
-                bool success = false;
+                bool success;
                 if (issue is not null)
                 {
                     Issue = issue;
@@ -76,7 +74,7 @@ namespace ServerWeb.Pages.Administrator
             if (ModelState.IsValid)
             {
                 bool success = await _issueManagerService.UnresolveIssueAsync(Id);
-                if(success)
+                if (success)
                 {
                     this.SetTempData(WebApplicationExtensions.Status.Success, "Issue unresolved successfully.");
                 }

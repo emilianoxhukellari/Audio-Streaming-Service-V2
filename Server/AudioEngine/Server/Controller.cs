@@ -1,25 +1,13 @@
 ﻿using AudioEngine.Services;
 using DataAccess.Contexts;
 using DataAccess.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Server_Application.Server
 {
@@ -98,22 +86,26 @@ namespace Server_Application.Server
             _serverListener = new ServerListener();
             _internalRequestQueue = new Queue<InternalRequest>();
             IsRunning = false;
-            InitializeClientCountLimit(ref _clientCountLimit);  
+            InitializeClientCountLimit(ref _clientCountLimit);
             Listen(EventType.InternalRequest, new ServerEventCallback(AddInternalRequest));
         }
 
         private void InitializeClientCountLimit(ref int clientCountLimit)
         {
-            using(var scope = _serviceProvider.CreateScope())
+            using (var scope = _serviceProvider.CreateScope())
             {
                 var dataAccessConfigurationService = scope.ServiceProvider.GetRequiredService<IDataAccessConfigurationService>();
                 clientCountLimit = dataAccessConfigurationService.DesktopAppClientCountLimit;
             }
         }
 
+        /// <summary>
+        /// This method will forcibly terminate clients. 
+        /// </summary>
+        /// <param name="mode"></param>
         private void TerminateClients(TerminateClientsMode mode)
         {
-            if(mode == TerminateClientsMode.All)
+            if (mode == TerminateClientsMode.All)
             {
                 while (_clients.Count > 0)
                 {
@@ -124,8 +116,8 @@ namespace Server_Application.Server
                     catch { }
                 }
             }
-            
-            else if(mode == TerminateClientsMode.Limit)
+
+            else if (mode == TerminateClientsMode.Limit)
             {
                 while (_clients.Count > _clientCountLimit)
                 {
@@ -234,7 +226,6 @@ namespace Server_Application.Server
         /// Listens for clients trying to connect to the streaming port.
         /// </summary>
         /// 
-
         private void StreamingListeningLoop()
         {
             try
@@ -245,7 +236,7 @@ namespace Server_Application.Server
                     {
                         lock (_criticalStreamingListeningOperation)
                         {
-                            if(ConnectedCount >= ClientCountLimit)
+                            if (ConnectedCount >= ClientCountLimit)
                             {
                                 Thread.Sleep(300);
                                 continue;
@@ -415,6 +406,12 @@ namespace Server_Application.Server
             return $"{ClientId}@";
         }
 
+        /// <summary>
+        /// This method will change the limit count for clients. This represents the maximum number of clients
+        /// connected at one time. If there are more clients connected than the new limit, the excessive clients
+        /// will be terminated.
+        /// </summary>
+        /// <param name="limit"></param>
         public void ChangeClientCountLimit(int limit)
         {
             bool acquiredLock = false;
@@ -434,7 +431,8 @@ namespace Server_Application.Server
         }
 
         /// <summary>
-        /// Starts the controller.
+        /// Starts the controller: 1) Start communication listening thread. 2) Start streaming listening thread. 3) Start create client
+        /// handler thread. 4) Start internal request thread.
         /// </summary>
         public void Start()
         {
@@ -460,6 +458,10 @@ namespace Server_Application.Server
             }
         }
 
+        /// <summary>
+        /// Stop the controller: 1) Terminate communication listening thread. 2) Terminate streaming listening thread. 3) Terminate create client
+        /// handler thread. 4) Terminate all clients. 5) Terminate internal request thread.
+        /// </summary>
         public void Stop()
         {
             bool acquiredLock = false;

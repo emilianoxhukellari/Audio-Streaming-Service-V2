@@ -1,12 +1,13 @@
+using AudioEngine.Services;
 using DataAccess.Contexts;
-using ServerWeb.Services;
+using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ServerWeb.Extensions;
-using Microsoft.AspNetCore.Http.Features;
-using DataAccess.Services;
-using AudioEngine.Services;
+using ServerWeb.Services;
 
 namespace ServerWeb
 {
@@ -25,7 +26,7 @@ namespace ServerWeb
 
             builder.Services.AddServerSideBlazor();
 
-            builder.Services.AddDbContextPool<UserDbContext>(options =>
+            builder.Services.AddDbContextPool<IdentityDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("UserConnectionString"));
             });
@@ -40,7 +41,7 @@ namespace ServerWeb
                 options.UseSqlServer(builder.Configuration.GetConnectionString("StreamingConnectionString"));
             });
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<UserDbContext>();
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>();
 
             builder.Services.AddAuthorization(options =>
             {
@@ -63,10 +64,9 @@ namespace ServerWeb
                 options.MaxRequestBodySize = 3000000000;
             });
 
-
             builder.Services.AddScoped<IDataAccessConfigurationService, DataAccessConfigurationService>();
 
-            builder.Services.AddSingleton<IAudioEngineConfigurationService, AudioEngineConfigurationService>(); 
+            builder.Services.AddSingleton<IAudioEngineConfigurationService, AudioEngineConfigurationService>();
 
             builder.Services.AddScoped<IUserControlService, UserControlService>();
 
@@ -84,24 +84,19 @@ namespace ServerWeb
 
             builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
-
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = "AspNetCore.Identity.Application";
-                options.AccessDeniedPath = "/AccessDenied"; // Change this
+                options.AccessDeniedPath = "/AccessDenied"; 
             });
 
             var app = builder.Build();
 
             Task.Run(() => app.Initialize().Wait());
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+            // Middleware
+
+            app.UseExceptionHandler("/Error");
 
             app.UseHttpsRedirection();
 
@@ -127,5 +122,5 @@ namespace ServerWeb
 
             app.Run();
         }
-    }   
+    }
 }

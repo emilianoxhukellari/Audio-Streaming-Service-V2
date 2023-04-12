@@ -1,4 +1,3 @@
-using DataAccess.Contexts;
 using DataAccess.Models;
 using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +21,7 @@ namespace ServerWeb.Pages.User
 
         public (string hours, string minutes) GetPlaylistDuration()
         {
-            double seconds = Playlist.Duration;    
+            double seconds = Playlist.Duration;
             double minutes = seconds / 60;
             int hours = (int)(minutes / 60);
             int leftMinutes = (int)(minutes % 60);
@@ -37,7 +36,7 @@ namespace ServerWeb.Pages.User
         public async Task<IActionResult> OnGetAsync(int id)
         {
 
-            if(!await _playlistManagerService.UserHasPlaylist(User, id))
+            if (!await _playlistManagerService.UserHasPlaylist(User, id))
             {
                 return NotFound();
             }

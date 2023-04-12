@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Server_Application.Server
+﻿namespace Server_Application.Server
 {
     public enum EventType
     {

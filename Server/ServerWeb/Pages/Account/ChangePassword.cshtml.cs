@@ -1,17 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ServerWeb.Pages.Administrator
 {
     public class ChangePasswordModel : PageModel
     {
         [BindProperty]
-        public ChangePassword ChangePassword{ get; set; }
+        public ChangePassword ChangePassword { get; set; }
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;    
+        private readonly SignInManager<IdentityUser> _signInManager;
 
         public ChangePasswordModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
@@ -26,7 +25,7 @@ namespace ServerWeb.Pages.Administrator
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
 
@@ -36,9 +35,9 @@ namespace ServerWeb.Pages.Administrator
                 }
 
                 var result = await _userManager.ChangePasswordAsync(user, ChangePassword.CurrentPassword, ChangePassword.NewPassword);
-                if(!result.Succeeded)
+                if (!result.Succeeded)
                 {
-                    foreach(var error in result.Errors)
+                    foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }

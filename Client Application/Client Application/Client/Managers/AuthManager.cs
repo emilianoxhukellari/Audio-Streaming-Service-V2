@@ -13,7 +13,9 @@ using Client_Application.Client.Network;
 
 namespace Client_Application.Client.Managers
 {
-
+    /// <summary>
+    /// This class represent an authentication manager that deals with log in, log out, register, remember me.
+    /// </summary>
     public sealed class AuthManager
     {
         private static volatile AuthManager? _instance;
@@ -27,11 +29,18 @@ namespace Client_Application.Client.Managers
             _communicationManager = CommunicationManager.GetInstance();
         }
 
+        /// <summary>
+        /// Wait until the singleton is created.
+        /// </summary>
         public static void WaitForInstance()
         {
             _isInitialized.WaitOne();
         }
 
+        /// <summary>
+        /// Initialize the singleton. This method is thread-safe.
+        /// </summary>
+        /// <returns></returns>
         public static AuthManager InitializeSingleton()
         {
             if (_instance == null)
@@ -48,6 +57,11 @@ namespace Client_Application.Client.Managers
             return _instance;
         }
 
+        /// <summary>
+        /// Get the singleton instance.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public static AuthManager GetInstance()
         {
             if (_instance != null)
@@ -60,11 +74,17 @@ namespace Client_Application.Client.Managers
             }
         }
 
+        /// <summary>
+        /// Create a new empty session for this client.
+        /// </summary>
         public void NewSession()
         {
             _session = new Session();
         }
 
+        /// <summary>
+        /// Reauthenticate to server if the client disconnected.
+        /// </summary>
         public void RecoverSession()
         {
             if (_session != null)
@@ -100,6 +120,13 @@ namespace Client_Application.Client.Managers
             return false;
         }
 
+        /// <summary>
+        /// Perform log in with the server. 
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <param name="rememberMe"></param>
+        /// <returns></returns>
         public AuthenticationResult LogIn(string email, string password, bool rememberMe)
         {
             AuthenticationResult result = _communicationManager.AuthenticateToServer(email, password);
@@ -145,6 +172,9 @@ namespace Client_Application.Client.Managers
             }
         }
 
+        /// <summary>
+        /// Remove credentials of this client for next time they log in.
+        /// </summary>
         public void RemoveRememberMe()
         {
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
@@ -154,6 +184,11 @@ namespace Client_Application.Client.Managers
             }
         }
 
+        /// <summary>
+        /// Change the credentials stored in this computer for this client.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
         public void RememberMeUpdate(string email, string password)
         {
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
@@ -167,6 +202,11 @@ namespace Client_Application.Client.Managers
                 }
             }
         }
+
+        /// <summary>
+        /// Check whether the client had checked "Remember Me" when they logged in last.
+        /// </summary>
+        /// <returns></returns>
         public bool IsRememberMe()
         {
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
@@ -177,6 +217,13 @@ namespace Client_Application.Client.Managers
             return false;
         }
 
+        /// <summary>
+        /// Check whether the client had checked "Remember Me" when they logged in last. Also, provide the email and password
+        /// of that user.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public bool IsRememberMe(out string? email, out string? password)
         {
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
@@ -215,6 +262,11 @@ namespace Client_Application.Client.Managers
         private static readonly byte[] _key = { 0x2F, 0xC1, 0x10, 0x44, 0xD1, 0x74, 0xA9, 0x3E, 0x86, 0x33, 0xF5, 0x20, 0x4F, 0xA5, 0x8B, 0x5E };
         private static readonly byte[] _iv = { 0x9C, 0x86, 0x31, 0xD2, 0xF8, 0xA5, 0x98, 0x7E, 0x52, 0x10, 0x7F, 0xE3, 0x50, 0x84, 0x06, 0x31 };
 
+        /// <summary>
+        /// Encrypt the clearText using AES encryption.
+        /// </summary>
+        /// <param name="clearText"></param>
+        /// <returns></returns>
         public static string Encrypt(string clearText)
         {
             using Aes aes = Aes.Create();
@@ -227,6 +279,11 @@ namespace Client_Application.Client.Managers
             return Convert.ToBase64String(output.ToArray());
         }
 
+        /// <summary>
+        /// Decrypt the encrypted message using AES encryption.
+        /// </summary>
+        /// <param name="encrypted"></param>
+        /// <returns></returns>
         public static string Decrypt(string encrypted)
         {
             using Aes aes = Aes.Create();

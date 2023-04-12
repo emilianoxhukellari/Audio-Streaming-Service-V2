@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Server_Application.Server
+﻿namespace Server_Application.Server
 {
     public enum InternalRequestType
     {

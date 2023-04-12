@@ -3,15 +3,22 @@ using DataAccess.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server_Application.Server;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AudioEngine.Services
 {
+    public class ServerLoadArgs : EventArgs
+        {
+            public int ConnectedClientsCount { get; set; }
+            public int ClientCountLimit { get; set; }
+            public int Percentage
+            {
+                get
+                {
+                    return ClientCountLimit == 0 ? 0 : (int)((double)ConnectedClientsCount / ClientCountLimit * 100);
+                }
+            }
+        }
+    
     public class AudioEngineService : IAudioEngineService
     {
         private readonly IDbContextFactory<StreamingDbContext> _dbContextFactory;
@@ -26,21 +33,7 @@ namespace AudioEngine.Services
         public event EventHandler<int>? ServerDesktopClientCountLimitChanged;
         public event EventHandler<ServerLoadArgs>? ServerLoadUpdate;
 
-        public class ServerLoadArgs : EventArgs
-        {
-            public int ConnectedClientsCount { get; set; }
-            public int ClientCountLimit { get; set; }
-            public int Percentage
-            {
-                get
-                {
-                    return ClientCountLimit == 0 ? 0 : (int)((double)ConnectedClientsCount / ClientCountLimit * 100);
-                }
-            }
-        }
-
-        public bool IsRunning { get; set; }
-
+        public bool IsRunning { get; private set; }
 
         public AudioEngineService(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, IAudioEngineConfigurationService audioEngineConfigurationService)
         {
@@ -78,9 +71,7 @@ namespace AudioEngine.Services
                 Thread.Sleep(500);
             }
         }
-
-        // Get Init State
-
+        
         public ServerLoadArgs GetServerLoadInitialState()
         {
             return new ServerLoadArgs

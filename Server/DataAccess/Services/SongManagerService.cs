@@ -1,12 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -20,11 +14,13 @@ namespace DataAccess.Services
             _dataAccessConfigurationService = dataAccessConfigurationService;
         }
 
+        /// <inheritdoc/>
         public async Task<int> GetNumberOfSongsAsync()
         {
             return await _context.Songs.CountAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<bool> AddSongAsync(Song song)
         {
             try
@@ -36,6 +32,7 @@ namespace DataAccess.Services
             catch { return false; }
         }
 
+        /// <inheritdoc/>
         public async Task<bool> DeleteSongAsync(int songId)
         {
             var song = await _context.Songs.FindAsync(songId);
@@ -56,6 +53,7 @@ namespace DataAccess.Services
             catch { return false; }
         }
 
+        /// <inheritdoc/>
         public async Task<List<Song>> GetSongsForWebAppAsync(string pattern)
         {
             IQueryable<DataAccess.Models.Song> songs;
@@ -80,6 +78,7 @@ namespace DataAccess.Services
             return await songs.ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<List<Song>> GetSongsForWebAppAsync()
         {
             IQueryable<DataAccess.Models.Song> songs;
@@ -103,6 +102,7 @@ namespace DataAccess.Services
             return await songs.ToListAsync();
         }
 
+        /// <inheritdoc/>
         public List<DataAccess.Models.Song> GetSongsForDesktopApp(string search)
         {
             IQueryable<DataAccess.Models.Song> songs;
@@ -127,11 +127,13 @@ namespace DataAccess.Services
             return songs.ToList();
         }
 
+        /// <inheritdoc/>
         public DataAccess.Models.Song? GetSongFromDatabase(int songId)
         {
             return _context.Songs.Find(songId);
         }
 
+        /// <inheritdoc/>
         public async Task<Song?> GetSongFromDatabaseAsync(int songId)
         {
             return await _context.Songs.FindAsync(songId);
@@ -145,6 +147,7 @@ namespace DataAccess.Services
                 .ToList();
         }
 
+        /// <inheritdoc/>
         private string GetNormalized(string input)
         {
             if (string.IsNullOrWhiteSpace(input))

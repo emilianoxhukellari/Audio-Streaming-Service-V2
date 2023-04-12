@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Server_Application.Server
 {
@@ -108,6 +105,11 @@ namespace Server_Application.Server
             return serialized;
         }
 
+        /// <summary>
+        /// Convert seconds to format {00:00}
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <returns></returns>
         public static string SecondsToString(double seconds)
         {
             int minutes = (int)(seconds / 60);

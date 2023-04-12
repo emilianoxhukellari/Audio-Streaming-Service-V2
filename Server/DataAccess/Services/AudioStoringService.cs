@@ -1,16 +1,7 @@
-﻿using DataAccess.Contexts;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using DataAccess.Services.DataLogic;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Server_Application.Server;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -30,6 +21,7 @@ namespace DataAccess.Services
             RelativeImagesPath = _dataAccessConfigurationService.ImageFilesRelativePath;
         }
 
+        /// <inheritdoc/>
         public async Task StoreSongAsync(SongInput songInput)
         {
             string songName = songInput.SongName;
@@ -57,11 +49,12 @@ namespace DataAccess.Services
             await _songManagerService.AddSongAsync(song);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> UpdateSongFileAsync(int songId, IFormFile formFile)
         {
             var song = await _songManagerService.GetSongFromDatabaseAsync(songId);
 
-            if(song == null)
+            if (song == null)
             {
                 return false;
             }
@@ -166,7 +159,6 @@ namespace DataAccess.Services
 
             return (double)dataSize / bytesPerSecond;
         }
-
 
         private string GetNormalized(string input)
         {

@@ -2,18 +2,11 @@
 using DataAccess.Contexts;
 using DataAccess.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 
 
 namespace Server_Application.Server
@@ -72,7 +65,7 @@ namespace Server_Application.Server
         private volatile bool _exitCommunicationLoop;
         private volatile bool _isLoggedIn;
 
-        public ClientHandler(string clientId, SslStream streamingSSL, SslStream communicationSSL, StreamingDbContext  streamingDbContext, IServiceProvider serviceProvider)
+        public ClientHandler(string clientId, SslStream streamingSSL, SslStream communicationSSL, StreamingDbContext streamingDbContext, IServiceProvider serviceProvider)
         {
             _playlistSynchronizerInternalService = new PlaylistSynchronizerInternalService(serviceProvider);
             _serviceProvider = serviceProvider;
@@ -88,7 +81,7 @@ namespace Server_Application.Server
             Run();
         }
 
-        ~ClientHandler() 
+        ~ClientHandler()
         {
             _streamingSSL?.Dispose();
             _communcationSSL?.Dispose();
@@ -265,7 +258,7 @@ namespace Server_Application.Server
         {
             try
             {
-                if(Monitor.TryEnter(_lock, 0))
+                if (Monitor.TryEnter(_lock, 0))
                 {
                     new ServerEvent(EventType.InternalRequest, true, InternalRequestType.RemoveClientHandler, this);
                 }
@@ -300,12 +293,11 @@ namespace Server_Application.Server
             }
         }
 
-
         private void ExecuteCommunicationRequest(string request)
         {
             string[] translate = request.Split('@');
 
-            if(_isLoggedIn)
+            if (_isLoggedIn)
             {
                 if (translate[0] == "TERMINATE_SONG_DATA_RECEIVE")
                 {
@@ -365,6 +357,7 @@ namespace Server_Application.Server
                 }
             }
         }
+
 
         private void SynchronizeAddPlaylist()
         {
@@ -443,7 +436,7 @@ namespace Server_Application.Server
                 byte[] ackBytes = ReceiveSSL(ackLength, _communcationSSL);
                 ack = Encoding.UTF8.GetString(ackLengthBytes);
             }
-            
+
             catch { }
 
             finally
@@ -451,7 +444,7 @@ namespace Server_Application.Server
                 _communcationSSL!.WriteTimeout = Timeout.Infinite;
                 _communcationSSL!.ReadTimeout = Timeout.Infinite;
 
-                if(ack == "ACK")
+                if (ack == "ACK")
                 {
                     Thread.Sleep(50);
                     new Task(() =>
@@ -619,7 +612,7 @@ namespace Server_Application.Server
             int numberOfPlaylists = BitConverter.ToInt32(numberOfPlaylistsBytes);
             List<PlaylistSyncData> playlists = new List<PlaylistSyncData>();
 
-            for(int i = 0; i < numberOfPlaylists; i++)
+            for (int i = 0; i < numberOfPlaylists; i++)
             {
                 byte[] playlistIdBytes = ReceiveSSL(4, _communcationSSL);
                 int playlistId = BitConverter.ToInt32(playlistIdBytes);
@@ -635,7 +628,7 @@ namespace Server_Application.Server
 
                 List<int> songIds = new List<int>(numberOfSongs);
 
-                for(int j = 0; j < numberOfSongs; j++)
+                for (int j = 0; j < numberOfSongs; j++)
                 {
                     byte[] songIdBytes = ReceiveSSL(4, _communcationSSL);
                     int songId = BitConverter.ToInt32(songIdBytes);
@@ -685,8 +678,6 @@ namespace Server_Application.Server
             int passwordLength = BitConverter.ToInt32(passwordLengthBytes);
             byte[] passwordBytes = ReceiveSSL(passwordLength, _communcationSSL);
             string password = Encoding.UTF8.GetString(passwordBytes);
-
-            Trace.WriteLine($"-0-------------------------------------- {email} {password}");
 
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -777,7 +768,7 @@ namespace Server_Application.Server
 
         private void LoggedIn(bool state)
         {
-            if(state)
+            if (state)
             {
                 _isLoggedIn = true;
                 _streamingThread.Start();
@@ -800,7 +791,7 @@ namespace Server_Application.Server
             {
                 List<Song> results = new List<Song>();
 
-                using(var scope = _serviceProvider.CreateScope())
+                using (var scope = _serviceProvider.CreateScope())
                 {
                     ISongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<ISongManagerService>();
                     IAudioEngineConfigurationService audioEngineConfigurationService = scope.ServiceProvider.GetRequiredService<IAudioEngineConfigurationService>();
@@ -812,7 +803,7 @@ namespace Server_Application.Server
                     }
                 }
 
-                
+
 
                 int numberOfSongs = results.Count;
                 byte[] numberOfSongsBytes = BitConverter.GetBytes(numberOfSongs);

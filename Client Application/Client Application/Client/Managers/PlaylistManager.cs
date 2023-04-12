@@ -13,7 +13,9 @@ using Client_Application.Client.Network;
 
 namespace Client_Application.Client.Managers
 {
-
+    /// <summary>
+    /// This class represents a playlist with the necessary data for synchronization.
+    /// </summary>
     public sealed class PlaylistSyncData
     {
         public int PlaylistId { get; private set; }
@@ -32,6 +34,9 @@ namespace Client_Application.Client.Managers
         }
     }
 
+    /// <summary>
+    /// This class represents the data of local playlists.
+    /// </summary>
     public sealed class PlaylistData
     {
         public int PlaylistId { get; set; }
@@ -62,6 +67,9 @@ namespace Client_Application.Client.Managers
         SongAlreadyInPlaylist
     }
 
+    /// <summary>
+    /// This class represents a playlist manager. 
+    /// </summary>
     public sealed class PlaylistManager
     {
         private static volatile PlaylistManager? _instance;
@@ -79,11 +87,18 @@ namespace Client_Application.Client.Managers
             CurrentPlaylist = "";
         }
 
+        /// <summary>
+        /// Wait until the singleton is created.
+        /// </summary>
         public static void WaitForInstance()
         {
             _isInitialized.WaitOne();
         }
 
+        /// <summary>
+        /// Initialize the singleton. This method is thread-safe.
+        /// </summary>
+        /// <returns></returns>
         public static PlaylistManager InitializeSingleton()
         {
             if (_instance == null)
@@ -100,6 +115,11 @@ namespace Client_Application.Client.Managers
             return _instance;
         }
 
+        /// <summary>
+        /// Get the singleton instance.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public static PlaylistManager GetInstance()
         {
             if (_instance != null)
@@ -112,6 +132,10 @@ namespace Client_Application.Client.Managers
             }
         }
 
+        /// <summary>
+        /// Synchronize all playlists from server.
+        /// </summary>
+        /// <returns></returns>
         public PlaylistResult Sync()
         {
             {
@@ -212,23 +236,27 @@ namespace Client_Application.Client.Managers
             return PlaylistResult.Error;
         }
 
+        /// <summary>
+        /// Get the names of all local playlists.
+        /// </summary>
+        /// <returns></returns>
         public string[] GetPlaylistLinks()
         {
             return Directory.GetDirectories(_playlistsRelateivePath).Select(d => Path.GetRelativePath(_playlistsRelateivePath, d)).ToArray();
         }
 
-        public int GetPlaylistId(string playlistLink)
+        private int GetPlaylistId(string playlistLink)
         {
             byte[] dataBytes = File.ReadAllBytes(@$"{_playlistsRelateivePath}{playlistLink}\playlist_data.bytes");
             return new PlaylistData(dataBytes).PlaylistId;
         }
 
-        public void WritePlaylistData(string playlistLink, int playlistId)
+        private void WritePlaylistData(string playlistLink, int playlistId)
         {
             File.WriteAllBytes(@$"{_playlistsRelateivePath}{playlistLink}\playlist_data.bytes", new PlaylistData(playlistId).GetBytes());
         }
 
-        public string GetPlaylistNameFromId(int id)
+        private string GetPlaylistNameFromId(int id)
         {
             foreach (var playlist in GetPlaylistLinks())
             {
@@ -240,6 +268,12 @@ namespace Client_Application.Client.Managers
             return "";
         }
 
+        /// <summary>
+        /// Create a new playlist with playlistName.
+        /// </summary>
+        /// <param name="playlistName"></param>
+        /// <param name="syncWithServer"></param>
+        /// <returns></returns>
         public PlaylistResult CreateNewPlaylist(string playlistName, bool syncWithServer = true)
         {
             if (playlistName != "")
@@ -263,7 +297,7 @@ namespace Client_Application.Client.Managers
             return PlaylistResult.EmptyName;
         }
 
-        public PlaylistResult CreateNewPlaylist(int playlistId, string playlistName, bool syncWithServer = true)
+        private PlaylistResult CreateNewPlaylist(int playlistId, string playlistName, bool syncWithServer = true)
         {
             if (playlistName != "")
             {
@@ -286,6 +320,12 @@ namespace Client_Application.Client.Managers
             return PlaylistResult.EmptyName;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newName"></param>
+        /// <param name="syncWithServer"></param>
+        /// <returns></returns>
         public PlaylistResult RenameCurrentPlaylist(string newName, bool syncWithServer = true)
         {
             string source = $"{_playlistsRelateivePath}{CurrentPlaylist}";
@@ -327,6 +367,10 @@ namespace Client_Application.Client.Managers
             }
         }
 
+        /// <summary>
+        /// Delete all playlists locally only.
+        /// </summary>
+        /// <returns></returns>
         public PlaylistResult DeleteAllPlaylistsLocal()
         {
             string[] playlists = GetPlaylistLinks();
@@ -342,7 +386,7 @@ namespace Client_Application.Client.Managers
             return PlaylistResult.Success;
         }
 
-        public PlaylistResult DeletePlaylist(string playlist, bool syncWithServer = true)
+        private PlaylistResult DeletePlaylist(string playlist, bool syncWithServer = true)
         {
             try
             {
@@ -358,6 +402,11 @@ namespace Client_Application.Client.Managers
             catch { return PlaylistResult.Error; }
         }
 
+        /// <summary>
+        /// Delete current playlist. Current playlist is the playlist that the client has accessed.
+        /// </summary>
+        /// <param name="syncWithServer"></param>
+        /// <returns></returns>
         public PlaylistResult DeleteCurrentPlaylist(bool syncWithServer = true)
         {
             try
@@ -374,6 +423,13 @@ namespace Client_Application.Client.Managers
             catch { return PlaylistResult.Error; }
         }
 
+        /// <summary>
+        /// Add song to playlist with playlistLink.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="playlistLink"></param>
+        /// <param name="syncWithServer"></param>
+        /// <returns></returns>
         public PlaylistResult AddSongToPlaylist(Song song, string playlistLink, bool syncWithServer = true)
         {
             string fullSongPath = GetFullSongPath(song, playlistLink);
@@ -393,6 +449,13 @@ namespace Client_Application.Client.Managers
             }
         }
 
+        /// <summary>
+        /// Remove song from playlist with playlistLink.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="playlistLink"></param>
+        /// <param name="syncWithServer"></param>
+        /// <returns></returns>
         public PlaylistResult RemoveSongFromPlaylist(Song song, string playlistLink, bool syncWithServer = true)
         {
             string fullSongPath = GetFullSongPath(song, playlistLink);
@@ -414,6 +477,12 @@ namespace Client_Application.Client.Managers
             return @$"{_playlistsRelateivePath}{playlistLink}\{fileName}";
         }
 
+        /// <summary>
+        /// Search for songs based on searchString. It will ask the server to send songs that match the pattern on
+        /// song name or artist name.
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <returns></returns>
         public List<Song> SearchPlaylistSongs(string searchString)
         {
             string serializedString = GetNormalized(searchString);
@@ -448,6 +517,11 @@ namespace Client_Application.Client.Managers
             return new string(text.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray()).ToUpper();
         }
 
+        /// <summary>
+        /// Get all songs of playlist with playlistLink.
+        /// </summary>
+        /// <param name="playlistLink"></param>
+        /// <returns></returns>
         public List<Song> GetPlaylistSongs(string playlistLink)
         {
             List<Song> songs = new List<Song>(0);
@@ -464,6 +538,10 @@ namespace Client_Application.Client.Managers
             return songs;
         }
 
+        /// <summary>
+        /// Get all songs of current playlist.
+        /// </summary>
+        /// <returns></returns>
         public List<Song> GetCurrentPlaylistSongs()
         {
             List<Song> songs = new List<Song>(0);

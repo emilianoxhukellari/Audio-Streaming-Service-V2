@@ -1,5 +1,4 @@
-﻿using DataAccess.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -40,11 +39,13 @@ namespace ServerWeb.Services
             return new RedirectToPageResult("/Index");
         }
 
+        /// <inheritdoc/>
         public async Task<IActionResult> RedirectToIndexAsync(IdentityUser? user)
         {
             return await ToIndexAsync(user);
         }
 
+        /// <inheritdoc/>
         public async Task<IActionResult> RedirectToIndexAsync(ClaimsPrincipal claimsPrincipal)
         {
             var user = await _userManager.GetUserAsync(claimsPrincipal);

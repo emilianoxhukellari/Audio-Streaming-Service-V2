@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerWeb.Services;
-using System.Runtime.CompilerServices;
 
 namespace ServerWeb.Pages
-{ 
+{
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;

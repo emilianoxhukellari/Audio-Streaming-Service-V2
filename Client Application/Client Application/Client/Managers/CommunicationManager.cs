@@ -14,6 +14,9 @@ using Client_Application.Client.Network;
 
 namespace Client_Application.Client.Managers
 {
+    /// <summary>
+    /// This class represents a communication manager that uses SSL to exchange messages with the server.
+    /// </summary>
     public sealed class CommunicationManager
     {
         private static volatile CommunicationManager? _instance;
@@ -35,11 +38,18 @@ namespace Client_Application.Client.Managers
             _communicationThread.Start();
         }
 
+        /// <summary>
+        /// Wait until the singleton is created.
+        /// </summary>
         public static void WaitForInstance()
         {
             _isInitialized.WaitOne();
         }
 
+        /// <summary>
+        /// Initialize the singleton. This method is thread-safe.
+        /// </summary>
+        /// <returns></returns>
         public static CommunicationManager InitializeSingleton(DualSocket dualSocket)
         {
             if (_instance == null)
@@ -56,6 +66,11 @@ namespace Client_Application.Client.Managers
             return _instance;
         }
 
+        /// <summary>
+        /// Get the singleton instance.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public static CommunicationManager GetInstance()
         {
             if (_instance != null)
@@ -92,60 +107,50 @@ namespace Client_Application.Client.Managers
             }
         }
 
-
         private void ExecuteNetworkRequest(NetworkRequest networkRequest)
         {
-            if(!_dualSocket.Connected)
+            if (!_dualSocket.Connected)
             {
                 return;
             }
-            if (networkRequest.Type == NetworkRequestType.SearchSongOrArtist)
+
+            switch (networkRequest.Type)
             {
-                ExecuteSearchRequest(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.TerminateSongDataReceive)
-            {
-                ExecuteTerminateSongDataReceiveRequest();
-            }
-            else if (networkRequest.Type == NetworkRequestType.AuthenticateToServer)
-            {
-                ExecuteAuthenticateToServer(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.RegisterToServer)
-            {
-                ExecuteRegisterToServer(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.Disconnect)
-            {
-                ExecuteDisconnect(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeStart)
-            {
-                ExecuteSynchronizeStart(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeDeletePlaylist)
-            {
-                ExecuteSyncDeletePlaylist(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeDeletePlaylist)
-            {
-                ExecuteSyncDeletePlaylist(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeAddPlaylist)
-            {
-                ExecuteSyncAddPlaylist(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeRenamePlaylist)
-            {
-                ExecuteSyncRenamePlaylist(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeDeleteSong)
-            {
-                ExecuteSyncDeleteSongFromPlaylist(networkRequest.Parameters);
-            }
-            else if (networkRequest.Type == NetworkRequestType.SynchronizeAddSong)
-            {
-                ExecuteSyncAddSongToPlaylist(networkRequest.Parameters);
+                case NetworkRequestType.SearchSongOrArtist:
+                    ExecuteSearchRequest(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.TerminateSongDataReceive:
+                    ExecuteTerminateSongDataReceiveRequest();
+                    break;
+                case NetworkRequestType.AuthenticateToServer:
+                    ExecuteAuthenticateToServer(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.RegisterToServer:
+                    ExecuteRegisterToServer(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.Disconnect:
+                    ExecuteDisconnect(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.SynchronizeStart:
+                    ExecuteSynchronizeStart(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.SynchronizeDeletePlaylist:
+                    ExecuteSyncDeletePlaylist(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.SynchronizeAddPlaylist:
+                    ExecuteSyncAddPlaylist(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.SynchronizeRenamePlaylist:
+                    ExecuteSyncRenamePlaylist(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.SynchronizeDeleteSong:
+                    ExecuteSyncDeleteSongFromPlaylist(networkRequest.Parameters);
+                    break;
+                case NetworkRequestType.SynchronizeAddSong:
+                    ExecuteSyncAddSongToPlaylist(networkRequest.Parameters);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -261,6 +266,12 @@ namespace Client_Application.Client.Managers
             networkResult.UpdateSyncUpdate();
         }
 
+        /// <summary>
+        /// Start the syncronization process with the server. Suppy a list of PlaylistSyncData to the method, and it
+        /// will send it to the server. The server will return a SyncDiff.
+        /// </summary>
+        /// <param name="playlistsUp"></param>
+        /// <returns></returns>
         public SyncDiff SyncStart(List<PlaylistSyncData> playlistsUp)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.SynchronizationStart);
@@ -268,6 +279,11 @@ namespace Client_Application.Client.Managers
             return networkResult.Wait().SyncDiff!;
         }
 
+        /// <summary>
+        /// Notify the server to rename playlist with playlistId to newName.
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="newName"></param>
         public void SyncRenamePlaylist(int playlistId, string newName)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.SynchronizationUpdate);
@@ -275,6 +291,10 @@ namespace Client_Application.Client.Managers
             networkResult.Wait();
         }
 
+        /// <summary>
+        /// Notify the server to delete playlist with playlistId.
+        /// </summary>
+        /// <param name="playlistId"></param>
         public void SyncDeletePlaylist(int playlistId)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.SynchronizationUpdate);
@@ -282,6 +302,11 @@ namespace Client_Application.Client.Managers
             networkResult.Wait();
         }
 
+        /// <summary>
+        /// Notify the server to add song with songId to playlist with playlistId.
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="songId"></param>
         public void SyncAddSongToPlaylist(int playlistId, int songId)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.SynchronizationUpdate);
@@ -297,6 +322,7 @@ namespace Client_Application.Client.Managers
         }
 
         /// <summary>
+        /// Notify the server to add a new playlist with playlistName.
         /// Returns the id of the new playlist supplied by the server.
         /// </summary>
         /// <param name="playlistName"></param>
@@ -308,6 +334,12 @@ namespace Client_Application.Client.Managers
             return networkResult.Wait().PlaylistId;
         }
 
+        /// <summary>
+        /// Authenticate user with email and password to the server.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public AuthenticationResult AuthenticateToServer(string email, string password)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.Authentication);
@@ -315,6 +347,12 @@ namespace Client_Application.Client.Managers
             return networkResult.Wait().ValidAuthentication;
         }
 
+        /// <summary>
+        /// Register a user with email and password to the server.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public List<string>? RegisterToServer(string email, string password)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.Registration);
@@ -322,6 +360,9 @@ namespace Client_Application.Client.Managers
             return networkResult.Wait().RegistrationErrors;
         }
 
+        /// <summary>
+        /// Gracefully disconnect from the server.
+        /// </summary>
         public void DisconnectFromServer()
         {
             NetworkResult networkResult = new NetworkResult(ResultType.Disconnect);
@@ -329,6 +370,11 @@ namespace Client_Application.Client.Managers
             networkResult.Wait();
         }
 
+        /// <summary>
+        /// Search for songs from the server.
+        /// </summary>
+        /// <param name="search"></param>
+        /// <returns>List of Song that were found based on search.</returns>
         public List<Song> SearchSongsServer(string search)
         {
             Trace.WriteLine("Func Enter");
@@ -343,11 +389,13 @@ namespace Client_Application.Client.Managers
             return new List<Song>(0);
         }
 
+        /// <summary>
+        /// Notify the server to stop sending audio data.
+        /// </summary>
         public void TerminateSongDataReceive()
         {
             AddNetworkRequest(NetworkRequestType.TerminateSongDataReceive);
         }
-
 
         private void ReceiveDeletePlaylistsReply(ref SyncDiff diff)
         {
@@ -581,7 +629,7 @@ namespace Client_Application.Client.Managers
             NetworkResult networkResult = (NetworkResult)parameters[0];
             string email = (string)parameters[1];
             string password = (string)parameters[2];
-            
+
             try
             {
                 string request = "REGISTER@";
@@ -592,7 +640,7 @@ namespace Client_Application.Client.Managers
 
                 _dualSocket.CommunicationSSL.SendSSL(requestLengthBytes, 4);
                 _dualSocket.CommunicationSSL.SendSSL(requestBytes, requestLength);
-                
+
                 byte[] emailBytes = Encoding.UTF8.GetBytes(email);
                 int emailLength = emailBytes.Length;
                 byte[] emailLengthBytes = BitConverter.GetBytes(emailLength);

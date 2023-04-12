@@ -9,9 +9,9 @@ namespace ServerWeb.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IIndexRedirection _indexRedirection;
-        public LogoutModel(SignInManager<IdentityUser> signInManager, IIndexRedirection indexRedirection) 
-        { 
-            _signInManager= signInManager;  
+        public LogoutModel(SignInManager<IdentityUser> signInManager, IIndexRedirection indexRedirection)
+        {
+            _signInManager = signInManager;
             _indexRedirection = indexRedirection;
         }
         public void OnGet()
@@ -25,7 +25,6 @@ namespace ServerWeb.Pages.Account
         }
         public async Task<IActionResult> OnPostLogoutReject()
         {
-            
             return await _indexRedirection.RedirectToIndexAsync(User);
         }
     }

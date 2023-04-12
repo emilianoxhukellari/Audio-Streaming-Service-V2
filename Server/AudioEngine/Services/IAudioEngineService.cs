@@ -1,18 +1,19 @@
-﻿namespace AudioEngine.Services
+﻿
+namespace AudioEngine.Services
 {
     public interface IAudioEngineService
     {
-        bool IsRunning { get; set; }
+        bool IsRunning { get; }
 
         event EventHandler<int>? ServerDesktopClientCountLimitChanged;
         event EventHandler<int>? ServerDesktopSongLimitChanged;
-        event EventHandler<AudioEngineService.ServerLoadArgs>? ServerLoadUpdate;
+        event EventHandler<ServerLoadArgs>? ServerLoadUpdate;
         event EventHandler<bool>? ServerStartStopChanged;
         event EventHandler<int>? ServerWebSongLimitChanged;
 
         int GetDesktopAppSongSearchLimit();
         int GetDesktopClientCountLimit();
-        AudioEngineService.ServerLoadArgs GetServerLoadInitialState();
+        ServerLoadArgs GetServerLoadInitialState();
         int GetWebAppSongSearchLimit();
         void SetDesktopAppSongSearchLimit(int limit);
         void SetDesktopClientCountLimit(int limit);

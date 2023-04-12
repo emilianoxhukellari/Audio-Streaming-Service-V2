@@ -3,7 +3,6 @@ using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Diagnostics;
 
 namespace ServerWeb.Pages.Administrator
 {
@@ -43,7 +42,7 @@ namespace ServerWeb.Pages.Administrator
         public async Task<IActionResult> OnPostDeleteAsync(int songId)
         {
             await _songManagerService.DeleteSongAsync(songId);
-            if(Pattern != string.Empty)
+            if (Pattern != string.Empty)
             {
                 Songs = await _songManagerService.GetSongsForWebAppAsync(Pattern);
             }

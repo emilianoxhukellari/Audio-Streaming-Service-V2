@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ServerWeb.Pages;
 using System.Data;
-using System.Net;
 
 namespace ServerWeb.Services
 {
@@ -14,18 +12,21 @@ namespace ServerWeb.Services
             _userManager = userManager;
         }
 
+        /// <inheritdoc/>
         public async Task<List<IdentityUser>> GetAllUsersNotInRole(string roleName)
         {
             var roleUsersIds = (await _userManager.GetUsersInRoleAsync(roleName)).Select(x => x.Id).ToArray();
             return await _userManager.Users.Where(x => !roleUsersIds.Contains(x.Id)).ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<List<IdentityUser>> GetAllUsersInRole(string roleName)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
             return users.ToList();
         }
 
+        /// <inheritdoc/>
         public async Task<List<IdentityUser>> GetUsersNotInRoleMatch(string roleName, string pattern)
         {
             var allUsers = await GetAllUsersNotInRole(roleName);
@@ -33,6 +34,7 @@ namespace ServerWeb.Services
             return users.ToList();
         }
 
+        /// <inheritdoc/>
         public async Task<List<IdentityUser>> GetUsersInRoleMatch(string roleName, string pattern)
         {
             var allUsers = await GetAllUsersInRole(roleName);
@@ -52,6 +54,7 @@ namespace ServerWeb.Services
             return addToNewRoleResult;
         }
 
+        /// <inheritdoc/>
         public async Task<IdentityResult> ChangeUserRoleToAsync(IdentityUser identityUser, string newRole)
         {
             var roles = await _userManager.GetRolesAsync(identityUser);
@@ -63,6 +66,7 @@ namespace ServerWeb.Services
             return IdentityResult.Success;
         }
 
+        /// <inheritdoc/>
         public async Task<IdentityResult> ChangeUserRoleToAsync(string Email, string newRole)
         {
             var identityUser = await _userManager.FindByEmailAsync(Email);
@@ -75,6 +79,7 @@ namespace ServerWeb.Services
             return IdentityResult.Success;
         }
 
+        /// <inheritdoc/>
         public async Task<IdentityResult> RemoveUserFromRoleAsync(IdentityUser identityUser)
         {
             var roles = await _userManager.GetRolesAsync(identityUser);
@@ -82,6 +87,7 @@ namespace ServerWeb.Services
             return await ChangeUserRoleAsync(identityUser, oldRole, "User");
         }
 
+        /// <inheritdoc/>
         public async Task<IdentityResult> RemoveUserFromRoleAsync(string Email)
         {
             var identityUser = await _userManager.FindByEmailAsync(Email);

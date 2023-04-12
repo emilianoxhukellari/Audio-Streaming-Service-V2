@@ -1,7 +1,6 @@
 using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ServerWeb.Pages.User
@@ -18,12 +17,12 @@ namespace ServerWeb.Pages.User
         public int NumberOfDeletedPlaylists { get; set; }
         public int NumberOfSubmittedIssues { get; set; }
         public HomeModel(
-            UserManager<IdentityUser> userManager, 
+            UserManager<IdentityUser> userManager,
             IPlaylistManagerService playlistManagerService,
             IIssueManagerService issueManagerService)
         {
             _userManager = userManager;
-            _playlistManagerService = playlistManagerService;   
+            _playlistManagerService = playlistManagerService;
             _issueManagerService = issueManagerService;
         }
         public async Task OnGetAsync()

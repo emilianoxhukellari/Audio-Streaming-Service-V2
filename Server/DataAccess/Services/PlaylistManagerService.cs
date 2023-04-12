@@ -2,12 +2,7 @@
 using DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -21,6 +16,7 @@ namespace DataAccess.Services
             _userManager = userManager;
         }
 
+        /// <inheritdoc/>
         public async Task<int> GetNumberOfPlaylistsAsync(ClaimsPrincipal user)
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -31,6 +27,7 @@ namespace DataAccess.Services
             return 0;
         }
 
+        /// <inheritdoc/>
         public async Task<int> GetNumberOfDeletedPlaylistsAsync(ClaimsPrincipal user)
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -41,6 +38,7 @@ namespace DataAccess.Services
             return 0;
         }
 
+        /// <inheritdoc/>
         public async Task<List<Playlist>> GetRemovedPlaylistAsync(ClaimsPrincipal user)
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -51,6 +49,7 @@ namespace DataAccess.Services
             return new List<Playlist>(0);
         }
 
+        /// <inheritdoc/>
         public async Task<List<Playlist>> GetPlaylistsAsync(ClaimsPrincipal user)
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -61,6 +60,7 @@ namespace DataAccess.Services
             return new List<Playlist>(0);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> UserHasPlaylist(ClaimsPrincipal user, int playlistId)
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -72,12 +72,13 @@ namespace DataAccess.Services
             return false;
         }
 
+        /// <inheritdoc/>
         public async Task<Playlist?> GetPlaylistAsync(int id)
         {
             return await _streamingDbContext.Playlists.FindAsync(id);
         }
 
-
+        /// <inheritdoc/>
         public async Task<bool> RecoverPlaylist(int playlistId)
         {
             var playlist = await _streamingDbContext.Playlists.FindAsync(playlistId);
@@ -90,6 +91,7 @@ namespace DataAccess.Services
             return false;
         }
 
+        /// <inheritdoc/>
         public async Task<bool> PermanentlyDeletePlaylistAsync(int playlistId)
         {
             var playlist = await _streamingDbContext.Playlists.FindAsync(playlistId);
@@ -104,6 +106,7 @@ namespace DataAccess.Services
             return true;
         }
 
+        /// <inheritdoc/>
         public async Task<bool> SoftDeletePlaylistAsync(int playlistId)
         {
             var playlist = await _streamingDbContext.Playlists.FindAsync(playlistId);
@@ -118,6 +121,7 @@ namespace DataAccess.Services
             return true;
         }
 
+        /// <inheritdoc/>
         public bool SoftDeletePlaylist(int playlistId)
         {
             var playlist = _streamingDbContext.Playlists.Find(playlistId);
@@ -132,6 +136,7 @@ namespace DataAccess.Services
             return true;
         }
 
+        /// <inheritdoc/>
         public async Task<List<Song>> GetSongsAsync(int playlistId)
         {
             var songs = await _streamingDbContext.PlaylistSongs
@@ -141,6 +146,7 @@ namespace DataAccess.Services
             return songs;
         }
 
+        /// <inheritdoc/>
         public int AddPlaylist(string playlistName, string userId)
         {
             var playlist = new Playlist
@@ -155,6 +161,7 @@ namespace DataAccess.Services
             return playlist.PlaylistId;
         }
 
+        /// <inheritdoc/>
         public void RenamePlaylist(int playlistId, string newName)
         {
             var playlist = _streamingDbContext.Playlists.Find(playlistId);
@@ -166,6 +173,7 @@ namespace DataAccess.Services
             }
         }
 
+        /// <inheritdoc/>
         public void AddSongToPlaylist(int playlistId, int songId)
         {
             var playlist = _streamingDbContext.Playlists.Find(playlistId);
@@ -185,6 +193,7 @@ namespace DataAccess.Services
             }
         }
 
+        /// <inheritdoc/>
         public void DeleteSongFromPlaylist(int playlistId, int songId)
         {
             var playlist = _streamingDbContext.Playlists.Find(playlistId);
@@ -200,6 +209,7 @@ namespace DataAccess.Services
             }
         }
 
+        /// <inheritdoc/>
         public List<int> GetPlaylistIds(string userId)
         {
             return _streamingDbContext.Playlists
@@ -208,6 +218,7 @@ namespace DataAccess.Services
                 .ToList();
         }
 
+        /// <inheritdoc/>
         public string? GetPlaylistName(int playlistId)
         {
             return _streamingDbContext.Playlists

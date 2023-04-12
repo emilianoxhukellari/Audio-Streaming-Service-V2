@@ -13,6 +13,9 @@ using System.Threading;
 
 namespace Client_Application.Client.Network
 {
+    /// <summary>
+    /// This class represents an ssl/tls client. 
+    /// </summary>
     public sealed class SslClient : IDisposable
     {
         private readonly Socket? _socket;
@@ -67,6 +70,10 @@ namespace Client_Application.Client.Network
             }
         }
 
+        /// <summary>
+        /// Returns an SslStream if the internal stream and socket is ready.
+        /// </summary>
+        /// <returns></returns>
         public SslStream? GetSslStream()
         {
             if (IsReadyForSSL)
@@ -79,6 +86,12 @@ namespace Client_Application.Client.Network
             }
         }
 
+        /// <summary>
+        /// Receive byte data with size via ssl.
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        /// <exception cref="ExceptionSSL"></exception>
         public byte[] ReceiveSSL(int size)
         {
             if (!IsReadyForSSL || _sslStream == null)
@@ -99,6 +112,12 @@ namespace Client_Application.Client.Network
             return packet;
         }
 
+        /// <summary>
+        /// Send byte data with size via ssl.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="size"></param>
+        /// <exception cref="ExceptionSSL"></exception>
         public void SendSSL(byte[] data, int size)
         {
             if (!IsReadyForSSL || _sslStream == null)
@@ -108,6 +127,11 @@ namespace Client_Application.Client.Network
             _sslStream.Write(data, 0, size);
         }
 
+        /// <summary>
+        /// Connect the ssl client to server.
+        /// </summary>
+        /// <param name="iPEndPoint"></param>
+        /// <exception cref="Exception"></exception>
         public void Connect(IPEndPoint iPEndPoint)
         {
             if (_socket != null)
@@ -121,6 +145,10 @@ namespace Client_Application.Client.Network
             }
         }
 
+        /// <summary>
+        /// Initialize ssl by authenticating as a client.
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         public void InitializeSSL()
         {
             if (IsSocketConnected && _socket != null)
@@ -136,6 +164,9 @@ namespace Client_Application.Client.Network
             }
         }
 
+        /// <summary>
+        /// Dispose the ssl client.
+        /// </summary>
         public void Dispose()
         {
             IsSocketConnected = false;
@@ -145,18 +176,24 @@ namespace Client_Application.Client.Network
             _socket?.Dispose();
         }
 
+        /// <summary>
+        /// Forcefully disconnect the ssl client.
+        /// </summary>
         public void ForceDisconnect()
         {
             _sslStream?.Close();
             Dispose();
         }
 
+        /// <summary>
+        /// Gracefully disconnect the ssl client.
+        /// </summary>
         public void GracefulDisconnect()
         {
             Dispose();
         }
 
-        public bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (certificate.GetCertHashString() == _HASH)
             {

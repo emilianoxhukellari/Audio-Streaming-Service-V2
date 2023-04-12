@@ -1,15 +1,9 @@
-using DataAccess.Contexts;
 using DataAccess.Models;
 using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using ServerWeb.Services;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace ServerWeb.Pages.Account
 {
@@ -36,20 +30,20 @@ namespace ServerWeb.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 IdentityUser? user;
                 IdentityResult registerResult;
 
                 (user, registerResult) = await _registrationService.Register(Register.Email, Register.Password);
-                
-                if (user != null) 
+
+                if (user != null)
                 {
                     await _signInManager.SignInAsync(user, false);
 
                     return RedirectToPage("/User/Home");
                 }
-                foreach(var error in registerResult.Errors)
+                foreach (var error in registerResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }

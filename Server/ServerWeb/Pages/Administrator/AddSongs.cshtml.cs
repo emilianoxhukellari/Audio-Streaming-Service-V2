@@ -3,11 +3,7 @@ using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using ServerWeb.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ServerWeb.Pages.Administrator
 {

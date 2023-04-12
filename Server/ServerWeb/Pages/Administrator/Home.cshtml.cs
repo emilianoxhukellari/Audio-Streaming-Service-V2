@@ -1,9 +1,7 @@
 using DataAccess.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ServerWeb.Services;
 
 namespace ServerWeb.Pages.Administrator
 {
@@ -19,11 +17,11 @@ namespace ServerWeb.Pages.Administrator
         public string UserEmail { get; set; } = string.Empty;
 
         public HomeModel(
-            IIssueManagerService issueManagerService, 
+            IIssueManagerService issueManagerService,
             ISongManagerService songManagerService,
             UserManager<IdentityUser> userManager
             )
-        { 
+        {
             _issueManagerService = issueManagerService;
             _songManagerService = songManagerService;
             _userManager = userManager;
@@ -31,8 +29,8 @@ namespace ServerWeb.Pages.Administrator
         public async Task OnGetAsync()
         {
             NumberOfSongs = await _songManagerService.GetNumberOfSongsAsync();
-            NumberOfSolvedIssues = await _issueManagerService.GetNumberOfIssues(IssueManagerService.IssueType.Solved);
-            NumberOfUnsolvedIssues = await _issueManagerService.GetNumberOfIssues(IssueManagerService.IssueType.Unsolved);
+            NumberOfSolvedIssues = await _issueManagerService.GetNumberOfIssues(IssueType.Solved);
+            NumberOfUnsolvedIssues = await _issueManagerService.GetNumberOfIssues(IssueType.Unsolved);
             var user = await _userManager.GetUserAsync(User);
             UserEmail = user?.Email ?? string.Empty;
         }

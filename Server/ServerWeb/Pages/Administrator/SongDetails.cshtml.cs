@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerWeb.Extensions;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace ServerWeb.Pages.Administrator
 {
@@ -22,12 +21,14 @@ namespace ServerWeb.Pages.Administrator
         [Display(Name = "Song File")]
         public IFormFile? SongFile { get; set; }
         public Song Song { get; set; }
+
         public SongDetailsModel(ISongManagerService songManagerService, IAudioStoringService audioStoringService)
         {
             _songManagerService = songManagerService;
             _audioStoringService = audioStoringService;
             Song = new Song();
         }
+
         public void OnGet()
         {
             Song = _songManagerService.GetSongFromDatabase(Id) ?? new Song();
@@ -35,11 +36,11 @@ namespace ServerWeb.Pages.Administrator
 
         public async Task<IActionResult> OnPost()
         {
-            if(SongFile != null)
+            if (SongFile != null)
             {
                 bool success = await _audioStoringService.UpdateSongFileAsync(Id, SongFile);
 
-                if(success)
+                if (success)
                 {
                     this.SetTempData(WebApplicationExtensions.Status.Success, "Song updated successfully.");
                 }

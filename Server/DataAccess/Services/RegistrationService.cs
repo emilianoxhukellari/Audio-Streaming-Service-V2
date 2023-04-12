@@ -1,11 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -19,6 +14,7 @@ namespace DataAccess.Services
             _streamingDbContext = streamingDbContext;
         }
 
+        /// <inheritdoc/>
         public async Task<(IdentityUser?, IdentityResult)> Register(string email, string password)
         {
             var user = new IdentityUser
@@ -31,7 +27,7 @@ namespace DataAccess.Services
 
             if (registerResult.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "User"); // Add role
+                await _userManager.AddToRoleAsync(user, "User"); 
 
                 var streamingUser = new StreamingUser
                 {

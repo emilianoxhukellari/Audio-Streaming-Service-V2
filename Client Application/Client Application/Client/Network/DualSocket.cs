@@ -81,11 +81,17 @@ namespace Client_Application.Client.Network
             CommunicationSSL?.Dispose();
         }
 
+        /// <summary>
+        /// Set Connected to false.
+        /// </summary>
         public void UpdateDisconnected()
         {
             Connected = false;
         }
 
+        /// <summary>
+        /// Forcfully disconnect. Does not wait for server to reply.
+        /// </summary>
         public void ForceDisconnect()
         {
             StreamingSSL.ForceDisconnect();
@@ -93,6 +99,9 @@ namespace Client_Application.Client.Network
             Connected = false;
         }
 
+        /// <summary>
+        /// Reconnect to server.
+        /// </summary>
         public void Reconnect()
         {
             _communicationConnectedFlag.Reset();
@@ -106,6 +115,9 @@ namespace Client_Application.Client.Network
             });
         }
 
+        /// <summary>
+        /// Connect to server. This is intial connect.
+        /// </summary>
         public void Connect()
         {
             if(!Connected) 

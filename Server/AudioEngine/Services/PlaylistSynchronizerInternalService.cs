@@ -1,16 +1,13 @@
-﻿using DataAccess.Contexts;
-using DataAccess.Services;
+﻿using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Server_Application.Server;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AudioEngine.Services
 {
+    /// <summary>
+    /// This is an internal service and must not be added to DI container.
+    /// </summary>
     public class PlaylistSynchronizerInternalService
     {
         private readonly IPlaylistManagerService _playlistManagerService;
@@ -24,60 +21,99 @@ namespace AudioEngine.Services
             _songManagerService = _serviceScope.ServiceProvider.GetRequiredService<ISongManagerService>();
         }
 
-        ~PlaylistSynchronizerInternalService() 
+        ~PlaylistSynchronizerInternalService()
         {
             _serviceScope.Dispose();
         }
 
+        /// <summary>
+        /// Set the user id for this specific synchronization service.
+        /// </summary>
+        /// <param name="userId"></param>
         public void SetUserId(string userId)
         {
             UserId = userId;
         }
 
+        /// <summary>
+        /// Client has deleted a playlist. This method updates the server.
+        /// </summary>
+        /// <param name="playlistId"></param>
         public void SyncDeletePlaylist(int playlistId)
         {
             _playlistManagerService.SoftDeletePlaylist(playlistId);
         }
 
+        /// <summary>
+        /// Client has created a playlist. This method updates the server.
+        /// </summary>
+        /// <param name="playlistName"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public int SyncAddPlaylist(string playlistName)
         {
-            if(UserId == null)
+            if (UserId == null)
             {
                 throw new ArgumentNullException("User id is not set.");
             }
             return _playlistManagerService.AddPlaylist(playlistName, UserId);
         }
 
+        /// <summary>
+        /// Client has renamed a playlist. This method updates the server.
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="newName"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void SyncRenamePlaylist(int playlistId, string newName)
         {
-            if(UserId == null)
+            if (UserId == null)
             {
                 throw new ArgumentNullException("User id is not set.");
             }
             _playlistManagerService.RenamePlaylist(playlistId, newName);
         }
 
+        /// <summary>
+        /// Client has deleted a song from a playlist. This method updates the server.
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="songId"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void SyncDeleteSongFromPlaylist(int playlistId, int songId)
         {
-            if(UserId == null)
+            if (UserId == null)
             {
                 throw new ArgumentNullException("User id is not set.");
             }
             _playlistManagerService.DeleteSongFromPlaylist(playlistId, songId);
         }
 
+        /// <summary>
+        /// Client has added a song to a playlist. This method updates the server.
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="songId"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void SyncAddSongToPlaylist(int playlistId, int songId)
         {
-            if(UserId == null)
+            if (UserId == null)
             {
                 throw new ArgumentNullException("User id is not set.");
             }
             _playlistManagerService.AddSongToPlaylist(playlistId, songId);
         }
 
+        /// <summary>
+        /// This method returns a difference of updates that must be made for synchronization to the desktop client based on
+        /// the playlists that the client sent.
+        /// </summary>
+        /// <param name="playlistsUp"></param>
+        /// <returns>Sync Diff of updates that the desktop client must make.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public SyncDiff GetDiff(List<PlaylistSyncData> playlistsUp)
         {
-            if(UserId == null)
+            if (UserId == null)
             {
                 throw new ArgumentNullException("User id is not set.");
             }
@@ -90,9 +126,8 @@ namespace AudioEngine.Services
             List<int> deletePlaylists = clientPlaylists.Except(serverPlaylists).ToList(); //DELETE
 
             int[] addPlaylistIds = serverPlaylists.Except(clientPlaylists).ToArray(); //ADD
-            Trace.WriteLine($"Number of playlists to add: {addPlaylistIds.Length}");
             List<(int playlistId, string playlistName)> addPlaylists = new();
-            foreach(int playlistId in addPlaylistIds)
+            foreach (int playlistId in addPlaylistIds)
             {
                 addPlaylists.Add((playlistId, _playlistManagerService.GetPlaylistName(playlistId)!));
             }
@@ -108,11 +143,11 @@ namespace AudioEngine.Services
             }
 
             List<(int playlistId, int songId)> deleteSongs = new(); // DELETE SONGS
-            foreach(int playlistId in intersectPlaylists)
+            foreach (int playlistId in intersectPlaylists)
             {
                 List<int> clientSongIds = playlistsUp.Where(p => p.PlaylistId == playlistId).Select(p => p.SongIds).FirstOrDefault()!;
                 var deleteSongForPlaylist = clientSongIds.Except(_songManagerService.GetSongIds(playlistId));
-                foreach(var deleteSong in deleteSongForPlaylist)
+                foreach (var deleteSong in deleteSongForPlaylist)
                 {
                     deleteSongs.Add((playlistId, deleteSong));
                 }
@@ -128,20 +163,20 @@ namespace AudioEngine.Services
                 foreach (var addSongId in addSongForPlaylistIds)
                 {
                     DataAccess.Models.Song? song = _songManagerService.GetSongFromDatabase(addSongId);
-                    if(song != null)
+                    if (song != null)
                     {
                         songsToAdd.Add(new Song(song.SongId, song.SongName, song.ArtistName, song.Duration, File.ReadAllBytes(song.ImageFileName)));
                     }
                 }
 
-                if(songsToAdd.Count > 0)
+                if (songsToAdd.Count > 0)
                 {
                     addSongs.Add((playlistId, songsToAdd));
                 }
             }
 
 
-            foreach(int playlistId in addPlaylistIds) // Add songs of playlists that the client did not have
+            foreach (int playlistId in addPlaylistIds) // Add songs of playlists that the client did not have
             {
                 List<Song> songsToAdd = new(0);
                 var addSongForPlaylistIds = _songManagerService.GetSongIds(playlistId);
@@ -154,7 +189,7 @@ namespace AudioEngine.Services
                     }
                 }
 
-                if(songsToAdd.Count > 0)
+                if (songsToAdd.Count > 0)
                 {
                     addSongs.Add((playlistId, songsToAdd));
                 }
@@ -162,27 +197,27 @@ namespace AudioEngine.Services
 
             SyncDiff diff = new SyncDiff();
 
-            if(deletePlaylists.Count > 0)
+            if (deletePlaylists.Count > 0)
             {
                 diff.DeletePlaylists = deletePlaylists;
             }
 
-            if(addPlaylists.Count > 0)
+            if (addPlaylists.Count > 0)
             {
                 diff.AddPlaylists = addPlaylists;
             }
 
-            if(renamePlaylists.Count > 0)
+            if (renamePlaylists.Count > 0)
             {
                 diff.RenamePlaylists = renamePlaylists;
             }
 
-            if(deleteSongs.Count > 0)
+            if (deleteSongs.Count > 0)
             {
                 diff.DeleteSongs = deleteSongs;
             }
 
-            if(addSongs.Count > 0)
+            if (addSongs.Count > 0)
             {
                 diff.AddSongs = addSongs;
             }

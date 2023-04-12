@@ -491,11 +491,18 @@ namespace Client_Application.Client.Core
                 byte[] fromPacketBytes = BitConverter.GetBytes(fromPacket);
                 int toPacket = end;
                 byte[] toPacketBytes = BitConverter.GetBytes(toPacket);
-                TerminateReceive();
-                _dualSocket.StreamingSSL.SendSSL(MOD2, 4);
-                _dualSocket.StreamingSSL.SendSSL(fromPacketBytes, 4);
-                _dualSocket.StreamingSSL.SendSSL(toPacketBytes, 4);
-                StartReceiveData();
+                try
+                {
+                    TerminateReceive();
+                    _dualSocket.StreamingSSL.SendSSL(MOD2, 4);
+                    _dualSocket.StreamingSSL.SendSSL(fromPacketBytes, 4);
+                    _dualSocket.StreamingSSL.SendSSL(toPacketBytes, 4);
+                    StartReceiveData();
+                }
+                catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
+                {
+                    _dualSocket.Reconnect();
+                }
             }
         }
 

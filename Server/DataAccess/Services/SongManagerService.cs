@@ -10,14 +10,20 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
-    public class SongManagerService
+    public class SongManagerService : ISongManagerService
     {
         private readonly StreamingDbContext _context;
-        public SongManagerService(StreamingDbContext context)
+        private readonly IDataAccessConfigurationService _dataAccessConfigurationService;
+        public SongManagerService(StreamingDbContext context, IDataAccessConfigurationService dataAccessConfigurationService)
         {
             _context = context;
+            _dataAccessConfigurationService = dataAccessConfigurationService;
         }
 
+        public async Task<int> GetNumberOfSongsAsync()
+        {
+            return await _context.Songs.CountAsync();
+        }
 
         public async Task<bool> AddSongAsync(Song song)
         {
@@ -34,9 +40,9 @@ namespace DataAccess.Services
         {
             var song = await _context.Songs.FindAsync(songId);
 
-            if(song is null)
+            if (song is null)
             {
-                return false;   
+                return false;
             }
 
             try
@@ -65,10 +71,13 @@ namespace DataAccess.Services
                         NormalizedArtistname = song.NormalizedArtistname,
                         Duration = song.Duration,
                         ImageFileName = song.ImageFileName,
-                        SongFileName= song.SongFileName,
+                        SongFileName = song.SongFileName,
                     };
-            int count = 7;
-            return await songs.Take(count).ToListAsync();
+            if (songs.Count() > _dataAccessConfigurationService.WebAppSongSearchLimit)
+            {
+                return await songs.Take(_dataAccessConfigurationService.WebAppSongSearchLimit).ToListAsync();
+            }
+            return await songs.ToListAsync();
         }
 
         public async Task<List<Song>> GetSongsForWebAppAsync()
@@ -87,11 +96,14 @@ namespace DataAccess.Services
                         ImageFileName = song.ImageFileName,
                         SongFileName = song.SongFileName,
                     };
-            int count = 7;
-            return await songs.Take(count).ToListAsync();
+            if (songs.Count() > _dataAccessConfigurationService.WebAppSongSearchLimit)
+            {
+                return await songs.Take(_dataAccessConfigurationService.WebAppSongSearchLimit).ToListAsync();
+            }
+            return await songs.ToListAsync();
         }
 
-        public List<DataAccess.Models.Song> GetSongsForDesktopApp(string search, int max = int.MaxValue)
+        public List<DataAccess.Models.Song> GetSongsForDesktopApp(string search)
         {
             IQueryable<DataAccess.Models.Song> songs;
 
@@ -108,9 +120,9 @@ namespace DataAccess.Services
                         ImageFileName = song.ImageFileName
                     };
 
-            if (songs.Count() > max)
+            if (songs.Count() > _dataAccessConfigurationService.DesktopAppSongSearchLimit)
             {
-                return songs.Take(max).ToList();
+                return songs.Take(_dataAccessConfigurationService.DesktopAppSongSearchLimit).ToList();
             }
             return songs.ToList();
         }

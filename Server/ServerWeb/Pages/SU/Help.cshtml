@@ -1,0 +1,83 @@
+﻿@page
+@model ServerWeb.Pages.SU.HelpModel
+@{
+    ViewData["Title"] = "Help";
+}
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-question-mark" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Help</h4>
+    <div class="text-center">
+    </div>
+</div>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Super User</h4>
+        </div>
+        <div class="card-body">
+            <p>This type of user manages the roles of other users including Super Users. This user can do the following:</p>
+            <ol>
+                <li>Add user to role.</li>
+                <li>Remove user from role.</li>
+            </ol>
+            <p>When a user is removed from their role, they are automatically assigned the User role.</p>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Administrator</h4>
+        </div>
+        <div class="card-body">
+            <p>This type of user manages songs and issues. This user can do the following:</p>
+            <ol>
+                <li>Add songs to database.</li>
+                <li>Update the song file for any song.</li>
+                <li>Delete any songs in database.</li>
+                <li>Solve any issues by giving a description of the solution.</li>
+                <li>Modify any solved issues by changing the description.</li>
+                <li>Unresolve any issue.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Engine Administrator</h4>
+        </div>
+        <div class="card-body">
+            <p>This type of user manages the audio engine. This user can do the following:</p>
+            <ol>
+                <li>Start and stop the engine.</li>
+                <li>Change the limit of songs that are sent to the desktop client upon request.</li>
+                <li>Change the limit of songs that are sent to the web administrator upon request.</li>
+                <li>Change the limit of the number of desktop clients that can be connected to the engine at one time.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>User</h4>
+        </div>
+        <div class="card-body">
+            <p>This type of user can use two applications – Desktop Application and Web Application. This user can do the following:</p>
+            <ol>
+                <li>Check their playlists and their songs.</li>
+                <li>Delete playlists.</li>
+                <li>Recover playlists.</li>
+                <li>Submit Issues.</li>
+                <li>Use Desktop Application where they can play music, create and update playlists, queue songs, etc.</li>
+            </ol>
+        </div>
+    </div>
+</div>

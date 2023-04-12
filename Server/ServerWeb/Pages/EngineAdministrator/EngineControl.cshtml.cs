@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ServerWeb.Pages.Administrator
+namespace ServerWeb.Pages.EngineAdministrator
 {
-    [Authorize(Policy = "RequireAdministratorRole")]
-    public class MoreModel : PageModel
+    [Authorize(Policy = "RequireEngineAdministratorRole")]
+    public class EngineControlModel : PageModel
     {
         public void OnGet()
         {

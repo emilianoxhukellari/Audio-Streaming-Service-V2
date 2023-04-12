@@ -1,14 +1,16 @@
 using DataAccess.Contexts;
 using DataAccess.Models;
 using DataAccess.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ServerWeb.Pages.User
 {
+    [Authorize(Policy = "RequireUserRole")]
     public class PlaylistDetailsModel : PageModel
     {
-        private readonly PlaylistManagerService _playlistManagerService;
+        private readonly IPlaylistManagerService _playlistManagerService;
         public Playlist Playlist { get; set; } = new Playlist();
         public List<Song> Songs { get; set; } = new List<Song>(0);
         public string SecondsToString(double seconds)
@@ -27,7 +29,7 @@ namespace ServerWeb.Pages.User
             return (Convert.ToString(hours), Convert.ToString(leftMinutes));
         }
 
-        public PlaylistDetailsModel(PlaylistManagerService playlistManagerService)
+        public PlaylistDetailsModel(IPlaylistManagerService playlistManagerService)
         {
             _playlistManagerService = playlistManagerService;
         }

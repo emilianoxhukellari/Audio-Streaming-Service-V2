@@ -1,20 +1,22 @@
 using DataAccess.Models;
 using DataAccess.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
 
 namespace ServerWeb.Pages.Administrator
 {
+    [Authorize(Policy = "RequireAdministratorRole")]
     public class SongsModel : PageModel
     {
-        private readonly SongManagerService _songManagerService;
+        private readonly ISongManagerService _songManagerService;
 
         [BindProperty]
         public string Pattern { get; set; } = string.Empty;
         public List<Song> Songs { get; set; } = new List<Song>(0);
 
-        public SongsModel(SongManagerService songManagerService)
+        public SongsModel(ISongManagerService songManagerService)
         {
             _songManagerService = songManagerService;
         }

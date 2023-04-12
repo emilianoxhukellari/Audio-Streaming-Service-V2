@@ -1,5 +1,53 @@
-﻿<h3>WebSongSearchLimiter</h3>
+﻿@inject AudioEngine.Services.IAudioEngineService AudioEngineService
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Web App Song Search Limit</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col">
+                <p>Current Limit: @SongLimit</p>
+            </div>
+        </div>
+        <EditForm Model="this">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <input type="number" id="NewSongLimit" class="form-control" @bind="NewSongLimit" min="0" step="1" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" @onclick="UpdateMaxSongs">Update</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
 
 @code {
+    private int SongLimit { get; set; }
+    private int NewSongLimit { get; set; }
 
+    private void UpdateMaxSongs()
+    {
+        AudioEngineService.SetWebAppSongSearchLimit(NewSongLimit);
+    }
+
+    protected override void OnInitialized()
+    {
+        int limit = AudioEngineService.GetWebAppSongSearchLimit();
+        SongLimit = limit;
+        NewSongLimit = limit;
+        AudioEngineService.ServerWebSongLimitChanged += OnServerWebSongLimitChanged;
+    }
+
+    private async void OnServerWebSongLimitChanged(object? sender, int limit)
+    {
+        SongLimit = AudioEngineService.GetWebAppSongSearchLimit();
+        await InvokeAsync(StateHasChanged);
+    }
 }

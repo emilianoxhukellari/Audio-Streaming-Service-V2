@@ -1,16 +1,12 @@
 ﻿@inject AudioEngine.Services.IAudioEngineService AudioEngineService
 @inject IJSRuntime IJSRuntime
 
-
-<div>
-    <div class="btn-group justify-content-start">
+<div class="d-flex justify-content-center">
+    <div class="btn-group">
         <button type="button" class="btn btn-success" @onclick="HandleStart" disabled="@_isServerRunning">Start</button>
         <button type="button" class="btn btn-danger" @onclick="HandleStop" disabled="@(!_isServerRunning)">Stop</button>
     </div>
 </div>
-
-
-
 
 @code {
     private bool _isServerRunning;
@@ -29,7 +25,7 @@
 
     protected override void OnInitialized()
     {
-        AudioEngineService.ServerStateChanged += OnServerStateChanged;
+        AudioEngineService.ServerStartStopChanged += OnServerStateChanged;
         _isServerRunning = AudioEngineService.IsRunning;
     }
 

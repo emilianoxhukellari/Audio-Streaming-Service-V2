@@ -1,21 +1,52 @@
 ﻿@inject AudioEngine.Services.IAudioEngineService AudioEngineService
 
-<p>Max number of songs that can be searched at one time: @MaxSongs</p>
-<input type="number" @bind="NewMaxSongs" min="1" step="1" />
-<button @onclick="UpdateMaxSongs">Update Max Songs</button>
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Desktop App Song Search Limit</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col">
+                <p>Current Limit: @SongLimit</p>
+            </div>
+        </div>
+        <EditForm Model="this">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <InputNumber id="NewSongLimit" class="form-control w-100" @bind-Value="NewSongLimit" min="0" step="1" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" @onclick="UpdateMaxSongs">Update</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
 
 @code {
-    private int MaxSongs { get; set; } = 10;
-    private int NewMaxSongs { get; set; } = 10;
+    private int SongLimit { get; set; }
+    private int NewSongLimit { get; set; }
 
     private void UpdateMaxSongs()
     {
-        MaxSongs = NewMaxSongs;
-        AudioEngineService.SetDesktopSearchLimit(NewMaxSongs);
+        AudioEngineService.SetDesktopAppSongSearchLimit(NewSongLimit);
     }
 
     protected override void OnInitialized()
     {
-        //AudioEngineService.SetDesktopSearchLimit(NewMaxSongs);
+        int limit = AudioEngineService.GetDesktopAppSongSearchLimit();
+        SongLimit = limit;
+        NewSongLimit = limit;
+        AudioEngineService.ServerDesktopSongLimitChanged += OnServerDesktopSongLimitChanged;
+    }
+
+    private async void OnServerDesktopSongLimitChanged(object? sender, int limit)
+    {
+        SongLimit = AudioEngineService.GetDesktopAppSongSearchLimit();
+        await InvokeAsync(StateHasChanged);
     }
 }

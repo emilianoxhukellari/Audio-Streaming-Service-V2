@@ -110,7 +110,6 @@ namespace Client_Application.Client.Network
         {
             if(!Connected) 
             {
-                Trace.WriteLine("Hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
                 _communicationConnectedFlag.Reset();
                 _streamingConnectedFlag.Reset();
                 _reconnectFlag.Set();
@@ -142,12 +141,14 @@ namespace Client_Application.Client.Network
                         CommunicationSSL.InitializeSSL();
                         CommunicationSSL.SendSSL(Encoding.UTF8.GetBytes(_clientId), 6);
                         _communicationConnectedFlag.Set();
+                        Trace.WriteLine($"[COMMUNICATION CONNECTED]");
                         lock (_lockConnected)
                         {
                             _communicationConnected = true;
                             if (_communicationConnected && _streamingConnected)
                             {
                                 Connected = true;
+                                
                             }
                         }
                         break;
@@ -171,6 +172,7 @@ namespace Client_Application.Client.Network
                     if (!_communicationConnected && !_streamingConnected)
                     {
                         Connected = false;
+                        
                     }
                 }
                 while (true)
@@ -184,6 +186,7 @@ namespace Client_Application.Client.Network
                         lock (_lockConnected)
                         {
                             _streamingConnected = true;
+                            Trace.WriteLine($"[STREAMING CONNECTED]");
                             if (_communicationConnected && _streamingConnected)
                             {
                                 Connected = true;

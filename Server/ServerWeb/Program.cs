@@ -16,11 +16,10 @@ namespace ServerWeb
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables();
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
 
             builder.Services.AddRazorPages();
 
@@ -75,11 +74,11 @@ namespace ServerWeb
 
             builder.Services.AddScoped<IAudioStoringService, AudioStoringService>();
 
-            builder.Services.AddScoped<PlaylistManagerService>();
+            builder.Services.AddScoped<IPlaylistManagerService, PlaylistManagerService>();
 
-            builder.Services.AddScoped<SongManagerService>();
+            builder.Services.AddScoped<ISongManagerService, SongManagerService>();
 
-            builder.Services.AddScoped<IssueManagerService>();
+            builder.Services.AddScoped<IIssueManagerService, IssueManagerService>();
 
             builder.Services.AddSingleton<IAudioEngineService, AudioEngineService>();
 

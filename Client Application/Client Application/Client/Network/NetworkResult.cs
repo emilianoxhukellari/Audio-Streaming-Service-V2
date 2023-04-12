@@ -18,6 +18,13 @@ namespace Client_Application.Client.Network
         SynchronizationStart,
         SynchronizationUpdate
     }
+    public enum AuthenticationResult
+    {
+        Valid,
+        Invalid,
+        Error
+    }
+
     public sealed class SyncDiff
     {
         public List<int>? DeletePlaylists;
@@ -29,7 +36,7 @@ namespace Client_Application.Client.Network
 
     public class Result
     {
-        public bool ValidAuthentication { get; set; }
+        public AuthenticationResult ValidAuthentication { get; set; }
         public List<string>? RegistrationErrors { get; set; }
         public bool Disconnected { get; set; }
         public int PlaylistId { get; set; }
@@ -82,11 +89,14 @@ namespace Client_Application.Client.Network
                 _event.Set();   
             }
         }
-        public void UpdateAuthenticationResult(bool success)
+
+        
+
+        public void UpdateAuthenticationResult(AuthenticationResult result)
         {
             lock (_lock)
             {
-                _result.ValidAuthentication = success;
+                _result.ValidAuthentication = result;
                 _event.Set();
             }
         }

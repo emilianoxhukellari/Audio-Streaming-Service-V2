@@ -103,6 +103,13 @@ namespace Client_Application
                     currentUserControl.Content = _logInControl;
                 });
             }
+            else if(logInState == LogInState.LogInError)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _logInControl.ErrorLoginNotify();
+                });
+            }
         }
 
         #endregion

@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ServerWeb.Pages.EngineAdministrator
+namespace ServerWeb.Pages.Administrator
 {
-    [Authorize(Policy = "RequireEngineAdministratorRole")]
-    public class HomeModel : PageModel
+    [Authorize(Policy = "RequireAdministratorRole")]
+    public class HelpModel : PageModel
     {
         public void OnGet()
         {

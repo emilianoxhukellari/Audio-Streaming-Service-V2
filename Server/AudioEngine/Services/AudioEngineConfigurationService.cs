@@ -10,20 +10,6 @@ using System.Threading.Tasks;
 
 namespace AudioEngine.Services
 {
-    public static class JsonElementExtensions
-    {
-        public static Dictionary<string, JsonElement> ToDictionary(this JsonElement jsonElement)
-        {
-            var dictionary = new Dictionary<string, JsonElement>();
-
-            foreach (var property in jsonElement.EnumerateObject())
-            {
-                dictionary.Add(property.Name, property.Value);
-            }
-
-            return dictionary;
-        }
-    }
     public class AudioEngineConfigurationService : IAudioEngineConfigurationService
     {
         private readonly IConfiguration _configuration;
@@ -31,52 +17,6 @@ namespace AudioEngine.Services
         public int PortStreaming { get; private set; }
         public string Host { get; private set; }
         public X509Certificate X509Certificate { get; private set; }
-
-        public int DesktopSongSearchLimit
-        {
-            get => int.Parse(_configuration["AudioEngineConfiguration:SongSearchLimit"]!);
-
-            set
-            {
-                Trace.WriteLine($"AAAAAAAAAAAAAAAAAAAAAAAAA: {value}");
-                _configuration["AudioEngineConfiguration:SongSearchLimit"] = Convert.ToString(value);
-                UpdateAppSetting("AudioEngineConfiguration:SongSearchLimit", value.ToString());
-            }
-
-        }
-
-        public void UpdateAppSetting(string key, string value)
-        {
-            var configJson = File.ReadAllText("appsettings.json");
-            var config = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(configJson);
-
-            var keys = key.Split(':');
-            UpdateSetting(config, keys, 0, value);
-
-            var updatedConfigJson = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText("appsettings.json", updatedConfigJson);
-        }
-
-        private void UpdateSetting(Dictionary<string, JsonElement> config, string[] keys, int index, string value)
-        {
-            if (index == keys.Length - 1)
-            {
-                if (config[keys[index]].ValueKind == JsonValueKind.String)
-                {
-                    config[keys[index]] = JsonDocument.Parse($"\"{value}\"").RootElement;
-                }
-                else
-                {
-                    config[keys[index]] = JsonDocument.Parse(value).RootElement;
-                }
-            }
-            else
-            {
-                var nestedConfig = config[keys[index]].ToDictionary();
-                UpdateSetting(nestedConfig, keys, index + 1, value);
-                config[keys[index]] = JsonDocument.Parse(JsonSerializer.Serialize(nestedConfig)).RootElement;
-            }
-        }
 
         public AudioEngineConfigurationService(IConfiguration configuration)
         {

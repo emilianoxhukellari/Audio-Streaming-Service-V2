@@ -10,17 +10,17 @@ namespace ServerWeb.Pages.SU
     {
         private readonly ILogger<HomeModel> _logger;
         private readonly UserManager<IdentityUser> _userManager;
+        public int NumberOfSuperUsers { get; set; }
+        public int NumberOfAdministrators { get; set; }
+        public int NumberOfEngineAdministrators { get; set; }
+        public int NumberOfUsers { get; set; }
+        public string UserEmail { get; set; } = string.Empty;
 
         public HomeModel(ILogger<HomeModel> logger, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _userManager = userManager;
         }
-
-        public int NumberOfSuperUsers { get; set; }
-        public int NumberOfAdministrators { get; set; }
-        public int NumberOfEngineAdministrators { get; set; }
-        public int NumberOfUsers { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -32,6 +32,8 @@ namespace ServerWeb.Pages.SU
             NumberOfAdministrators = administrators.Count;
             NumberOfEngineAdministrators = engineAdministrators.Count;
             NumberOfUsers = users.Count;
+            var user = await _userManager.GetUserAsync(User);
+            UserEmail = user?.Email ?? string.Empty;
         }
     }
 }

@@ -1,5 +1,6 @@
 using DataAccess.Models;
 using DataAccess.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerWeb.Extensions;
@@ -10,9 +11,10 @@ namespace ServerWeb.Pages.Administrator
 {
     [RequestFormLimits(MultipartBodyLengthLimit = 3000000000)]
     [RequestSizeLimit(3000000000)]
+    [Authorize(Policy = "RequireAdministratorRole")]
     public class SongDetailsModel : PageModel
     {
-        private readonly SongManagerService _songManagerService;
+        private readonly ISongManagerService _songManagerService;
         private readonly IAudioStoringService _audioStoringService;
         [BindProperty(SupportsGet = true)]
         public int Id { get; set; }
@@ -20,7 +22,7 @@ namespace ServerWeb.Pages.Administrator
         [Display(Name = "Song File")]
         public IFormFile? SongFile { get; set; }
         public Song Song { get; set; }
-        public SongDetailsModel(SongManagerService songManagerService, IAudioStoringService audioStoringService)
+        public SongDetailsModel(ISongManagerService songManagerService, IAudioStoringService audioStoringService)
         {
             _songManagerService = songManagerService;
             _audioStoringService = audioStoringService;

@@ -1,0 +1,43 @@
+﻿@inject AudioEngine.Services.IAudioEngineService AudioEngineService
+@using static AudioEngine.Services.AudioEngineService
+
+<h3 class="text-center">Server Load</h3>
+
+<div class="progress" style="height: 2.5rem;">
+    <div class="progress-bar" role="progressbar" style="width: @LoadPercentage%; background-color: @BackgroundColor" aria-valuenow="@LoadPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+<div class="text-center mt-3">
+    <p>@ConnectedCount/@LimitCount Connected Clients</p>
+</div>
+
+@code {
+    public int LoadPercentage { get; set; }
+    public int ConnectedCount { get; set; }
+    public int LimitCount { get; set; }
+
+    private string BackgroundColor => GetBackgroundColor(LoadPercentage);
+
+    private string GetBackgroundColor(int percentage)
+    {
+        int red = (int)Math.Round(percentage * 2.55);
+        int green = (int)Math.Round((100 - percentage) * 2.55);
+        return $"rgb({red}, {green}, 0)";
+    }
+
+    protected override void OnInitialized()
+    {
+        AudioEngineService.ServerLoadUpdate += OnServerLoadUpdate;
+        ServerLoadArgs args = AudioEngineService.GetServerLoadInitialState();
+        ConnectedCount = args.ConnectedClientsCount;
+        LimitCount = args.ClientCountLimit;
+        LoadPercentage = args.Percentage;
+    }
+    private async void OnServerLoadUpdate(object? sender, ServerLoadArgs args)
+    {
+        ConnectedCount = args.ConnectedClientsCount;
+        LimitCount = args.ClientCountLimit;
+        LoadPercentage = args.Percentage;
+        await InvokeAsync(StateHasChanged);
+    }
+}

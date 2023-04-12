@@ -171,8 +171,8 @@ namespace Client_Application.Client.Core
             {
                 ClientEvent.Fire(EventType.LongNetworkRequest, new LongNetworkRequestArgs { Started = true });
                 _dualSocket.Connect();
-                bool success = _authManager.LogIn(args.Email, args.Password, args.RememberMe);
-                if (success)
+                AuthenticationResult authResult = _authManager.LogIn(args.Email, args.Password, args.RememberMe);
+                if (authResult == AuthenticationResult.Valid)
                 {
                     ClientEvent.Fire(EventType.LogInStateUpdate, new LogInStateUpdateArgs { LogInState = LogInState.LogInValid, Email = args.Email });
                     PlaylistResult result = _playlistManager.Sync();
@@ -185,12 +185,21 @@ namespace Client_Application.Client.Core
                         MessageBox.Show($"Could not sync playlists.", "Sync Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
-                else
+                else if (authResult == AuthenticationResult.Invalid)
                 {
                     ClientEvent.Fire(EventType.LogInStateUpdate,
                         new LogInStateUpdateArgs
                         {
                             LogInState = LogInState.LogInInvalid,
+                        });
+                }
+
+                else if (authResult == AuthenticationResult.Error)
+                {
+                    ClientEvent.Fire(EventType.LogInStateUpdate,
+                        new LogInStateUpdateArgs
+                        {
+                            LogInState = LogInState.LogInError,
                         });
                 }
 

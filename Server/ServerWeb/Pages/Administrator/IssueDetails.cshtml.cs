@@ -1,5 +1,6 @@
 using DataAccess.Models;
 using DataAccess.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerWeb.Extensions;
@@ -8,9 +9,10 @@ using System.Diagnostics;
 
 namespace ServerWeb.Pages.Administrator
 {
+    [Authorize(Policy = "RequireAdministratorRole")]
     public class IssueDetailsModel : PageModel
     {
-        private readonly IssueManagerService _issueManagerService;
+        private readonly IIssueManagerService _issueManagerService;
 
         [BindProperty(SupportsGet = true)]
         public int Id { get; set; }
@@ -18,7 +20,7 @@ namespace ServerWeb.Pages.Administrator
         public string? SolutionDescription { get; set; }
         public Issue Issue { get; set; } 
 
-        public IssueDetailsModel(IssueManagerService issueManagerService)
+        public IssueDetailsModel(IIssueManagerService issueManagerService)
         {
             _issueManagerService = issueManagerService;
             Issue = new Issue();

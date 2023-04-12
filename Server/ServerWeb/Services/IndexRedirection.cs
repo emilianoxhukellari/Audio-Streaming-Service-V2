@@ -34,7 +34,7 @@ namespace ServerWeb.Services
 
                 else if (await _userManager.IsInRoleAsync(user, "EngineAdministrator"))
                 {
-                    return new RedirectToPageResult("/EngineAdministrator/Home");
+                    return new RedirectToPageResult("/EngineAdministrator/EngineControl");
                 }
             }
             return new RedirectToPageResult("/Index");

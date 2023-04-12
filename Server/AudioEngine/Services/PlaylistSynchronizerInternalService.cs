@@ -13,15 +13,15 @@ namespace AudioEngine.Services
 {
     public class PlaylistSynchronizerInternalService
     {
-        private readonly PlaylistManagerService _playlistManagerService;
-        private readonly SongManagerService _songManagerService;
+        private readonly IPlaylistManagerService _playlistManagerService;
+        private readonly ISongManagerService _songManagerService;
         private readonly IServiceScope _serviceScope;
         public string? UserId { get; set; }
         public PlaylistSynchronizerInternalService(IServiceProvider serviceProvider)
         {
             _serviceScope = serviceProvider.CreateScope();
-            _playlistManagerService = _serviceScope.ServiceProvider.GetRequiredService<PlaylistManagerService>();
-            _songManagerService = _serviceScope.ServiceProvider.GetRequiredService<SongManagerService>();
+            _playlistManagerService = _serviceScope.ServiceProvider.GetRequiredService<IPlaylistManagerService>();
+            _songManagerService = _serviceScope.ServiceProvider.GetRequiredService<ISongManagerService>();
         }
 
         ~PlaylistSynchronizerInternalService() 

@@ -3,3 +3,50 @@
 @{
     ViewData["Title"] = "Home";
 }
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-people" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">@Model.UserEmail</h4>
+    <div class="text-center">
+    </div>
+</div>
+
+<div class="container" style="margin-top:100px">
+    <div class="row align-items-center h-100 mt-5">
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-headphones" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Playlists</h3>
+            <p class="text-center">View and manage your playlists.</p>
+            <div class="text-center">
+                <h1>@Model.NumberOfPlaylists</h1>
+                <a asp-page="/User/Playlists" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-action-undo" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Deleted Playlists</h3>
+            <p class="text-center">View and recover your deleted playlists.</p>
+            <div class="text-center">
+                <h1>@Model.NumberOfDeletedPlaylists</h1>
+                <a asp-page="/User/RecoverPlaylists" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+            <div style="display: flex; justify-content: center;">
+                <span class="oi oi-bug" style="font-size: 7em;"></span>
+            </div>
+            <h3 class="text-center mt-3">Issues</h3>
+            <p class="text-center">Create and submit issues.</p>
+            <div class="text-center">
+                <h1>@Model.NumberOfSubmittedIssues</h1>
+                <a asp-page="/User/SubmitIssue" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+    </div>
+</div>

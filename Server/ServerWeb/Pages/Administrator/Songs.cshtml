@@ -61,7 +61,7 @@
         <div class="input-group-prepend">
             <button class="btn btn-primary search-button" type="submit">Search</button>
         </div>
-        <input type="text" class="form-control search-input" placeholder="Search Issue" aria-label="Search" aria-describedby="basic-addon2" asp-for="Pattern" required>
+        <input type="text" class="form-control search-input" placeholder="Search Song" aria-label="Search" aria-describedby="basic-addon2" asp-for="Pattern" required>
     </div>
 </form>
 
@@ -75,7 +75,7 @@
                         byte[] imageBytes = System.IO.File.ReadAllBytes(song.ImageFileName);
                         string base64String = Convert.ToBase64String(imageBytes);
                     }
-                    <img src="data:image/png;base64,@base64String" class="img-thumbnail song-img" alt="@song.SongName" />
+                    <img src="data:image/png;base64,@base64String" class="song-img" alt="@song.SongName" />
                     <div class="song-details">
                         <h5 class="mb-0">@song.SongName by @song.ArtistName</h5>
                     </div>

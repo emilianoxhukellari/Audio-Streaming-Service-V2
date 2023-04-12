@@ -46,7 +46,7 @@
                         byte[] imageBytes = System.IO.File.ReadAllBytes(song.ImageFileName);
                         string base64String = Convert.ToBase64String(imageBytes);
                     }
-                    <img src="data:image/png;base64,@base64String" class="img-thumbnail song-img" alt="@song.SongName" />
+                    <img src="data:image/png;base64,@base64String" class="song-img" alt="@song.SongName" />
                     <div class="song-details">
                         <h5 class="mb-0">@song.SongName by @song.ArtistName</h5>
                     </div>

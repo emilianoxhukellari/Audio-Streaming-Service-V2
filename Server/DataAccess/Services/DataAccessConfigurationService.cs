@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 
 namespace DataAccess.Services
 {
@@ -36,8 +37,9 @@ namespace DataAccess.Services
 
             set
             {
-                _configuration["DataAccessConfiguration:DesktopAppSongSearchLimit"] = Convert.ToString(value);
-                UpdateAppSetting("DataAccessConfiguration:DesktopAppSongSearchLimit", value.ToString());
+                int validValue = value < 0 ? 0 : value;
+                _configuration["DataAccessConfiguration:DesktopAppSongSearchLimit"] = Convert.ToString(validValue);
+                UpdateAppSetting("DataAccessConfiguration:DesktopAppSongSearchLimit", validValue.ToString());
             }
 
         }
@@ -48,8 +50,9 @@ namespace DataAccess.Services
 
             set
             {
-                _configuration["DataAccessConfiguration:WebAppSongSearchLimit"] = Convert.ToString(value);
-                UpdateAppSetting("DataAccessConfiguration:WebAppSongSearchLimit", value.ToString());
+                int validValue = value < 0 ? 0 : value;
+                _configuration["DataAccessConfiguration:WebAppSongSearchLimit"] = Convert.ToString(validValue);
+                UpdateAppSetting("DataAccessConfiguration:WebAppSongSearchLimit", validValue.ToString());
             }
         }
 
@@ -59,8 +62,9 @@ namespace DataAccess.Services
 
             set
             {
-                _configuration["DataAccessConfiguration:DesktopAppClientCountLimit"] = Convert.ToString(value);
-                UpdateAppSetting("DataAccessConfiguration:DesktopAppClientCountLimit", value.ToString());
+                int validValue = value < 0 ? 0 : value;
+                _configuration["DataAccessConfiguration:DesktopAppClientCountLimit"] = Convert.ToString(validValue);
+                UpdateAppSetting("DataAccessConfiguration:DesktopAppClientCountLimit", validValue.ToString());
             }
         }
 
@@ -83,7 +87,7 @@ namespace DataAccess.Services
             }
         }
 
-        public void UpdateAppSetting(string key, string value)
+        private void UpdateAppSetting(string key, string value)
         {
             var configJson = File.ReadAllText("appsettings.json");
             var config = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(configJson);

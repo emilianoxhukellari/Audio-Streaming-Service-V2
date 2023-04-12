@@ -20,7 +20,7 @@ namespace DataAccess.Services
         NonSolved,
         All
     }
-    public class IssueManagerService
+    public class IssueManagerService : IIssueManagerService
     {
         private readonly StreamingDbContext _streamingDbContext;
         private readonly UserDbContext _userDbContext;
@@ -31,10 +31,40 @@ namespace DataAccess.Services
             _userManager = userManager;
             _userDbContext = userDbContext;
         }
+
+        public enum IssueType
+        {
+            Solved,
+            Unsolved
+        }
+
+        public async Task<int> GetNumberOfSubmittedIssuesByUserAsync(ClaimsPrincipal user)
+        {
+            var identityUser = await _userManager.GetUserAsync(user);
+            if (identityUser is not null)
+            {
+                return await _streamingDbContext.Issues.Where(i => i.SubmitterId == identityUser.Id).CountAsync();
+            }
+            return 0;
+        }
+
+        public async Task<int> GetNumberOfIssues(IssueType issueType)
+        {
+            if(issueType == IssueType.Solved)
+            {
+                return await _streamingDbContext.Issues.Where(i => i.IsSolved).CountAsync();
+            }
+            else if(issueType == IssueType.Unsolved)
+            {
+                return await _streamingDbContext.Issues.Where(i => !i.IsSolved).CountAsync();   
+            }
+            return 0;
+        }
+
         public async Task<bool> CreateIssueAsync(string title, string issueType, string description, ClaimsPrincipal user)
         {
             var identityUser = await _userManager.GetUserAsync(user);
-            if(identityUser != null)
+            if (identityUser != null)
             {
                 var issue = new Issue
                 {
@@ -54,9 +84,9 @@ namespace DataAccess.Services
 
         public async Task<bool> SolveIssueAsync(int issueId, string solutionDescription, ClaimsPrincipal user)
         {
-            var issue = await GetIssueAsync(issueId); 
+            var issue = await GetIssueAsync(issueId);
             var identityUser = await _userManager.GetUserAsync(user);
-            if(issue is not null && identityUser is not null)
+            if (issue is not null && identityUser is not null)
             {
                 issue.ResolverId = identityUser.Id;
                 issue.SolutionDescription = solutionDescription;
@@ -70,7 +100,7 @@ namespace DataAccess.Services
         public async Task<bool> UnresolveIssueAsync(int issueId)
         {
             var issue = await _streamingDbContext.Issues.FindAsync(issueId);
-            if(issue is not null)
+            if (issue is not null)
             {
                 issue.ResolverId = null;
                 issue.SolutionDescription = null;
@@ -84,15 +114,15 @@ namespace DataAccess.Services
         public async Task<List<Issue>> GetIssuesFromPatternAsync(string pattern, IssueRetrieveMode issueRetrieveMode)
         {
             List<Issue> issues = new List<Issue>(0);
-            if(issueRetrieveMode == IssueRetrieveMode.NonSolved)
+            if (issueRetrieveMode == IssueRetrieveMode.NonSolved)
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == false).ToListAsync();  
+                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == false).ToListAsync();
             }
-            else if(issueRetrieveMode == IssueRetrieveMode.Solved) 
+            else if (issueRetrieveMode == IssueRetrieveMode.Solved)
             {
                 issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == true).ToListAsync();
             }
-            else if(issueRetrieveMode == IssueRetrieveMode.All)
+            else if (issueRetrieveMode == IssueRetrieveMode.All)
             {
                 issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern))).ToListAsync();
             }
@@ -133,7 +163,7 @@ namespace DataAccess.Services
             return await _streamingDbContext.Issues.FindAsync(issueId);
         }
 
-        public async Task<IdentityUser?> GetIssueResolver(int issueId)
+        public async Task<IdentityUser?> GetIssueResolverAsync(int issueId)
         {
             var issue = await _streamingDbContext.Issues.FindAsync(issueId);
             if (issue != null)
@@ -143,7 +173,7 @@ namespace DataAccess.Services
             return null;
         }
 
-        public async Task<IdentityUser?> GetIssueSubmitter(int issueId)
+        public async Task<IdentityUser?> GetIssueSubmitterAsync(int issueId)
         {
             var issue = await _streamingDbContext.Issues.FindAsync(issueId);
             if (issue != null)

@@ -181,7 +181,7 @@ namespace Server_Application.Server
             DataAccess.Models.Song? song = null;
             using (var scope = _serviceProvider.CreateScope())
             {
-                SongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<SongManagerService>();
+                ISongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<ISongManagerService>();
                 song = songManagerService.GetSongFromDatabase(songId);
             }
 
@@ -802,10 +802,10 @@ namespace Server_Application.Server
 
                 using(var scope = _serviceProvider.CreateScope())
                 {
-                    SongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<SongManagerService>();
+                    ISongManagerService songManagerService = scope.ServiceProvider.GetRequiredService<ISongManagerService>();
                     IAudioEngineConfigurationService audioEngineConfigurationService = scope.ServiceProvider.GetRequiredService<IAudioEngineConfigurationService>();
 
-                    foreach (var song in songManagerService.GetSongsForDesktopApp(searchString, audioEngineConfigurationService.DesktopSongSearchLimit))
+                    foreach (var song in songManagerService.GetSongsForDesktopApp(searchString))
                     {
                         byte[] imageBytes = File.ReadAllBytes(song.ImageFileName);
                         results.Add(new Song(song.SongId, song.SongName, song.ArtistName, song.Duration, imageBytes));

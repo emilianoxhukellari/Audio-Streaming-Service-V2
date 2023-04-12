@@ -1,15 +1,17 @@
 using DataAccess.Models;
 using DataAccess.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ServerWeb.Pages.User
 {
+    [Authorize(Policy = "RequireUserRole")]
     public class PlaylistsModel : PageModel
     {
-        private readonly PlaylistManagerService _playlistManagerService;
+        private readonly IPlaylistManagerService _playlistManagerService;
         public List<Playlist> Playlists { get; set; } = new List<Playlist>(0);
-        public PlaylistsModel(PlaylistManagerService playlistManagerService)
+        public PlaylistsModel(IPlaylistManagerService playlistManagerService)
         {
             _playlistManagerService = playlistManagerService;
         }

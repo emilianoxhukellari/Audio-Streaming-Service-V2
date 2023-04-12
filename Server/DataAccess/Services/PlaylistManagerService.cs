@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
-    public class PlaylistManagerService
+    public class PlaylistManagerService : IPlaylistManagerService
     {
         private readonly StreamingDbContext _streamingDbContext;
         private readonly UserManager<IdentityUser> _userManager;
@@ -19,6 +19,26 @@ namespace DataAccess.Services
         {
             _streamingDbContext = streamingDbContext;
             _userManager = userManager;
+        }
+
+        public async Task<int> GetNumberOfPlaylistsAsync(ClaimsPrincipal user)
+        {
+            var identityUser = await _userManager.GetUserAsync(user);
+            if (identityUser is not null)
+            {
+                return await _streamingDbContext.Playlists.Where(p => p.UserId == identityUser.Id && p.IsDeleted == false).CountAsync();
+            }
+            return 0;
+        }
+
+        public async Task<int> GetNumberOfDeletedPlaylistsAsync(ClaimsPrincipal user)
+        {
+            var identityUser = await _userManager.GetUserAsync(user);
+            if (identityUser is not null)
+            {
+                return await _streamingDbContext.Playlists.Where(p => p.UserId == identityUser.Id && p.IsDeleted == true).CountAsync();
+            }
+            return 0;
         }
 
         public async Task<List<Playlist>> GetRemovedPlaylistAsync(ClaimsPrincipal user)
@@ -45,7 +65,7 @@ namespace DataAccess.Services
         {
             var identityUser = await _userManager.GetUserAsync(user);
 
-            if(identityUser is not null)
+            if (identityUser is not null)
             {
                 return await _streamingDbContext.Playlists.AnyAsync(p => p.UserId == identityUser.Id && p.PlaylistId == playlistId);
             }
@@ -61,7 +81,7 @@ namespace DataAccess.Services
         public async Task<bool> RecoverPlaylist(int playlistId)
         {
             var playlist = await _streamingDbContext.Playlists.FindAsync(playlistId);
-            if(playlist is not null) 
+            if (playlist is not null)
             {
                 playlist.IsDeleted = false;
                 await _streamingDbContext.SaveChangesAsync();
@@ -88,13 +108,13 @@ namespace DataAccess.Services
         {
             var playlist = await _streamingDbContext.Playlists.FindAsync(playlistId);
 
-            if(playlist is null)
+            if (playlist is null)
             {
                 return false;
             }
 
             playlist.IsDeleted = true;
-            await _streamingDbContext.SaveChangesAsync();   
+            await _streamingDbContext.SaveChangesAsync();
             return true;
         }
 
@@ -102,7 +122,7 @@ namespace DataAccess.Services
         {
             var playlist = _streamingDbContext.Playlists.Find(playlistId);
 
-            if(playlist is null)
+            if (playlist is null)
             {
                 return false;
             }

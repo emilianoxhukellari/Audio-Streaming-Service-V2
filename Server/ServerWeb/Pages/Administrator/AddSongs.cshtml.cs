@@ -1,5 +1,6 @@
 using DataAccess.Models;
 using DataAccess.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace ServerWeb.Pages.Administrator
 {
     [RequestFormLimits(MultipartBodyLengthLimit = 3000000000)]
     [RequestSizeLimit(3000000000)]
+    [Authorize(Policy = "RequireAdministratorRole")]
     public class AddSongsModel : PageModel
     {
         [BindProperty]

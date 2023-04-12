@@ -63,6 +63,7 @@ namespace Client_Application.Client.Event
     {
         LogInValid,
         LogInInvalid,
+        LogInError,
         LogOut
     }
 

@@ -9,7 +9,7 @@ namespace ServerWeb.Pages.User
     [Authorize(Policy = "RequireUserRole")]
     public class RecoverPlaylistsModel : PageModel
     {
-        private readonly PlaylistManagerService _playlistManagerService;
+        private readonly IPlaylistManagerService _playlistManagerService;
         public List<Playlist> Playlists { get; set; } = new List<Playlist>(0);
 
         public string SecondsToString(double seconds)
@@ -19,7 +19,7 @@ namespace ServerWeb.Pages.User
             return $"{hours:D2}:{minutes:D2}";
         }
 
-        public RecoverPlaylistsModel(PlaylistManagerService playlistManagerService)
+        public RecoverPlaylistsModel(IPlaylistManagerService playlistManagerService)
         {
             _playlistManagerService = playlistManagerService;
         }

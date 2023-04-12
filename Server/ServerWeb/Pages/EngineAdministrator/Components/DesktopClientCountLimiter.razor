@@ -1,0 +1,52 @@
+﻿@inject AudioEngine.Services.IAudioEngineService AudioEngineService
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Desktop App Client Count Limit</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col">
+                <p>Current Limit: @ClientCountLimit</p>
+            </div>
+        </div>
+        <EditForm Model="this">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <input type="number" id="NewClientCountLimit" class="form-control w-100" @bind="NewClientCountLimit" min="0" step="1" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" @onclick="UpdateClientCount">Update</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private int ClientCountLimit { get; set; }
+    private int NewClientCountLimit { get; set; }
+
+    private void UpdateClientCount()
+    {
+        AudioEngineService.SetDesktopClientCountLimit(NewClientCountLimit);
+    }
+
+    protected override void OnInitialized()
+    {
+        int limit = AudioEngineService.GetDesktopClientCountLimit();
+        ClientCountLimit = limit;
+        NewClientCountLimit = limit;
+        AudioEngineService.ServerDesktopClientCountLimitChanged += OnServerDesktopClientCountLimitChanged;
+    }
+
+    private async void OnServerDesktopClientCountLimitChanged(object? sender, int limit)
+    {
+        ClientCountLimit = AudioEngineService.GetDesktopClientCountLimit();
+        await InvokeAsync(StateHasChanged);
+    }
+}

@@ -100,22 +100,29 @@ namespace Client_Application.Client.Managers
             return false;
         }
 
-        public bool LogIn(string email, string password, bool rememberMe)
+        public AuthenticationResult LogIn(string email, string password, bool rememberMe)
         {
-            bool success = _communicationManager.AuthenticateToServer(email, password);
+            AuthenticationResult result = _communicationManager.AuthenticateToServer(email, password);
 
-            if (success)
+            if (result == AuthenticationResult.Valid)
             {
                 _session = new Session(email, password);
                 ExecuteValidLogIn(email, password, rememberMe);
-                return true;
+                return AuthenticationResult.Valid;
             }
-            else
+            else if (result == AuthenticationResult.Invalid)
             {
                 _session = new Session();
                 ExecuteInvalidLogIn(email, password, rememberMe);
-                return false;
+                return AuthenticationResult.Invalid;
             }
+            else if (result == AuthenticationResult.Error)
+            {
+                _session = new Session();
+                ExecuteInvalidLogIn(email, password, rememberMe);
+                return AuthenticationResult.Error;
+            }
+            return result;
         }
 
         private void ExecuteValidLogIn(string email, string password, bool rememberMe)
@@ -132,8 +139,6 @@ namespace Client_Application.Client.Managers
 
         private void ExecuteInvalidLogIn(string email, string password, bool rememberMe)
         {
-            
-
             if (!rememberMe)
             {
                 RemoveRememberMe();

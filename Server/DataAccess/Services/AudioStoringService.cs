@@ -16,12 +16,12 @@ namespace DataAccess.Services
 {
     public class AudioStoringService : IAudioStoringService
     {
-        private readonly SongManagerService _songManagerService;
+        private readonly ISongManagerService _songManagerService;
         private readonly IDataAccessConfigurationService _dataAccessConfigurationService;
         public string RelativeSongsPath { get; private set; }
         public string RelativeImagesPath { get; private set; }
 
-        public AudioStoringService(SongManagerService songManagerService, IDataAccessConfigurationService dataAccessConfigurationService)
+        public AudioStoringService(ISongManagerService songManagerService, IDataAccessConfigurationService dataAccessConfigurationService)
         {
             _songManagerService = songManagerService;
             _dataAccessConfigurationService = dataAccessConfigurationService;

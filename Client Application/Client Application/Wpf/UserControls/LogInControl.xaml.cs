@@ -43,6 +43,11 @@ namespace Client_Application.Wpf.UserControls
             loginErrorLabel.Content = "Username or Password Incorrect";
         }
 
+        public void ErrorLoginNotify()
+        {
+            loginErrorLabel.Content = "An error occurred when logging in";
+        }
+
         public void Reset()
         {
             loginErrorLabel.Content = string.Empty;

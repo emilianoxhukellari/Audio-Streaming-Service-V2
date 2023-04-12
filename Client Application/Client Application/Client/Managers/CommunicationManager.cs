@@ -95,6 +95,10 @@ namespace Client_Application.Client.Managers
 
         private void ExecuteNetworkRequest(NetworkRequest networkRequest)
         {
+            if(!_dualSocket.Connected)
+            {
+                return;
+            }
             if (networkRequest.Type == NetworkRequestType.SearchSongOrArtist)
             {
                 ExecuteSearchRequest(networkRequest.Parameters);
@@ -304,7 +308,7 @@ namespace Client_Application.Client.Managers
             return networkResult.Wait().PlaylistId;
         }
 
-        public bool AuthenticateToServer(string email, string password)
+        public AuthenticationResult AuthenticateToServer(string email, string password)
         {
             NetworkResult networkResult = new NetworkResult(ResultType.Authentication);
             AddNetworkRequest(NetworkRequestType.AuthenticateToServer, networkResult, email, password);
@@ -327,10 +331,11 @@ namespace Client_Application.Client.Managers
 
         public List<Song> SearchSongsServer(string search)
         {
+            Trace.WriteLine("Func Enter");
             NetworkResult networkResult = new NetworkResult(ResultType.FoundSongs);
             AddNetworkRequest(NetworkRequestType.SearchSongOrArtist, networkResult, search);
             List<Song>? foundSongs = networkResult.Wait().FoundSongs;
-
+            Trace.WriteLine("Func Pass");
             if (foundSongs != null)
             {
                 return foundSongs;
@@ -664,17 +669,17 @@ namespace Client_Application.Client.Managers
 
                 if (reply == "VALID")
                 {
-                    networkResult.UpdateAuthenticationResult(true);
+                    networkResult.UpdateAuthenticationResult(AuthenticationResult.Valid);
                 }
                 else if (reply == "INVALID")
                 {
-                    networkResult.UpdateAuthenticationResult(false);
+                    networkResult.UpdateAuthenticationResult(AuthenticationResult.Invalid);
                 }
             }
             catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
             {
                 _dualSocket.Reconnect();
-                networkResult.UpdateAuthenticationResult(false);
+                networkResult.UpdateAuthenticationResult(AuthenticationResult.Error);
             }
         }
 
@@ -747,6 +752,7 @@ namespace Client_Application.Client.Managers
 
         private void ExecuteSearchRequest(object[] parameters)
         {
+            Trace.WriteLine("Enter");
             NetworkResult networkResult = (NetworkResult)parameters[0];
             string searchString = (string)parameters[1];
             string searchSongSerialized = string.Concat(searchString.Where(c => !char.IsWhiteSpace(c)));
@@ -803,10 +809,12 @@ namespace Client_Application.Client.Managers
                 catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
                 {
                     _dualSocket.Reconnect();
+                    Trace.WriteLine("Catch");
                 }
                 finally
                 {
                     networkResult.UpdateFoundSongs(foundSongs);
+                    Trace.WriteLine("Finally");
                 }
             }
         }

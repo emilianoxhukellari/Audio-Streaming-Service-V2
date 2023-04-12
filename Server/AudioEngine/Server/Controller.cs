@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -34,6 +35,7 @@ namespace Server_Application.Server
         private readonly int _portCommunication;
         private readonly int _portStreaming;
         private readonly string _host;
+        private int _clientCountLimit;
         private Thread _listenerCommunicationThread;
         private Thread _listenerStreamingThread;
         private Thread _handleInternalRequestsThread;
@@ -48,6 +50,7 @@ namespace Server_Application.Server
         private readonly object _engineStateLock = new object();
         private readonly object _criticalCommunicationListeningOperation = new object();
         private readonly object _criticalStreamingListeningOperation = new object();
+        private readonly object _clientCountLimitChangeLock = new object();
 
         private readonly IDbContextFactory<StreamingDbContext> _dbContextFactory;
         private readonly IServiceProvider _serviceProvider;
@@ -59,10 +62,17 @@ namespace Server_Application.Server
         private volatile bool _exitCreateClientHandlerLoop;
         private volatile bool _exitHandleInternalRequestLoop;
 
-
         public bool IsRunning { get; private set; }
+        public int ConnectedCount { get { return _clients.Count; } }
+        public int ClientCountLimit { get { return _clientCountLimit; } }
 
-        public Controller(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, IAudioEngineConfigurationService audioEngineConfigurationService) 
+        private enum TerminateClientsMode
+        {
+            All,
+            Limit
+        }
+
+        public Controller(IDbContextFactory<StreamingDbContext> dbContextFactory, IServiceProvider serviceProvider, IAudioEngineConfigurationService audioEngineConfigurationService)
         {
             _dbContextFactory = dbContextFactory;
             _serviceProvider = serviceProvider;
@@ -88,23 +98,43 @@ namespace Server_Application.Server
             _serverListener = new ServerListener();
             _internalRequestQueue = new Queue<InternalRequest>();
             IsRunning = false;
+            InitializeClientCountLimit(ref _clientCountLimit);  
             Listen(EventType.InternalRequest, new ServerEventCallback(AddInternalRequest));
         }
 
-        ~Controller()
+        private void InitializeClientCountLimit(ref int clientCountLimit)
         {
+            using(var scope = _serviceProvider.CreateScope())
+            {
+                var dataAccessConfigurationService = scope.ServiceProvider.GetRequiredService<IDataAccessConfigurationService>();
+                clientCountLimit = dataAccessConfigurationService.DesktopAppClientCountLimit;
+            }
         }
 
-        
-        private void TerminateClients()
+        private void TerminateClients(TerminateClientsMode mode)
         {
-            while(_clients.Count > 0)
+            if(mode == TerminateClientsMode.All)
             {
-                try
+                while (_clients.Count > 0)
                 {
-                    _clients[0]?.TerminateClientHandler();
+                    try
+                    {
+                        _clients[0]?.TerminateClientHandler();
+                    }
+                    catch { }
                 }
-                catch { }
+            }
+            
+            else if(mode == TerminateClientsMode.Limit)
+            {
+                while (_clients.Count > _clientCountLimit)
+                {
+                    try
+                    {
+                        _clients[0]?.TerminateClientHandler();
+                    }
+                    catch { }
+                }
             }
         }
 
@@ -130,7 +160,6 @@ namespace Server_Application.Server
         {
             ClientHandler handler = (ClientHandler)parameters[0];
             _clients.Remove(handler);
-            DisplayConnectedClients();
             GC.Collect();
         }
 
@@ -163,7 +192,7 @@ namespace Server_Application.Server
                 {
                     _newInternalRequest.WaitOne();
 
-                    if(_exitHandleInternalRequestLoop)
+                    if (_exitHandleInternalRequestLoop)
                     {
                         break;
                     }
@@ -193,7 +222,7 @@ namespace Server_Application.Server
             _listenerStreamingThread.IsBackground = true;
             _exitStreamingListeningLoop = false;
 
-            if(_streamingSocket == null || !_streamingSocket.IsBound)
+            if (_streamingSocket == null || !_streamingSocket.IsBound)
             {
                 _streamingSocket = CreateSocket(_host, _portStreaming);
             }
@@ -214,14 +243,17 @@ namespace Server_Application.Server
                 {
                     if (_streamingSocket != null)
                     {
-                        Socket socket = _streamingSocket.Accept();
                         lock (_criticalStreamingListeningOperation)
                         {
+                            if(ConnectedCount >= ClientCountLimit)
+                            {
+                                Thread.Sleep(300);
+                                continue;
+                            }
+
+                            Socket socket = _streamingSocket.Accept();
                             IPEndPoint? ipEndPoint = (IPEndPoint?)socket.RemoteEndPoint;
-
-
                             SslStream sslStream = new SslStream(new NetworkStream(socket, true), false);
-
                             sslStream.AuthenticateAsServer(_x509Certificate, false, true);
 
                             string clientId = Encoding.UTF8.GetString(ReceiveTCP(6, sslStream));
@@ -275,20 +307,23 @@ namespace Server_Application.Server
             {
                 while (!_exitCommunicationListeningLoop)
                 {
-                    if(_communicationSocket != null)
+                    if (_communicationSocket != null)
                     {
-                        Socket socket = _communicationSocket.Accept();
 
                         lock (_criticalCommunicationListeningOperation)
                         {
+                            if (ConnectedCount >= ClientCountLimit)
+                            {
+                                Thread.Sleep(300);
+                                continue;
+                            }
+
+                            Socket socket = _communicationSocket.Accept();
                             IPEndPoint? ipEndPoint = (IPEndPoint?)socket.RemoteEndPoint;
-
                             SslStream sslStream = new SslStream(new NetworkStream(socket, true), false);
-
                             sslStream.AuthenticateAsServer(_x509Certificate, false, false);
 
                             string clientId = Encoding.UTF8.GetString(ReceiveTCP(6, sslStream));
-
                             string clientFullId = GetClientFullId(clientId, ipEndPoint);
                             lock (_lock)
                             {
@@ -306,7 +341,7 @@ namespace Server_Application.Server
                 _communicationSocket?.Close();
             }
         }
-        
+
 
         private void StartCreateClientHandlerLoop()
         {
@@ -330,7 +365,7 @@ namespace Server_Application.Server
             while (true)
             {
                 _newClient.WaitOne();
-                if(_exitCreateClientHandlerLoop)
+                if (_exitCreateClientHandlerLoop)
                 {
                     break;
                 }
@@ -341,34 +376,34 @@ namespace Server_Application.Server
                     {
                         if (_clientCommunicationSockets.ContainsKey(key))
                         {
-                            _clients.Add(new ClientHandler(key,
-                            _clientStreamingSockets[key],
-                            _clientCommunicationSockets[key],
-                            _dbContextFactory.CreateDbContext(),
-                            _serviceProvider));
-
-                            _clientCommunicationSockets.Remove(key);
-                            _clientStreamingSockets.Remove(key);
-
-                            DisplayConnectedClients();
+                            if (_clients.Count < _clientCountLimit)
+                            {
+                                _clients.Add(new ClientHandler(key,
+                                _clientStreamingSockets[key],
+                                _clientCommunicationSockets[key],
+                                _dbContextFactory.CreateDbContext(),
+                                _serviceProvider));
+                                _clientCommunicationSockets.Remove(key);
+                                _clientStreamingSockets.Remove(key);
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    _clientCommunicationSockets[key]?.Close();
+                                    _clientCommunicationSockets[key]?.Dispose();
+                                    _clientCommunicationSockets.Remove(key);
+                                    _clientStreamingSockets[key]?.Close();
+                                    _clientStreamingSockets[key]?.Dispose();
+                                    _clientStreamingSockets.Remove(key);
+                                }
+                                catch { }
+                            }
                             break;
                         }
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Asks the window to display the connected clients.
-        /// </summary>
-        private void DisplayConnectedClients()
-        {
-            List<string> connectedClients = new List<string>();
-            foreach (var client in _clients)
-            {
-                connectedClients.Add(client.ClientId);
-            }
-            new ServerEvent(EventType.DisplayConnectedClients, true, connectedClients);
         }
 
         private string GetClientFullId(string ClientId, IPEndPoint? iPEndPoint)
@@ -380,6 +415,24 @@ namespace Server_Application.Server
             return $"{ClientId}@";
         }
 
+        public void ChangeClientCountLimit(int limit)
+        {
+            bool acquiredLock = false;
+            try
+            {
+                Monitor.TryEnter(_clientCountLimitChangeLock, ref acquiredLock);
+                if (acquiredLock)
+                {
+                    _clientCountLimit = limit;
+                    TerminateClients(TerminateClientsMode.Limit);
+                }
+            }
+            finally
+            {
+                Monitor.Exit(_clientCountLimitChangeLock);
+            }
+        }
+
         /// <summary>
         /// Starts the controller.
         /// </summary>
@@ -389,7 +442,7 @@ namespace Server_Application.Server
             try
             {
                 Monitor.TryEnter(_engineStateLock, ref acquiredLock);
-                if(acquiredLock)
+                if (acquiredLock)
                 {
                     if (!IsRunning)
                     {
@@ -417,10 +470,10 @@ namespace Server_Application.Server
                 {
                     if (IsRunning)
                     {
-                        ExitCommunicationListeningLoop(); 
+                        ExitCommunicationListeningLoop();
                         ExitStreamingListeningLoop();
                         ExitCreateClientHandlerLoop();
-                        TerminateClients(); // Order is important
+                        TerminateClients(TerminateClientsMode.All);
                         ExitInternalRequestLoop();
                         IsRunning = false;
                     }

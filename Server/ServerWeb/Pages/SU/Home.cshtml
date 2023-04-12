@@ -5,11 +5,18 @@
     ViewData["Title"] = "Home";
 }
 
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-shield" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">@Model.UserEmail</h4>
+    <div class="text-center">
+    </div>
+</div>
 
-
-<div class="container" style="position:absolute; top:15%;">
+<div class="container" style="margin-top:100px;">
     <div class="row align-items-center h-100">
-        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+        <div class="col-sm-3 mx-auto mb-5" style="height: 40vh;">
             <div style="display: flex; justify-content: center;">
                 <span class="oi oi-shield" style="font-size: 7em;"></span>
             </div>
@@ -19,7 +26,7 @@
                 <a asp-page="/SU/SuperUserRole" class="btn btn-primary">Manage</a>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+        <div class="col-sm-3 mx-auto mb-5" style="height: 40vh;">
             <div style="display: flex; justify-content: center;">
                 <span class="oi oi-person" style="font-size: 7em;"></span>
             </div>
@@ -29,7 +36,7 @@
                 <a asp-page="/SU/AdministratorRole" class="btn btn-primary">Manage</a>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+        <div class="col-sm-3 mx-auto mb-5" style="height: 40vh;">
             <div style="display: flex; justify-content: center;">
                 <span class="oi oi-cog" style="font-size: 7em;"></span>
             </div>
@@ -39,7 +46,7 @@
                 <a asp-page="/SU/EngineAdministratorRole" class="btn btn-primary">Manage</a>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto" style="height: 40vh;">
+        <div class="col-sm-3 mx-auto mb-5" style="height: 40vh;">
             <div style="display: flex; justify-content: center;">
                 <span class="oi oi-people" style="font-size: 7em;"></span>
             </div>

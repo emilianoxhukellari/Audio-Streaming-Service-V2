@@ -3,3 +3,132 @@
 @{
     ViewData["Title"] = "Help";
 }
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-question-mark" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Help</h4>
+    <div class="text-center">
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Adding Songs</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Administrator you can add songs to the database. This process is achieved via the network, and you need not be physically close to the database.</p>
+
+            <p>The process of adding songs to the database:</p>
+
+            <ol>
+                <li>Input the name of the song.</li>
+                <li>Input the name of the artist.</li>
+                <li>Select a PNG file that represents the image of this song.</li>
+                <li>Select a WAV file that represents the audio file of this song.</li>
+            </ol>
+
+            <p>Keep in mind that selecting other file types is not allowed.</p>
+
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Songs</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Administrator you can search for songs and manage them.</p>
+
+            <p>The process of searching for a song:</p>
+
+            <ol>
+                <li>Input the song name or artist name in the "Search Song" search box.</li>
+                <li>Click on "Search" button.</li>
+                <li>The page will refresh and display the found songs.</li>
+            </ol>
+
+            <p>You do not need to suppy the full song name or artist name. A partial name will work.</p>
+
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Issues</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Administrator you can search for issues and solve them. Issues 
+                are submitted by users that encountered a problem either in the Desktop
+                Application, Web Application, or Songs.
+            </p>
+            <p>
+                When you go to "Issues" page, you will be given the most recent unsolved issues.
+                You can click on the issue and manage it.
+            </p>
+
+            <p>The process of searching for an issue:</p>
+
+            <ol>
+                <li>Input the issue name in the "Search Issue" search box.</li>
+                <li>Click on "Search" button.</li>
+                <li>The page will refresh and display the found issues.</li>
+            </ol>
+
+            <p>The process of solving an issue:</p>
+
+            <ol>
+                <li>Click on any issues.</li>
+                <li>You will be redirected to a page that gives you details about the issue.</li>
+                <li>Perform the necessary actions to solve the issue depending on the issue type.</li>
+                <li>Once the issue is solved, you must give a "Solution Description".</li>
+                <li>Finally, click on "Solve" button.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Updating and Unresolving Issues</h4>
+        </div>
+        <div class="card-body">
+            <p>
+                As an Administrator you can search for solved issues and unresolve or update them. The solved
+                issues were solved by you or another administrator. If for any reason, there is some update
+                on the solution of the issue, you can update the issue. Also, if the solution did not work, 
+                you can unresolve the issue and solve it later.
+            </p>
+
+            <p>The process of searching for a solved issue:</p>
+
+            <ol>
+                <li>Input the issue name in the "Search Issue" search box.</li>
+                <li>Click on "Search" button.</li>
+                <li>The page will refresh and display the found solved issues.</li>
+            </ol>
+
+            <p>The process of updating a solved issue:</p>
+            <ol>
+                <li>Click on the solved issue.</li>
+                <li>Update the solution description.</li>
+                <li>Click on "Solve" button.</li>
+                <li>This will update the previous solution description with the new one.</li>
+            </ol>
+
+            <p>The process of unsolving a solved issue:</p>
+            <ol>
+                <li>Click on the solved issue.</li>
+                <li>Click on "Unresolve" button.</li>
+                <li>This will remove the solution description and set the state of the issue to unresolved.</li>
+            </ol>
+        </div>
+    </div>
+</div>

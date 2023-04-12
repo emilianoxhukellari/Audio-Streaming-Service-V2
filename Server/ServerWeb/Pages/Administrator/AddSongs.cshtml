@@ -28,12 +28,12 @@
         </div>
         <div class="mb-3">
             <label asp-for="SongInput.ImageFile" class="form-label"></label>
-            <input class="form-control" asp-for="SongInput.ImageFile" >
+            <input class="form-control" asp-for="SongInput.ImageFile" accept="image/png">
             <span asp-validation-for="SongInput.ImageFile" class="text-danger"></span>
         </div>
         <div class="mb-3">
             <label asp-for="SongInput.SongFile" class="form-label"></label>
-            <input class="form-control" asp-for="SongInput.SongFile" >
+            <input class="form-control" asp-for="SongInput.SongFile" accept="audio/wav">
             <span asp-validation-for="SongInput.SongFile" class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-primary">Add Song</button>

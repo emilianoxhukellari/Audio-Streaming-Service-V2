@@ -165,7 +165,6 @@ namespace AudioEngine.Services
         {
             await Task.Run(_controller.Stop);
 
-
             if (IsRunning != _controller.IsRunning)
             {
                 IsRunning = _controller.IsRunning;

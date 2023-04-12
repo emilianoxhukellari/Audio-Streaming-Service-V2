@@ -1,5 +1,110 @@
 ﻿@page
 @model ServerWeb.Pages.EngineAdministrator.HelpModel
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Help";
 }
+
+<div class="col-sm-2 mx-auto mt-3" style="height: 15vh; width: 50%">
+    <div style="display: flex; justify-content: center;">
+        <span class="oi oi-question-mark" style="font-size: 5em;"></span>
+    </div>
+    <h4 class="text-center mt-3">Help</h4>
+    <div class="text-center">
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Start/Stop</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Engine Administrator, you can turn the Audio Engine on and off.</p>
+
+            <p>The process of turning the Engine on and off:</p>
+
+            <ol>
+                <li>Click on "Start" if the engine is off and click on "Stop" if the engine is on.</li>
+                <li>The Engine has now changed state.</li>
+            </ol>
+
+            <p>The process of changing the state of the engine is very complex in the background.</p>
+
+            <p>Turning the Audio Engine on does the following:</p>
+
+            <ol>
+                <li>Starts communication listening thread. This thread listens for sockets that are used for communication.</li>
+                <li>Starts streaming listening thread. This thread lisetns for songs that are used for streaming audio.</li>
+                <li>Starts create client handler thread. This thread creates client handlers for each desktop user that needs to connect.</li>
+                <li>Starts internal request thread. This thread deals with internal requests.</li>
+            </ol>
+
+            <p>Turning the Audio Engine off does the following: </p>
+            <ol>
+                <li>Stops communication listening thread.</li>
+                <li>Stops streaming listening thread.</li>
+                <li>Stops create client handler thread.</li>
+                <li>Terminates any desktop clients that are connected to the engine.</li>
+                <li>Stops internal request thread.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Desktop App Song Search Limit</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Engine Administrator, you can change the limit of songs that are sent to the desktop clients upon a search request.</p>
+
+            <p>The process of changing the desktop app song search limit:</p>
+
+            <ol>
+                <li>Input the limit in the input field.</li>
+                <li>Click on "Update" button.</li>
+                <li>The limit is changed and dynamically updated for every client and for every Engine Administrator.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Web App Song Search Limit</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Engine Administrator, you can change the limit of songs that are sent to the web application upon a search request from an administrator.</p>
+
+            <p>The process of changing the web app song search limit:</p>
+
+            <ol>
+                <li>Input the limit in the input field.</li>
+                <li>Click on "Update" button.</li>
+                <li>The limit is changed and dynamically updated for every administrator and for every Engine Administrator.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Desktop App Client Count Limit</h4>
+        </div>
+        <div class="card-body">
+            <p>As an Engine Administrator, you can change the maximum number of desktop clients that can be connected to the audio engine at one time.</p>
+
+            <p>The process of changing the desktop app client count limit:</p>
+
+            <ol>
+                <li>Input the limit in the input field.</li>
+                <li>Click on "Update" button.</li>
+                <li>The limit is changed and any excessive desktop clients are terminated.</li>
+            </ol>
+        </div>
+    </div>
+</div>

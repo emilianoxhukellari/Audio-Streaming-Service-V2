@@ -16,7 +16,7 @@ namespace ServerWeb.Services
         public async Task<List<IdentityUser>> GetAllUsersNotInRole(string roleName)
         {
             var roleUsersIds = (await _userManager.GetUsersInRoleAsync(roleName)).Select(x => x.Id).ToArray();
-            return await _userManager.Users.Where(x => !roleUsersIds.Contains(x.Id)).ToListAsync();
+            return await _userManager.Users.AsNoTracking().Where(x => !roleUsersIds.Contains(x.Id)).ToListAsync();
         }
 
         /// <inheritdoc/>

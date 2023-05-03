@@ -2,6 +2,7 @@
 using DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace DataAccess.Services
@@ -39,7 +40,7 @@ namespace DataAccess.Services
         }
 
         /// <inheritdoc/>
-        public async Task<(IdentityUser?, IdentityResult)> Register(string email, string password)
+        public async Task<(IdentityUser?, IdentityResult)> RegisterAsync(string email, string password)
         {
             var user = new IdentityUser
             {

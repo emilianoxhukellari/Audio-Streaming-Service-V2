@@ -22,10 +22,6 @@ namespace ServerWeb.Pages.Administrator
             _audioStoringService = audioStoringService;
         }
 
-        public void OnGet()
-        {
-        }
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)

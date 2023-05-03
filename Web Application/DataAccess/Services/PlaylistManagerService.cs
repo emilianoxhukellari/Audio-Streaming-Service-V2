@@ -22,7 +22,11 @@ namespace DataAccess.Services
             var identityUser = await _userManager.GetUserAsync(user);
             if (identityUser is not null)
             {
-                return await _streamingDbContext.Playlists.Where(p => p.UserId == identityUser.Id && p.IsDeleted == false).CountAsync();
+                return await _streamingDbContext
+                    .Playlists
+                    .AsNoTracking()
+                    .Where(p => p.UserId == identityUser.Id && p.IsDeleted == false)
+                    .CountAsync();
             }
             return 0;
         }
@@ -33,7 +37,11 @@ namespace DataAccess.Services
             var identityUser = await _userManager.GetUserAsync(user);
             if (identityUser is not null)
             {
-                return await _streamingDbContext.Playlists.Where(p => p.UserId == identityUser.Id && p.IsDeleted == true).CountAsync();
+                return await _streamingDbContext
+                    .Playlists
+                    .AsNoTracking()
+                    .Where(p => p.UserId == identityUser.Id && p.IsDeleted == true)
+                    .CountAsync();
             }
             return 0;
         }
@@ -44,7 +52,12 @@ namespace DataAccess.Services
             var identityUser = await _userManager.GetUserAsync(user);
             if (identityUser is not null)
             {
-                return await _streamingDbContext.Playlists.Where(p => p.UserId == identityUser.Id && p.IsDeleted == true).Include(p => p.PlaylistSongs).ToListAsync();
+                return await _streamingDbContext
+                    .Playlists
+                    .AsNoTracking()
+                    .Where(p => p.UserId == identityUser.Id && p.IsDeleted == true)
+                    .Include(p => p.PlaylistSongs)
+                    .ToListAsync();
             }
             return new List<Playlist>(0);
         }
@@ -55,7 +68,12 @@ namespace DataAccess.Services
             var identityUser = await _userManager.GetUserAsync(user);
             if (identityUser is not null)
             {
-                return await _streamingDbContext.Playlists.Where(p => p.UserId == identityUser.Id && p.IsDeleted == false).Include(p => p.PlaylistSongs).ToListAsync();
+                return await _streamingDbContext
+                    .Playlists
+                    .AsNoTracking()
+                    .Where(p => p.UserId == identityUser.Id && p.IsDeleted == false)
+                    .Include(p => p.PlaylistSongs)
+                    .ToListAsync();
             }
             return new List<Playlist>(0);
         }
@@ -67,7 +85,10 @@ namespace DataAccess.Services
 
             if (identityUser is not null)
             {
-                return await _streamingDbContext.Playlists.AnyAsync(p => p.UserId == identityUser.Id && p.PlaylistId == playlistId);
+                return await _streamingDbContext
+                    .Playlists
+                    .AsNoTracking()
+                    .AnyAsync(p => p.UserId == identityUser.Id && p.PlaylistId == playlistId);
             }
             return false;
         }
@@ -75,7 +96,7 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public async Task<Playlist?> GetPlaylistAsync(int id)
         {
-            return await _streamingDbContext.Playlists.FindAsync(id);
+            return await _streamingDbContext.Playlists.AsNoTracking().FirstOrDefaultAsync(p => p.PlaylistId == id);
         }
 
         /// <inheritdoc/>
@@ -140,6 +161,7 @@ namespace DataAccess.Services
         public async Task<List<Song>> GetSongsAsync(int playlistId)
         {
             var songs = await _streamingDbContext.PlaylistSongs
+                .AsNoTracking()
                 .Where(ps => ps.PlaylistId == playlistId)
                 .Select(ps => ps.Song)
                 .ToListAsync();
@@ -213,6 +235,7 @@ namespace DataAccess.Services
         public List<int> GetPlaylistIds(string userId)
         {
             return _streamingDbContext.Playlists
+                .AsNoTracking()
                 .Where(p => p.UserId == userId && p.IsDeleted != true)
                 .Select(p => p.PlaylistId)
                 .ToList();
@@ -222,6 +245,7 @@ namespace DataAccess.Services
         public string? GetPlaylistName(int playlistId)
         {
             return _streamingDbContext.Playlists
+                .AsNoTracking()
                 .Where(p => p.PlaylistId == playlistId)
                 .Select(p => p.PlaylistName)
                 .FirstOrDefault();

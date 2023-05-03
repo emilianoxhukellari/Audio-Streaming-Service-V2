@@ -59,6 +59,9 @@ namespace Server_Application.Server
         private readonly byte[] EXIT = Encoding.UTF8.GetBytes("exit");
         private readonly byte[] MOD1 = Encoding.UTF8.GetBytes("mod1"); // Regular streaming
         private readonly byte[] MOD2 = Encoding.UTF8.GetBytes("mod2"); // Optimization streaming
+        private readonly byte[] OK = BitConverter.GetBytes(true);
+        private readonly byte[] NOT_OK = BitConverter.GetBytes(false);
+
         private byte[] _lastSongData;
 
         private volatile bool _exitStreamingLoop;
@@ -175,8 +178,16 @@ namespace Server_Application.Server
             ISongManagerService songManagerService = _serviceScope.ServiceProvider.GetRequiredService<ISongManagerService>();
             song = songManagerService.GetSongFromDatabase(songId);
 
+            if(song is null)
+            {
+                SendSSL(NOT_OK, 1, _streamingSSL);
+                return;
+            }
+
             if (song != null)
             {
+                SendSSL(OK, 1, _streamingSSL);
+
                 byte[] songData = File.ReadAllBytes(song.SongFileName);
                 byte[] header = new byte[44];
                 Buffer.BlockCopy(songData, 0, header, 0, 44);
@@ -680,7 +691,7 @@ namespace Server_Application.Server
             IdentityUser? user;
             IdentityResult identityResult;
 
-            (user, identityResult) = await registrationService.Register(email, password);
+            (user, identityResult) = await registrationService.RegisterAsync(email, password);
 
             if (identityResult.Succeeded)
             {

@@ -35,7 +35,7 @@ namespace ServerWeb.Pages.Account
                 IdentityUser? user;
                 IdentityResult registerResult;
 
-                (user, registerResult) = await _registrationService.Register(Register.Email, Register.Password);
+                (user, registerResult) = await _registrationService.RegisterAsync(Register.Email, Register.Password);
 
                 if (user != null)
                 {

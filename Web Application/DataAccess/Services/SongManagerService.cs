@@ -17,7 +17,7 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public async Task<int> GetNumberOfSongsAsync()
         {
-            return await _context.Songs.CountAsync();
+            return await _context.Songs.AsNoTracking().CountAsync();
         }
 
         /// <inheritdoc/>
@@ -58,9 +58,10 @@ namespace DataAccess.Services
         {
             List<Song> songs;
 
-            songs = await _context.Songs.Where(
+            songs = await _context.Songs.AsNoTracking().Where(
                 s => s.NormalizedSongName.Contains(GetNormalized(search))
-                || s.NormalizedArtistname.Contains(GetNormalized(search))).ToListAsync();
+                || s.NormalizedArtistname.Contains(GetNormalized(search))
+                ).ToListAsync();
 
             if (songs.Count() > _dataAccessConfigurationService.DesktopAppSongSearchLimit)
             {
@@ -73,7 +74,7 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public async Task<List<Song>> GetSongsForWebAppAsync()
         {
-            var songs = await _context.Songs.ToListAsync();
+            var songs = await _context.Songs.AsNoTracking().ToListAsync();
           
             if (songs.Count() > _dataAccessConfigurationService.WebAppSongSearchLimit)
             {
@@ -88,9 +89,10 @@ namespace DataAccess.Services
         {
             List<Song> songs;
 
-            songs = _context.Songs.Where(
+            songs = _context.Songs.AsNoTracking().Where(
                 s => s.NormalizedSongName.Contains(GetNormalized(search)) 
-                || s.NormalizedArtistname.Contains(GetNormalized(search))).ToList();
+                || s.NormalizedArtistname.Contains(GetNormalized(search))
+                ).ToList();
 
             if (songs.Count() > _dataAccessConfigurationService.DesktopAppSongSearchLimit)
             {
@@ -102,18 +104,20 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public Song? GetSongFromDatabase(int songId)
         {
-            return _context.Songs.Find(songId);
+            return _context.Songs.AsNoTracking().FirstOrDefault(s => s.SongId == songId);
         }
 
         /// <inheritdoc/>
         public async Task<Song?> GetSongFromDatabaseAsync(int songId)
+
         {
-            return await _context.Songs.FindAsync(songId);
+            return await _context.Songs.AsNoTracking().FirstOrDefaultAsync(s => s.SongId == songId);
         }
 
         public List<int> GetSongIds(int playlistId)
         {
             return _context.PlaylistSongs
+                .AsNoTracking()
                 .Where(ps => ps.PlaylistId == playlistId)
                 .Select(ps => ps.SongId)
                 .ToList();

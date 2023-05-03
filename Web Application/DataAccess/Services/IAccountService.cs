@@ -12,7 +12,7 @@ namespace DataAccess.Services
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<(IdentityUser?, IdentityResult)> Register(string email, string password);
+        Task<(IdentityUser?, IdentityResult)> RegisterAsync(string email, string password);
 
         /// <summary>
         /// Delete a user from both databases.

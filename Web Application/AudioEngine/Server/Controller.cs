@@ -3,6 +3,8 @@ using DataAccess.Contexts;
 using DataAccess.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -19,7 +21,7 @@ namespace Server_Application.Server
     {
         private Dictionary<string, SslStream> _clientStreamingSockets;
         private Dictionary<string, SslStream> _clientCommunicationSockets;
-        private List<ClientHandler> _clients;
+        private ObservableCollection<ClientHandler> _clients;
         private readonly int _portCommunication;
         private readonly int _portStreaming;
         private readonly string _host;
@@ -44,10 +46,10 @@ namespace Server_Application.Server
         private readonly IAudioEngineConfigurationService _audioEngineConfigurationService;
         private readonly X509Certificate _x509Certificate;
 
-        private volatile bool _exitCommunicationListeningLoop;
-        private volatile bool _exitStreamingListeningLoop;
-        private volatile bool _exitCreateClientHandlerLoop;
-        private volatile bool _exitHandleInternalRequestLoop;
+        private volatile bool _exitCommunicationListeningLoop = true;
+        private volatile bool _exitStreamingListeningLoop = true;
+        private volatile bool _exitCreateClientHandlerLoop = true ;
+        private volatile bool _exitHandleInternalRequestLoop = true;
 
         public bool IsRunning { get; private set; }
         public int ConnectedCount { get { return _clients.Count; } }
@@ -74,7 +76,8 @@ namespace Server_Application.Server
             _handleInternalRequestsThread.IsBackground = true;
             _newClient = new AutoResetEvent(false);
             _newInternalRequest = new AutoResetEvent(false);
-            _clients = new List<ClientHandler>();
+            _clients = new ObservableCollection<ClientHandler>();
+            _clients.CollectionChanged += ClientsCollectionChanged;
             _host = _audioEngineConfigurationService.Host;
             _portCommunication = _audioEngineConfigurationService.PortCommunication;
             _portStreaming = _audioEngineConfigurationService.PortStreaming;
@@ -86,6 +89,44 @@ namespace Server_Application.Server
             IsRunning = false;
             InitializeClientCountLimit(ref _clientCountLimit);
             Listen(EventType.InternalRequest, new ServerEventCallback(AddInternalRequest));
+        }
+
+        /// <summary>
+        /// Check if the application has reached limit of supported clients.
+        /// </summary>
+        /// <returns></returns>
+        private bool HasReachedClientLimit()
+        {
+            return ConnectedCount >= ClientCountLimit;
+        }
+
+        /// <summary>
+        /// 1) If client limit has been reached, it will turn off communication and listening loop if not already off.
+        /// 2) If client limit has not been reached, it will turn on communication and listening loop if not already on.
+        /// </summary>
+        private void PerformLimitValidationAndApply()
+        {
+            if (HasReachedClientLimit() && !_exitCommunicationListeningLoop && !_exitStreamingListeningLoop)
+            {
+                ExitCommunicationListeningLoop();
+                ExitStreamingListeningLoop();
+            }
+
+            else if (!HasReachedClientLimit() && _exitCommunicationListeningLoop && _exitStreamingListeningLoop)
+            {
+                StartCommunicationListeningLoop();
+                StartStreamingListeningLoop();
+            }
+        }
+
+        /// <summary>
+        /// Called when _clients ObservableCollection is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClientsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            PerformLimitValidationAndApply();
         }
 
         private void InitializeClientCountLimit(ref int clientCountLimit)
@@ -161,17 +202,23 @@ namespace Server_Application.Server
 
         private void StartInternalRequestLoop()
         {
-            _handleInternalRequestsThread = new Thread(InternalRequestLoop);
-            _handleInternalRequestsThread.IsBackground = true;
-            _exitHandleInternalRequestLoop = false;
-            _handleInternalRequestsThread.Start();
+            if(_exitHandleInternalRequestLoop)
+            {
+                _handleInternalRequestsThread = new Thread(InternalRequestLoop);
+                _handleInternalRequestsThread.IsBackground = true;
+                _exitHandleInternalRequestLoop = false;
+                _handleInternalRequestsThread.Start();
+            }
         }
 
         private void ExitInternalRequestLoop()
         {
-            _exitHandleInternalRequestLoop = true;
-            _newInternalRequest.Set();
-            _handleInternalRequestsThread.Join();
+            if(!_exitHandleInternalRequestLoop)
+            {
+                _exitHandleInternalRequestLoop = true;
+                _newInternalRequest.Set();
+                _handleInternalRequestsThread.Join();
+            }
         }
 
         private void InternalRequestLoop()
@@ -199,25 +246,31 @@ namespace Server_Application.Server
 
         private void ExitStreamingListeningLoop()
         {
-            _exitStreamingListeningLoop = true;
-            _streamingSocket?.Close();
-            _streamingSocket?.Dispose();
-            _streamingSocket = null;
-            _listenerStreamingThread.Join();
+            if(!_exitStreamingListeningLoop)
+            {
+                _exitStreamingListeningLoop = true;
+                _streamingSocket?.Close();
+                _streamingSocket?.Dispose();
+                _streamingSocket = null;
+                _listenerStreamingThread.Join();
+            }
         }
 
         private void StartStreamingListeningLoop()
         {
-            _listenerStreamingThread = new Thread(StreamingListeningLoop);
-            _listenerStreamingThread.IsBackground = true;
-            _exitStreamingListeningLoop = false;
-
-            if (_streamingSocket == null || !_streamingSocket.IsBound)
+            if(_exitStreamingListeningLoop)
             {
-                _streamingSocket = CreateSocket(_host, _portStreaming);
-            }
+                _listenerStreamingThread = new Thread(StreamingListeningLoop);
+                _listenerStreamingThread.IsBackground = true;
+                _exitStreamingListeningLoop = false;
 
-            _listenerStreamingThread.Start();
+                if (_streamingSocket == null || !_streamingSocket.IsBound)
+                {
+                    _streamingSocket = CreateSocket(_host, _portStreaming);
+                }
+
+                _listenerStreamingThread.Start();
+            }
         }
 
         /// <summary>
@@ -232,26 +285,17 @@ namespace Server_Application.Server
                 {
                     if (_streamingSocket != null)
                     {
-                        lock (_criticalStreamingListeningOperation)
+                        Socket socket = _streamingSocket.Accept();
+                        IPEndPoint? ipEndPoint = (IPEndPoint?)socket.RemoteEndPoint;
+                        SslStream sslStream = new SslStream(new NetworkStream(socket, true), false);
+                        sslStream.AuthenticateAsServer(_x509Certificate, false, true);
+
+                        string clientId = Encoding.UTF8.GetString(ReceiveTCP(6, sslStream));
+                        string clientFullId = GetClientFullId(clientId, ipEndPoint);
+                        lock (_lock)
                         {
-                            if (ConnectedCount >= ClientCountLimit)
-                            {
-                                Thread.Sleep(300);
-                                continue;
-                            }
-
-                            Socket socket = _streamingSocket.Accept();
-                            IPEndPoint? ipEndPoint = (IPEndPoint?)socket.RemoteEndPoint;
-                            SslStream sslStream = new SslStream(new NetworkStream(socket, true), false);
-                            sslStream.AuthenticateAsServer(_x509Certificate, false, true);
-
-                            string clientId = Encoding.UTF8.GetString(ReceiveTCP(6, sslStream));
-                            string clientFullId = GetClientFullId(clientId, ipEndPoint);
-                            lock (_lock)
-                            {
-                                _clientStreamingSockets.Add(clientFullId, sslStream);
-                                _newClient.Set();
-                            }
+                            _clientStreamingSockets.Add(clientFullId, sslStream);
+                            _newClient.Set();
                         }
                     }
                 }
@@ -266,23 +310,29 @@ namespace Server_Application.Server
 
         private void StartCommunicationListeningLoop()
         {
-            _listenerCommunicationThread = new Thread(CommuncationListeningLoop);
-            _listenerCommunicationThread.IsBackground = true;
-            _exitCommunicationListeningLoop = false;
-            if (_communicationSocket == null || !_communicationSocket.IsBound)
+            if(_exitCommunicationListeningLoop)
             {
-                _communicationSocket = CreateSocket(_host, _portCommunication);
+                _listenerCommunicationThread = new Thread(CommuncationListeningLoop);
+                _listenerCommunicationThread.IsBackground = true;
+                _exitCommunicationListeningLoop = false;
+                if (_communicationSocket == null || !_communicationSocket.IsBound)
+                {
+                    _communicationSocket = CreateSocket(_host, _portCommunication);
+                }
+                _listenerCommunicationThread.Start();
             }
-            _listenerCommunicationThread.Start();
         }
 
         private void ExitCommunicationListeningLoop()
         {
-            _exitCommunicationListeningLoop = true;
-            _communicationSocket?.Close();
-            _communicationSocket?.Dispose();
-            _communicationSocket = null;
-            _listenerCommunicationThread.Join();
+            if(!_exitCommunicationListeningLoop)
+            {
+                _exitCommunicationListeningLoop = true;
+                _communicationSocket?.Close();
+                _communicationSocket?.Dispose();
+                _communicationSocket = null;
+                _listenerCommunicationThread.Join();
+            }
         }
 
         /// <summary>
@@ -298,27 +348,17 @@ namespace Server_Application.Server
                 {
                     if (_communicationSocket != null)
                     {
+                        Socket socket = _communicationSocket.Accept();
+                        IPEndPoint? ipEndPoint = (IPEndPoint?)socket.RemoteEndPoint;
+                        SslStream sslStream = new SslStream(new NetworkStream(socket, true), false);
+                        sslStream.AuthenticateAsServer(_x509Certificate, false, false);
 
-                        lock (_criticalCommunicationListeningOperation)
+                        string clientId = Encoding.UTF8.GetString(ReceiveTCP(6, sslStream));
+                        string clientFullId = GetClientFullId(clientId, ipEndPoint);
+                        lock (_lock)
                         {
-                            if (ConnectedCount >= ClientCountLimit)
-                            {
-                                Thread.Sleep(300);
-                                continue;
-                            }
-
-                            Socket socket = _communicationSocket.Accept();
-                            IPEndPoint? ipEndPoint = (IPEndPoint?)socket.RemoteEndPoint;
-                            SslStream sslStream = new SslStream(new NetworkStream(socket, true), false);
-                            sslStream.AuthenticateAsServer(_x509Certificate, false, false);
-
-                            string clientId = Encoding.UTF8.GetString(ReceiveTCP(6, sslStream));
-                            string clientFullId = GetClientFullId(clientId, ipEndPoint);
-                            lock (_lock)
-                            {
-                                _clientCommunicationSockets.Add(clientFullId, sslStream);
-                                _newClient.Set();
-                            }
+                            _clientCommunicationSockets.Add(clientFullId, sslStream);
+                            _newClient.Set();
                         }
                     }
                 }
@@ -334,16 +374,22 @@ namespace Server_Application.Server
 
         private void StartCreateClientHandlerLoop()
         {
-            _createClientHandlerTask = new Task(CreateClientHandlerLoop);
-            _exitCreateClientHandlerLoop = false;
-            _createClientHandlerTask.Start();
+            if(_exitCreateClientHandlerLoop)
+            {
+                _createClientHandlerTask = new Task(CreateClientHandlerLoop);
+                _exitCreateClientHandlerLoop = false;
+                _createClientHandlerTask.Start();
+            }
         }
 
         private void ExitCreateClientHandlerLoop()
         {
-            _exitCreateClientHandlerLoop = true;
-            _newClient.Set();
-            _createClientHandlerTask.Wait();
+            if(!_exitCreateClientHandlerLoop)
+            {
+                _exitCreateClientHandlerLoop = true;
+                _newClient.Set();
+                _createClientHandlerTask.Wait();
+            }
         }
 
         /// <summary>
@@ -419,6 +465,7 @@ namespace Server_Application.Server
                 {
                     _clientCountLimit = limit;
                     TerminateClients(TerminateClientsMode.Limit);
+                    PerformLimitValidationAndApply();
                 }
             }
             finally

@@ -20,9 +20,6 @@ namespace ServerWeb.Pages.Account
             _indexRedirection = indexRedirection;
             _accountService = accountService;
         }
-        public void OnGet()
-        {
-        }
 
         public async Task<IActionResult> OnPostDeleteAccountConfirmAsync()
         {

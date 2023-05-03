@@ -3,6 +3,7 @@ using Client_Application.Client.Network;
 using Client_Application.WaveOut;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -42,6 +43,8 @@ namespace Client_Application.Client.Core
         private readonly byte[] EXIT = Encoding.UTF8.GetBytes("exit");
         private readonly byte[] MOD1 = Encoding.UTF8.GetBytes("mod1");
         private readonly byte[] MOD2 = Encoding.UTF8.GetBytes("mod2");
+        private readonly byte[] OK = BitConverter.GetBytes(true);
+        private readonly byte[] NOT_OK = BitConverter.GetBytes(false);
         // NETWORKING COMMANDS
 
         // CALLBACKS
@@ -260,6 +263,14 @@ namespace Client_Application.Client.Core
             DisplayQueue();
         }
 
+        private bool RequestSong(int songId)
+        {
+            byte[] songIdBytes = BitConverter.GetBytes(songId);
+            _dualSocket.StreamingSSL.SendSSL(MOD1, 4);
+            _dualSocket.StreamingSSL.SendSSL(songIdBytes, 4);
+            return _dualSocket.StreamingSSL.ReceiveSSL(1).SequenceEqual(OK);
+        }
+
         private void StartSong() // Start playing sound.
         {
             if (_queue.Count > 0 && _dualSocket.Connected)
@@ -270,17 +281,21 @@ namespace Client_Application.Client.Core
                     TerminateReceive();
                     Song currentSong = _queue[_currentSongIndex];
                     int requestSongId = currentSong.SongId;
-                    byte[] requestSongIdBytes = BitConverter.GetBytes(requestSongId);
+                    bool success;
+
                     lock (_lock)
                     {
-                        _dualSocket.StreamingSSL.SendSSL(MOD1, 4);
-                        _dualSocket.StreamingSSL.SendSSL(requestSongIdBytes, 4);
+                        success = RequestSong(requestSongId);
                     }
-                    StartReceiveData();
-                    _preparedFlag.WaitOne();
-                    _waveOutPlayer.Play();
-                    SendCurrentSongInfo(currentSong);
-                    DisplayQueue(true);
+
+                    if(success)
+                    {
+                        StartReceiveData();
+                        _preparedFlag.WaitOne();
+                        _waveOutPlayer.Play();
+                        SendCurrentSongInfo(currentSong);
+                        DisplayQueue(true);
+                    }
                 }
                 catch (Exception ex) when (ex is IOException or ExceptionSSL or SocketException)
                 {

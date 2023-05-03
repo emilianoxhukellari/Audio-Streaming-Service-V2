@@ -1,4 +1,5 @@
 ﻿using DataAccess.Contexts;
+using DataAccess.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,7 +21,7 @@ namespace ServerWeb.Extensions
             using var scope = app.Services.CreateScope();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var authDbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
 
             var roles = app.Configuration.GetSection("Roles").Get<List<string>>();
 
@@ -36,23 +37,16 @@ namespace ServerWeb.Extensions
             }
 
             List<string> suData = app.Configuration.GetSection("SU").Get<List<string>>()!;
+            var userControlService = scope.ServiceProvider.GetRequiredService<IUserControlService>();
 
             if (!authDbContext.Users.Any(user => user.Email == suData[0]))
             {
-
-                var user = new IdentityUser()
-                {
-                    UserName = suData[0],
-                    Email = suData[0]
-                };
-
-                await userManager.CreateAsync(user, suData[1]);
-                await userManager.AddToRoleAsync(user, "SU");
+                await accountService.RegisterAsync(suData[0], suData[1]);
+                await userControlService.ChangeUserRoleToAsync(suData[0], "SU");
                 return app;
             }
             else
             {
-                var userControlService = scope.ServiceProvider.GetRequiredService<IUserControlService>();
                 await userControlService.ChangeUserRoleToAsync(suData[0], "SU");
                 return app;
             }

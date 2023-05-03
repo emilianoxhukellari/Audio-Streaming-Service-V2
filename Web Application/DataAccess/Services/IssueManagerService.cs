@@ -36,7 +36,7 @@ namespace DataAccess.Services
             var identityUser = await _userManager.GetUserAsync(user);
             if (identityUser is not null)
             {
-                return await _streamingDbContext.Issues.Where(i => i.SubmitterId == identityUser.Id).CountAsync();
+                return await _streamingDbContext.Issues.AsNoTracking().Where(i => i.SubmitterId == identityUser.Id).CountAsync();
             }
             return 0;
         }
@@ -46,11 +46,11 @@ namespace DataAccess.Services
         {
             if (issueType == IssueType.Solved)
             {
-                return await _streamingDbContext.Issues.Where(i => i.IsSolved).CountAsync();
+                return await _streamingDbContext.Issues.AsNoTracking().Where(i => i.IsSolved).CountAsync();
             }
             else if (issueType == IssueType.Unsolved)
             {
-                return await _streamingDbContext.Issues.Where(i => !i.IsSolved).CountAsync();
+                return await _streamingDbContext.Issues.AsNoTracking().Where(i => !i.IsSolved).CountAsync();
             }
             return 0;
         }
@@ -80,13 +80,14 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public async Task<bool> SolveIssueAsync(int issueId, string solutionDescription, ClaimsPrincipal user)
         {
-            var issue = await GetIssueAsync(issueId);
+            var issue = await _streamingDbContext.Issues.FindAsync(issueId);
             var identityUser = await _userManager.GetUserAsync(user);
             if (issue is not null && identityUser is not null)
             {
                 issue.ResolverId = identityUser.Id;
                 issue.SolutionDescription = solutionDescription;
                 issue.IsSolved = true;
+                _streamingDbContext.Update(issue);
                 await _streamingDbContext.SaveChangesAsync();
                 return true;
             }
@@ -102,6 +103,7 @@ namespace DataAccess.Services
                 issue.ResolverId = null;
                 issue.SolutionDescription = null;
                 issue.IsSolved = false;
+                _streamingDbContext.Update(issue);
                 await _streamingDbContext.SaveChangesAsync();
                 return true;
             }
@@ -114,15 +116,15 @@ namespace DataAccess.Services
             List<Issue> issues = new List<Issue>(0);
             if (issueRetrieveMode == IssueRetrieveMode.NonSolved)
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == false).ToListAsync();
+                issues = await _streamingDbContext.Issues.AsNoTracking().Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == false).ToListAsync();
             }
             else if (issueRetrieveMode == IssueRetrieveMode.Solved)
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == true).ToListAsync();
+                issues = await _streamingDbContext.Issues.AsNoTracking().Where(i => i.TitleNormalized.Contains(GetNormalized(pattern)) && i.IsSolved == true).ToListAsync();
             }
             else if (issueRetrieveMode == IssueRetrieveMode.All)
             {
-                issues = await _streamingDbContext.Issues.Where(i => i.TitleNormalized.Contains(GetNormalized(pattern))).ToListAsync();
+                issues = await _streamingDbContext.Issues.AsNoTracking().Where(i => i.TitleNormalized.Contains(GetNormalized(pattern))).ToListAsync();
             }
             return issues;
         }
@@ -134,6 +136,7 @@ namespace DataAccess.Services
             if (issueRetrieveMode == IssueRetrieveMode.NonSolved)
             {
                 issues = await _streamingDbContext.Issues
+                                        .AsNoTracking()
                                         .Where(i => i.IsSolved == false)
                                         .OrderByDescending(i => i.Date)
                                         .Take(maxCount)
@@ -142,6 +145,7 @@ namespace DataAccess.Services
             else if (issueRetrieveMode == IssueRetrieveMode.Solved)
             {
                 issues = await _streamingDbContext.Issues
+                                        .AsNoTracking()
                                         .Where(i => i.IsSolved == true)
                                         .OrderByDescending(i => i.Date)
                                         .Take(maxCount)
@@ -150,6 +154,7 @@ namespace DataAccess.Services
             else if (issueRetrieveMode == IssueRetrieveMode.All)
             {
                 issues = await _streamingDbContext.Issues
+                                        .AsNoTracking()   
                                         .OrderByDescending(i => i.Date)
                                         .Take(maxCount)
                                         .ToListAsync();
@@ -160,16 +165,16 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public async Task<Issue?> GetIssueAsync(int issueId)
         {
-            return await _streamingDbContext.Issues.FindAsync(issueId);
+            return await _streamingDbContext.Issues.AsNoTracking().FirstOrDefaultAsync(i => i.Id == issueId);
         }
 
         /// <inheritdoc/>
         public async Task<IdentityUser?> GetIssueResolverAsync(int issueId)
         {
-            var issue = await _streamingDbContext.Issues.FindAsync(issueId);
+            var issue = await _streamingDbContext.Issues.AsNoTracking().FirstOrDefaultAsync(i => i.Id == issueId);
             if (issue != null)
             {
-                return await _identityDbContext.Users.FindAsync(issue.ResolverId);
+                return await _identityDbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == issue.ResolverId);
             }
             return null;
         }
@@ -177,10 +182,10 @@ namespace DataAccess.Services
         /// <inheritdoc/>
         public async Task<IdentityUser?> GetIssueSubmitterAsync(int issueId)
         {
-            var issue = await _streamingDbContext.Issues.FindAsync(issueId);
+            var issue = await _streamingDbContext.Issues.AsNoTracking().FirstOrDefaultAsync(i => i.Id == issueId);
             if (issue != null)
             {
-                return await _identityDbContext.Users.FindAsync(issue.SubmitterId);
+                return await _identityDbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == issue.SubmitterId);
             }
             return null;
         }

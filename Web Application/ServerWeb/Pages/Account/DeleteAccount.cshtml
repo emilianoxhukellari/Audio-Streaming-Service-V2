@@ -1,0 +1,19 @@
+﻿@page
+@model ServerWeb.Pages.Account.DeleteAccountModel
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<form method="post">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-12 col-lg-4">
+                <p class="text-center h5">Are you sure you want to delete this account?</p>
+                <div class="text-center">
+                    <button class="btn btn-primary" asp-page-handler="DeleteAccountConfirm">Yes</button>
+                    <button class="btn btn-light border-dark" asp-page-handler="DeleteAccountReject">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

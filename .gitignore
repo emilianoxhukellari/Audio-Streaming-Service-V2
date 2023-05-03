@@ -1,6 +1,6 @@
-/Server/.vs/
-/Client Application/.vs/
-/Server/DataAccess/Data/
+/Web Application/.vs/
+/Deskto Application/.vs/
+/Web Application/DataAccess/Data/
 # User-specific files
 *.suo
 *.user
